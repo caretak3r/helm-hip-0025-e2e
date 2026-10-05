@@ -1,0 +1,13 @@
+apiVersion: v3
+name: hip-subcharts-cycle
+description: Subchart dependency cycle (a depends-on b, b depends-on a)
+version: 0.1.0
+dependencies:
+  - name: a
+    version: 0.1.0
+    repository: file://charts/a
+    depends-on: [b]
+  - name: b
+    version: 0.1.0
+    repository: file://charts/b
+    depends-on: [a]

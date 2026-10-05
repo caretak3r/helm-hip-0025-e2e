@@ -1,0 +1,24 @@
+{{- /* slow-ready Deployment for subcharts: (dict "root" $ "name" "x") */ -}}
+{{- define "e2e.workload.rabbitmq" -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: {{ .name }}}
+  template:
+    metadata:
+      labels: {app: {{ .name }}}
+    spec:
+      terminationGracePeriodSeconds: 0
+      containers:
+        - name: web
+          image: {{ .root.Values.image }}
+          imagePullPolicy: IfNotPresent
+          readinessProbe:
+            httpGet: {path: /, port: 80}
+            initialDelaySeconds: {{ .root.Values.readyDelay }}
+            periodSeconds: 1
+{{- end -}}

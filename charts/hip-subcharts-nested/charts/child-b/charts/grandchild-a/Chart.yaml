@@ -1,0 +1,4 @@
+apiVersion: v3
+name: grandchild-a
+description: deepest level subchart
+version: 0.1.0

@@ -1,0 +1,4 @@
+apiVersion: v3
+name: hip-readiness-gate
+description: HIP-0025 R36 custom readiness gates sequencing - Probe gates Deployment
+version: 0.1.0

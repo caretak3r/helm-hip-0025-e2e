@@ -1,0 +1,4 @@
+apiVersion: v3
+name: nginx
+description: nginx subchart stub
+version: 0.1.0

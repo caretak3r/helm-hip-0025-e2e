@@ -1,0 +1,23 @@
+# The three "Unsequenced Resources" cases: deployed after every sequenced group.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: loose            # lacks annotations
+data: {case: no-annotations}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: orphan           # depends on a group that does not exist -> warning
+  annotations:
+    helm.sh/resource-group: orphan
+    helm.sh/depends-on/resource-groups: '["no-such-group"]'
+data: {case: missing-dependency}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lonely           # isolated group: no edges in or out -> warning
+  annotations:
+    helm.sh/resource-group: lonely
+data: {case: isolated-group}

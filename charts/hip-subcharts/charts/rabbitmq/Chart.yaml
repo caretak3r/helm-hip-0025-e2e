@@ -1,0 +1,4 @@
+apiVersion: v3
+name: rabbitmq
+description: rabbitmq subchart stub
+version: 0.1.0

@@ -1,0 +1,4 @@
+apiVersion: v3
+name: broken
+description: Never-ready deployment for failure tests
+version: 0.1.0

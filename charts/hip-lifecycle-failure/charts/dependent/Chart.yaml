@@ -1,0 +1,4 @@
+apiVersion: v3
+name: dependent
+description: Depends on broken; should never be applied
+version: 0.1.0

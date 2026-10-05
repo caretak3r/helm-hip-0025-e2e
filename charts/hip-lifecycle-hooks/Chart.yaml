@@ -1,0 +1,13 @@
+apiVersion: v3
+name: hip-lifecycle-hooks
+description: Chart with hooks that should not be sequenced, plus sequenced subcharts
+version: 0.1.0
+dependencies:
+  - name: first
+    version: 0.1.0
+    repository: file://charts/first
+  - name: second
+    version: 0.1.0
+    repository: file://charts/second
+    depends-on:
+      - first

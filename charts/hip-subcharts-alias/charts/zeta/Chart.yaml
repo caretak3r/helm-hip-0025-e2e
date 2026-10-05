@@ -1,0 +1,4 @@
+apiVersion: v3
+name: zeta
+description: zeta subchart stub
+version: 0.1.0

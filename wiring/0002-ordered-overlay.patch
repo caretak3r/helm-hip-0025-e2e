@@ -1,0 +1,238 @@
+From bb10af11d2d29b6dadfaac63a7e889afe4a28184 Mon Sep 17 00:00:00 2001
+From: Rohit Gudi <50377477+caretak3r@users.noreply.github.com>
+Date: Thu, 24 Sep 2026 23:04:15 -0400
+Subject: [PATCH] build(hip0025-wire): ordered overlay for trees that contain
+ PR1 (harness only)
+
+Routes chart-v3 install/upgrade through PR1's executor on --wait=ordered and
+stores the plan; rollback follows the target revision's plan; uninstall is
+reverse-sequenced only for releases installed sequenced; upgrade and rollback
+delete removed objects in reverse order of the replaced revision's plan.
+
+Signed-off-by: Rohit Gudi <50377477+caretak3r@users.noreply.github.com>
+---
+ pkg/action/wire_ordered_v3.go | 212 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 212 insertions(+)
+ create mode 100644 pkg/action/wire_ordered_v3.go
+
+diff --git a/pkg/action/wire_ordered_v3.go b/pkg/action/wire_ordered_v3.go
+new file mode 100644
+index 000000000..aba0f0d5c
+--- /dev/null
++++ b/pkg/action/wire_ordered_v3.go
+@@ -0,0 +1,212 @@
++/*
++Copyright The Helm Authors.
++
++Licensed under the Apache License, Version 2.0 (the "License");
++you may not use this file except in compliance with the License.
++You may obtain a copy of the License at
++
++http://www.apache.org/licenses/LICENSE-2.0
++
++Unless required by applicable law or agreed to in writing, software
++distributed under the License is distributed on an "AS IS" BASIS,
++WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++See the License for the specific language governing permissions and
++limitations under the License.
++*/
++
++package action
++
++// HIP-0025 e2e harness wiring (hip0025-wire/ordered) — never contributed.
++// Added only to trees that contain PR1. Routes chart-v3 operations through
++// PR1's sequenced executor, following the HIP:
++//
++//	install/upgrade  sequenced when --wait=ordered; the plan is stored on the release
++//	rollback         sequenced when the target revision was installed sequenced
++//	uninstall        reverse-sequenced when the release was installed sequenced
++//	removals         (upgrade, rollback) after the target is applied, in reverse
++//	                 order of the source revision's plan, or all at once when the
++//	                 source was not sequenced
++
++import (
++	"context"
++	"fmt"
++	"time"
++
++	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
++
++	chart "helm.sh/helm/v4/internal/chart/v3"
++	release "helm.sh/helm/v4/internal/release/v2"
++	manifestutil "helm.sh/helm/v4/internal/release/v2/manifest"
++	"helm.sh/helm/v4/internal/release/v2/sequence"
++	releaseutil "helm.sh/helm/v4/internal/release/v2/util"
++	"helm.sh/helm/v4/pkg/kube"
++)
++
++func init() {
++	v3CheckInstall = func(i *Install) error { return checkReadinessTimeout(i.ReadinessTimeout, i.Timeout) }
++	v3CheckUpgrade = func(u *Upgrade) error { return checkReadinessTimeout(u.ReadinessTimeout, u.Timeout) }
++	v3CheckRollback = func(r *Rollback) error { return checkReadinessTimeout(r.ReadinessTimeout, r.Timeout) }
++
++	v3PlanInstall = func(i *Install, chrt *chart.Chart, rel *release.Release, manifests []releaseutil.Manifest) (v3Apply, error) {
++		if i.WaitStrategy != kube.OrderedWaitStrategy {
++			return nil, nil
++		}
++		return planOrdered(chrt, rel, manifests, i.ReadinessTimeout)
++	}
++	v3PlanUpgrade = func(u *Upgrade, chrt *chart.Chart, rel *release.Release, manifests []releaseutil.Manifest) (v3Apply, error) {
++		if u.WaitStrategy != kube.OrderedWaitStrategy {
++			return nil, nil
++		}
++		return planOrdered(chrt, rel, manifests, u.ReadinessTimeout)
++	}
++	v3PlanRollback = func(r *Rollback, target, previous *release.Release) (v3Apply, error) {
++		if previous.Plan == nil {
++			return nil, nil
++		}
++		target.Plan = previous.Plan
++		plan, err := sequence.RecoverPlan(target.Chart, target.Plan, target.Manifest)
++		if err != nil {
++			return nil, err
++		}
++		return orderedApply(plan, r.ReadinessTimeout), nil
++	}
++	v3PlanUninstall = func(_ *Uninstall, rel *release.Release) (v3Delete, error) {
++		if rel.Plan == nil {
++			return nil, nil
++		}
++		plan, err := sequence.RecoverPlan(rel.Chart, rel.Plan, rel.Manifest)
++		if err != nil {
++			return nil, err
++		}
++		return func(u *Uninstall, rel *release.Release, waiter kube.Waiter) (string, error) {
++			remaining, kept := filterSequencedPlanToKeep(plan)
++			deployment := &sequencedDeployment{
++				kubeClient:       u.cfg.KubeClient,
++				logger:           u.cfg.Logger(),
++				releaseName:      rel.Name,
++				releaseNamespace: rel.Namespace,
++				waitStrategy:     u.WaitStrategy,
++				waitOptions:      u.WaitOptions,
++				timeout:          u.Timeout,
++			}
++			_, report, err := deployment.deleteSequencedBatches(
++				remaining.Reverse(), parseCascadingFlag(u.DeletionPropagation, u.cfg.Logger()), waiter, kept,
++			)
++			return report, err
++		}, nil
++	}
++}
++
++func checkReadinessTimeout(readiness, total time.Duration) error {
++	if readiness > 0 && total > 0 && readiness > total {
++		return fmt.Errorf("--readiness-timeout (%s) must not exceed --timeout (%s)", readiness, total)
++	}
++	return nil
++}
++
++func planOrdered(chrt *chart.Chart, rel *release.Release, manifests []releaseutil.Manifest, readinessTimeout time.Duration) (v3Apply, error) {
++	plan, err := sequence.Build(chrt, manifests)
++	if err != nil {
++		return nil, err
++	}
++	if rel.Plan, err = sequence.NewPlanRecord(plan, manifests); err != nil {
++		return nil, fmt.Errorf("persisting sequencing plan: %w", err)
++	}
++	return orderedApply(plan, readinessTimeout), nil
++}
++
++func orderedApply(plan *sequence.Plan, readinessTimeout time.Duration) v3Apply {
++	if readinessTimeout <= 0 {
++		readinessTimeout = time.Minute
++	}
++	return func(ctx context.Context, op *v3Operation) error {
++		// Batches are always gated, even for a rollback run without --wait.
++		strategy := op.waitStrategy
++		if strategy == kube.HookOnlyStrategy {
++			strategy = kube.StatusWatcherStrategy
++		}
++		waitOptions, err := v3WaitOptions(strategy, op.waitOptions, op.desired)
++		if err != nil {
++			return err
++		}
++		deployment := &sequencedDeployment{
++			kubeClient:                   op.cfg.KubeClient,
++			logger:                       op.cfg.Logger(),
++			releaseName:                  op.target.Name,
++			releaseNamespace:             op.target.Namespace,
++			disableOpenAPI:               op.disableOpenAPI,
++			serverSideApply:              op.serverSideApply,
++			forceConflicts:               op.forceConflicts,
++			forceReplace:                 op.forceReplace,
++			waitStrategy:                 strategy,
++			waitOptions:                  waitOptions,
++			waitForJobs:                  op.waitForJobs,
++			timeout:                      op.timeout,
++			readinessTimeout:             readinessTimeout,
++			deadline:                     computeDeadline(op.timeout),
++			upgradeMode:                  op.upgrade,
++			currentResources:             op.current,
++			upgradeCSAFieldManager:       op.csaFieldManagerUpdate,
++			threeWayMergeForUnstructured: op.threeWayMerge,
++		}
++		err = deployment.apply(ctx, plan)
++		op.created = deployment.createdResources
++		if err != nil {
++			return err
++		}
++		return deleteRemovedV3(op, deployment, strategy, waitOptions)
++	}
++}
++
++// deleteRemovedV3 removes what the source revision had and the target lacks.
++func deleteRemovedV3(op *v3Operation, deployment *sequencedDeployment, strategy kube.WaitStrategy, waitOptions []kube.WaitOption) error {
++	if op.source == nil {
++		return nil
++	}
++	desired := make(map[string]bool, len(op.desired))
++	for _, res := range op.desired {
++		desired[objectKey(res)] = true
++	}
++	removedKeys := make(map[string]bool)
++	var removed kube.ResourceList
++	for _, res := range op.current {
++		if !desired[objectKey(res)] {
++			removedKeys[objectKey(res)] = true
++			removed = append(removed, res)
++		}
++	}
++	if len(removed) == 0 {
++		return nil
++	}
++	waiter, err := getWaiterFor(op.cfg.KubeClient, strategy, waitOptions...)
++	if err != nil {
++		return fmt.Errorf("getting waiter for removed-resource deletion: %w", err)
++	}
++	if op.source.Plan != nil {
++		sourcePlan, err := sequence.RecoverPlan(op.source.Chart, op.source.Plan, op.source.Manifest)
++		if err != nil {
++			return fmt.Errorf("recovering the replaced revision's plan: %w", err)
++		}
++		return deployment.deleteRemoved(sourcePlan.Reverse(), removedKeys, waiter)
++	}
++	if _, errs := op.cfg.KubeClient.Delete(removed, metav1.DeletePropagationBackground); len(errs) > 0 {
++		return joinErrors(errs, "; ")
++	}
++	return waiter.WaitForDelete(removed, op.timeout)
++}
++
++func filterSequencedPlanToKeep(plan *sequence.Plan) (*sequence.Plan, []manifestutil.Manifest) {
++	filtered := &sequence.Plan{
++		Batches:  make([]sequence.Batch, len(plan.Batches)),
++		Levels:   plan.Levels,
++		Warnings: plan.Warnings,
++	}
++	var kept []manifestutil.Manifest
++	for i, batch := range plan.Batches {
++		filtered.Batches[i] = batch
++		batchKept, remaining := filterSequencedManifestsToKeep(batch.Manifests)
++		kept = append(kept, batchKept...)
++		filtered.Batches[i].Manifests = remaining
++	}
++	return filtered, kept
++}
+-- 
+2.50.1 (Apple Git-155)
+

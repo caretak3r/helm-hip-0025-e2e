@@ -1,0 +1,89 @@
+{% extends "base.html.j2" %}
+{% macro outcome_badges(tv) %}
+<span class="badges">
+{% for o in tv.outcomes %}<span class="badge {{ o.css }}">{{ o.text }} {{ o.count }}</span>{% endfor %}
+{% if tv.error %}<span class="badge fail">build failed</span>{% endif %}
+</span>
+{% endmacro %}
+{% block main %}
+<section class="intro">
+  <p>This site shows black-box tests for
+    <a href="https://github.com/helm/community/blob/main/hips/hip-0025.md">HIP-0025</a>, the sequencing of
+    Helm resources. The tests install charts with real <code>helm</code> binaries on a kind cluster. The
+    umbrella pull request is <a href="https://github.com/helm/helm/pull/32314">helm/helm#32314</a>.</p>
+  {% if runs %}
+  <p>The work for HIP-0025 is in three pull requests. Each tier is one <code>helm</code> binary:</p>
+  <ul>
+    {% for tv in runs[0].tiers %}
+    <li>{{ tv.title }}{% if tv.pr %}: <a href="{{ tv.pr }}">{{ tv.pr.split('/')[-4] }}/{{ tv.pr.split('/')[-3] }}#{{ tv.pr.split('/')[-1] }}</a>{% endif %}{% if tv.merge %} ({{ tv.merge | join(' merged with ') }}){% endif %}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  <p>Upstream Helm cannot install a chart-v3 release yet. For this reason, every tier also contains
+    test-only wiring patches. The patches connect the <code>helm</code> commands to the code of each pull
+    request. They do not decide the order or the readiness of resources
+    {% if repo %}(<a href="{{ repo }}/blob/main/wiring/README.md">wiring/README.md</a>){% endif %}.</p>
+  <p>The tests get every ordering fact and every readiness fact from the kube-apiserver audit log. Thus all
+    timestamps come from one clock.{% if repo %} To run the same tests on your computer, read the
+    <a href="{{ repo }}#readme">README</a>.{% endif %}</p>
+</section>
+
+{% if runs %}
+{% set latest = runs[0] %}
+<section>
+  <h2>Latest run: <a href="{{ latest.stamp }}/index.html">{{ latest.stamp }}</a></h2>
+  <p class="lead">
+    <span class="badge {{ 'pass' if latest.green else 'fail' }}">{{ 'all tiers green' if latest.green else 'not all tiers green' }}</span>
+    Started {{ latest.meta.started_utc }} · Kubernetes {{ latest.meta.cluster.server_version }} on kind ·
+    harness {% if latest.harness.commit_url %}<a href="{{ latest.harness.commit_url }}"><code>{{ latest.harness.short }}</code></a>{% else %}<code>{{ latest.harness.short }}</code>{% endif %}
+    {% if latest.harness.dirty %}<span class="badge fail">local changes</span>{% endif %}
+    {% if latest.meta.get('fixture') %}<span class="badge xpass">fixture data</span>{% endif %}
+  </p>
+  <div class="cards">
+    {% for tv in latest.tiers %}
+    <article class="card">
+      <h3>{{ tv.label }}</h3>
+      <p class="title">{{ tv.title }}</p>
+      {% if tv.pr %}<p><a href="{{ tv.pr }}">{{ tv.pr }}</a></p>{% endif %}
+      {% for c in tv.commits %}<p class="mono"><a href="{{ c.url }}">{{ c.sha[:9] }}</a> {{ c.branch }}</p>{% endfor %}
+      {% if tv.build.get('version') %}<p class="mono">helm {{ tv.build.version }}</p>{% endif %}
+      <p class="k">HIP requirements</p>
+      <p class="muted">{{ tv.graded }} graded: {{ tv.scope }}</p>
+      <p class="badges">{% for m in tv.meanings %}<span class="badge {{ m.css }}">{{ m.count }} {{ m.meaning | lower }}</span>{% endfor %}</p>
+      <p class="k">Tests</p>
+      <p>{{ outcome_badges(tv) }}</p>
+      <p class="k">Go unit tests</p>
+      <p>{{ tv.unit_text }}</p>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+
+<section>
+  <h2>All runs</h2>
+  <div class="scroll">
+  <table class="data">
+    <thead>
+      <tr><th>Run</th><th>Started (UTC)</th><th>Harness</th><th>Result</th>{% for tv in latest.tiers %}<th>{{ tv.label }}</th>{% endfor %}</tr>
+    </thead>
+    <tbody>
+      {% for run in runs %}
+      <tr>
+        <td><a href="{{ run.stamp }}/index.html"><code>{{ run.stamp }}</code></a></td>
+        <td>{{ run.meta.started_utc }}</td>
+        <td>{% if run.harness.commit_url %}<a href="{{ run.harness.commit_url }}"><code>{{ run.harness.short }}</code></a>{% else %}<code>{{ run.harness.short }}</code>{% endif %}{% if run.harness.dirty %} <span class="badge fail">local changes</span>{% endif %}</td>
+        <td><span class="badge {{ 'pass' if run.green else 'fail' }}">{{ 'green' if run.green else 'failures' }}</span></td>
+        {% for col in latest.tiers %}
+        {% set found = run.tiers | selectattr('id', 'equalto', col.id) | list %}
+        <td>{% if found %}{{ outcome_badges(found[0]) }}{% else %}<span class="muted">not run</span>{% endif %}</td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</section>
+{% else %}
+<p>No runs yet. Run <code>make run</code>, then <code>make site</code>.</p>
+{% endif %}
+{% endblock %}

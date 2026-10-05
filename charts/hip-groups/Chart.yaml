@@ -1,0 +1,4 @@
+apiVersion: v3
+name: hip-groups
+description: HIP-0025 "Template examples" (database, queue -> app) plus the three unsequenced cases
+version: 0.1.0

@@ -1,0 +1,17 @@
+apiVersion: v3
+name: foo
+description: HIP-0025 Chart dependencies example (nginx,rabbitmq -> bar -> foo)
+version: 0.1.0
+annotations:
+  helm.sh/depends-on/subcharts: '["bar","rabbitmq"]'
+dependencies:
+  - name: nginx
+    version: 0.1.0
+    repository: file://charts/nginx
+  - name: rabbitmq
+    version: 0.1.0
+    repository: file://charts/rabbitmq
+  - name: bar
+    version: 0.1.0
+    repository: file://charts/bar
+    depends-on: [nginx, rabbitmq]

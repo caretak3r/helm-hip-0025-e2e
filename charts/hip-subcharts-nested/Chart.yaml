@@ -1,0 +1,10 @@
+apiVersion: v3
+name: parent-z
+description: 3-level nesting test (parent-z -> child-b -> grandchild-a)
+version: 0.1.0
+annotations:
+  helm.sh/depends-on/subcharts: '["child-b"]'
+dependencies:
+  - name: child-b
+    version: 0.1.0
+    repository: file://charts/child-b

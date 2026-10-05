@@ -1,0 +1,9 @@
+# HIP-0025 "Template examples": database and queue have no mutual dependency and
+# deploy together; app waits for both. The dependency list is deliberately in the
+# opposite order to the HIP text ("The order in which they are listed does not
+# affect deployment sequencing").
+{{ include "e2e.workload" (dict "root" $ "name" "db-service" "group" "database") }}
+---
+{{ include "e2e.workload" (dict "root" $ "name" "queue-processor" "group" "queue") }}
+---
+{{ include "e2e.workload" (dict "root" $ "name" "my-app" "group" "app" "deps" (list "queue" "database")) }}

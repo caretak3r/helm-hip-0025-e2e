@@ -1,0 +1,13 @@
+apiVersion: v3
+name: hip-lifecycle-failure
+description: Chart with a never-ready subchart to test failure handling
+version: 0.1.0
+dependencies:
+  - name: broken
+    version: 0.1.0
+    repository: file://charts/broken
+  - name: dependent
+    version: 0.1.0
+    repository: file://charts/dependent
+    depends-on:
+      - broken

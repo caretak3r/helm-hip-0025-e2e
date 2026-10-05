@@ -1,0 +1,39 @@
+{{- if .Values.probes }}
+{{- range .Values.probes }}
+---
+apiVersion: readiness.hip0025.example/v1
+kind: Probe
+metadata:
+  name: {{ .name }}
+  {{- if or .successExpressions .failureExpressions }}
+  annotations:
+    {{- if .successExpressions }}
+    helm.sh/readiness-success: {{ toJson .successExpressions | quote }}
+    {{- end }}
+    {{- if .failureExpressions }}
+    helm.sh/readiness-failure: {{ toJson .failureExpressions | quote }}
+    {{- end }}
+  {{- end }}
+spec:
+  target: {{ .name }}
+status: {}
+{{- end }}
+{{- else if or .Values.probe.successExpressions .Values.probe.failureExpressions .Values.probe.name }}
+apiVersion: readiness.hip0025.example/v1
+kind: Probe
+metadata:
+  name: {{ .Values.probe.name }}
+  {{- if .Values.probe.successExpressions }}
+  annotations:
+    helm.sh/readiness-success: {{ toJson .Values.probe.successExpressions | quote }}
+    {{- if .Values.probe.failureExpressions }}
+    helm.sh/readiness-failure: {{ toJson .Values.probe.failureExpressions | quote }}
+    {{- end }}
+  {{- else if .Values.probe.failureExpressions }}
+  annotations:
+    helm.sh/readiness-failure: {{ toJson .Values.probe.failureExpressions | quote }}
+  {{- end }}
+spec:
+  target: test
+status: {}
+{{- end }}

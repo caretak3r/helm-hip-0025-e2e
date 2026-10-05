@@ -1,0 +1,4 @@
+apiVersion: v3
+name: alpha
+description: alpha subchart depending on zeta by both alias and name
+version: 0.1.0

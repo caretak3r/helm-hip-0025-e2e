@@ -1,0 +1,4 @@
+# Parent chart: second depends on first (first -> second)
+{{ include "e2e.workload.parent" (dict "root" $ "name" "parent-first" "group" "first") }}
+---
+{{ include "e2e.workload.parent" (dict "root" $ "name" "parent-second" "group" "second" "deps" (list "first")) }}

@@ -1,0 +1,6 @@
+# database and queue deploy together; app depends on both
+{{ include "e2e.workload.upgrade" (dict "root" $ "name" "db" "group" "database") }}
+---
+{{ include "e2e.workload.upgrade" (dict "root" $ "name" "queue" "group" "queue") }}
+---
+{{ include "e2e.workload.upgrade" (dict "root" $ "name" "app" "group" "app" "deps" (list "database" "queue")) }}

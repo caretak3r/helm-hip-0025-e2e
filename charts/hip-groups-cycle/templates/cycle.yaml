@@ -1,0 +1,27 @@
+# Group cycle: group-a -> group-b -> group-c -> group-a
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: a
+  annotations:
+    helm.sh/resource-group: group-a
+    helm.sh/depends-on/resource-groups: '["group-c"]'
+data: {id: a}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: b
+  annotations:
+    helm.sh/resource-group: group-b
+    helm.sh/depends-on/resource-groups: '["group-a"]'
+data: {id: b}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: c
+  annotations:
+    helm.sh/resource-group: group-c
+    helm.sh/depends-on/resource-groups: '["group-b"]'
+data: {id: c}

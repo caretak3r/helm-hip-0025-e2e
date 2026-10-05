@@ -1,0 +1,4 @@
+apiVersion: v3
+name: bar
+description: bar subchart depending on nginx and rabbitmq
+version: 0.1.0

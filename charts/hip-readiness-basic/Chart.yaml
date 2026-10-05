@@ -1,0 +1,4 @@
+apiVersion: v3
+name: hip-readiness-basic
+description: HIP-0025 PR3 readiness annotations - Probe with configurable expressions
+version: 0.1.0

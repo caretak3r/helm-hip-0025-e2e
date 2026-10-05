@@ -1,0 +1,17 @@
+probes: []
+# probes:
+#   - name: probe1
+#     successExpressions: ['"{.phase} == Ready"']
+#     failureExpressions: ['"{.phase} == Failed"']
+
+# Legacy single-probe support (deprecated)
+probe:
+  name: probe
+  successExpressions: []
+  failureExpressions: []
+
+deployment:
+  enabled: false
+  name: app
+  image: nginx:1.27-alpine
+  readyDelay: 3

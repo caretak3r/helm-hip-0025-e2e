@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alpha
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: alpha}
+  template:
+    metadata:
+      labels: {app: alpha}
+    spec:
+      terminationGracePeriodSeconds: 0
+      containers:
+        - name: web
+          image: {{ .Values.image }}
+          imagePullPolicy: IfNotPresent
+          readinessProbe:
+            httpGet: {path: /, port: 80}
+            initialDelaySeconds: {{ .Values.readyDelay }}
+            periodSeconds: 1

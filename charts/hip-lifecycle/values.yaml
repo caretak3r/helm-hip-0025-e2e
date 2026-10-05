@@ -1,0 +1,6 @@
+image: nginx:1.27-alpine
+readyDelay: 3
+global:
+  rev: "1"
+c:
+  enabled: false

@@ -1,0 +1,4 @@
+apiVersion: v3
+name: hip-groups-cycle
+description: R24 circular group dependency - A -> B -> C -> A
+version: 0.1.0

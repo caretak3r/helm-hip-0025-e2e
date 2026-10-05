@@ -1,0 +1,216 @@
+{% extends "base.html.j2" %}
+{% block title %}Run {{ run.stamp }} · HIP-0025 black-box tests{% endblock %}
+{% block crumbs %} / run {{ run.stamp }}{% endblock %}
+{% block heading %}Run {{ run.stamp }}{% endblock %}
+{% block main %}
+{% set meta = run.meta %}
+{% if meta.get('fixture') %}
+<p class="banner">FIXTURE DATA. These results are sample data for the dashboard, not a real run.</p>
+{% endif %}
+<p class="lead">
+  <span class="badge {{ 'pass' if run.green else 'fail' }}">{{ 'all tiers green' if run.green else 'not all tiers green' }}</span>
+  Started {{ meta.started_utc }} · finished {{ meta.finished_utc }} · Kubernetes {{ meta.cluster.server_version }} on kind ·
+  harness {% if run.harness.commit_url %}<a href="{{ run.harness.commit_url }}"><code>{{ run.harness.short }}</code></a>{% else %}<code>{{ run.harness.short }}</code>{% endif %}
+  {% if run.harness.dirty %}<span class="badge fail">local changes</span>{% endif %}
+</p>
+<nav class="toc">
+  <a href="#verdicts">Verdict per PR</a> · <a href="#requirements">Requirements</a> · <a href="#tests">Tests</a> ·
+  <a href="#before-after">Before and after</a> · <a href="#builds">Builds</a> · <a href="#unit">Go unit tests</a> ·
+  <a href="#files">Files</a>
+</nav>
+
+<section id="verdicts">
+  <h2>Verdict per pull request</h2>
+  <p class="hint">A PR tier is graded on the requirements that its pull request owns. The combined tier is graded on all requirements.</p>
+  <div class="scroll">
+  <table class="data">
+    <thead><tr><th>Tier</th><th>Built from</th><th>Requirements graded</th><th>Result</th><th>Tests</th><th>Go unit tests (the PR's own)</th></tr></thead>
+    <tbody>
+    {% for tv in run.tiers %}
+      <tr>
+        <td><b>{{ tv.label }}</b><br><span class="muted">{{ tv.title }}</span></td>
+        <td class="mono">{% for c in tv.commits %}<a href="{{ c.url }}">{{ c.sha[:9] }}</a> {{ c.branch }}<br>{% endfor %}{% if tv.error %}<span class="badge fail">build failed</span>{% endif %}</td>
+        <td>{{ tv.graded }}<br><span class="muted">{{ tv.scope }}</span></td>
+        <td><span class="badges">{% for m in tv.meanings %}<span class="badge {{ m.css }}">{{ m.count }} {{ m.meaning | lower }}</span>{% endfor %}</span></td>
+        <td><span class="badges">{% for o in tv.outcomes %}<span class="badge {{ o.css }}">{{ o.text }} {{ o.count }}</span>{% endfor %}</span></td>
+        <td>{{ tv.unit_text }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section id="requirements">
+  <h2>Requirements × tiers</h2>
+  <p class="hint">Each row is one requirement of HIP-0025. A cell shows the verdict on one tier. A blue frame marks
+    the tier of the pull request that owns the requirement. Click a cell to see the evidence of the test. Click a
+    requirement to read the text of the HIP.</p>
+  <p class="legend"><span class="badge pass">✓ PASS</span> <span class="badge fail">✗ FAIL</span>
+    <span class="badge xfail">○ XFAIL: not implemented, expected</span> <span class="badge xpass">! XPASS</span>
+    <span class="badge na">— N/A: tier does not have the feature</span> <span class="badge untested">? UNTESTED</span></p>
+  <div class="scroll">
+  <table class="grid">
+    <thead><tr><th>Req</th><th>Requirement</th><th>Owner</th><th>Status</th>{% for tv in run.tiers %}<th class="col">{{ tv.label }}</th>{% endfor %}</tr></thead>
+    <tbody>
+    {% for row in run.req_rows %}
+      <tr id="{{ row.id }}">
+        <th class="rid">{{ row.id }}</th>
+        <td class="req">
+          <details>
+            <summary>{{ row.title }}</summary>
+            <blockquote>{{ row.hip | ticks }}<span class="src">HIP-0025, {{ row.section }}</span></blockquote>
+            {% if row.note %}<p class="note">Note: {{ row.note | ticks }}</p>{% endif %}
+          </details>
+        </td>
+        <td>{{ row.owner }}</td>
+        <td><span class="tag {{ row.status }}">{{ row.status }}</span></td>
+        {% for c in row.cells %}
+        <td class="cell {{ c.css }}{{ ' owner' if c.owner else '' }}">{% if c.link %}<a href="{{ c.link }}">{{ c.glyph }} {{ c.verdict }}</a>{% else %}{{ c.glyph }} {{ c.verdict }}{% endif %}</td>
+        {% endfor %}
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section id="tests">
+  <h2>Tests × tiers</h2>
+  <p class="hint">Each row is one test. A test runs only on a tier that has all the features that it needs. On the
+    other tiers the result is n/a. Click a cell to see the commands, the observations and the audit records of the test.</p>
+  {% for g in run.test_groups %}
+  <h3>{{ g.title }}</h3>
+  <div class="scroll">
+  <table class="grid tests">
+    <thead><tr><th>Test</th><th>Req</th>{% for tv in run.tiers %}<th class="col">{{ tv.label }}</th>{% endfor %}</tr></thead>
+    <tbody>
+    {% for r in g.rows %}
+      <tr>
+        <th class="test"><code>{{ r.name }}</code><span class="doc">{{ r.doc }}</span></th>
+        <td class="reqs">{% for rid in r.reqs %}<a href="#{{ rid }}">{{ rid }}</a> {% endfor %}</td>
+        {% for c in r.cells %}
+        {% if c %}
+        <td class="cell {{ c.css }}">{% if c.link %}<a href="{{ c.link }}">{{ c.text }}<span class="secs">{{ c.seconds | seconds }}</span></a>{% else %}{{ c.text }}{% endif %}</td>
+        {% else %}
+        <td class="cell none">not run</td>
+        {% endif %}
+        {% endfor %}
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% endfor %}
+</section>
+
+<section id="before-after">
+  <h2>Before and after</h2>
+  <p class="hint">Each pair shows one kind of operation without the HIP-0025 feature (before) and with it (after),
+    with one <code>helm</code> binary. The timelines come from the kube-apiserver audit log. The times are UTC.</p>
+  {% for p in run.before_after %}
+  <article class="pair">
+    <h3>{{ p.title }}</h3>
+    <p class="muted">Chart {% if run.harness.tree %}<a href="{{ run.harness.tree }}/charts/{{ p.chart }}"><code>charts/{{ p.chart }}</code></a>{% else %}<code>charts/{{ p.chart }}</code>{% endif %} · tier {{ p.tier_label }}</p>
+    <p>{{ p.look_for }}</p>
+    <div class="sides">
+      {% for s in p.sides %}
+      <div class="side">
+        <h4>{{ 'Before' if loop.first else 'After' }}: {{ s.caption }}</h4>
+        {% if s.found %}
+        <p><span class="badge {{ s.css }}">{{ s.text }}</span> <a href="{{ s.link }}"><code>{{ s.test }}</code></a></p>
+        <pre class="cmds">{% for c in s.commands %}{{ c.time }} $ {{ c.cmd }}
+{% if c.exit is not none %}             exit {{ c.exit }} after {{ c.seconds }} s
+{% endif %}{% endfor %}</pre>
+        {% if s.timeline %}
+        <p class="k">{{ s.timeline.label }}</p>
+        <pre class="timeline">{{ s.timeline.value | lines }}</pre>
+        {% endif %}
+        {% else %}
+        <p class="warn">The test <code>{{ s.test }}</code> did not run on this tier.</p>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </article>
+  {% endfor %}
+</section>
+
+<section id="builds">
+  <h2>Builds and environment</h2>
+  <dl class="kv">
+    <dt>Harness</dt><dd>{% if run.harness.commit_url %}<a href="{{ run.harness.commit_url }}">{{ run.harness.url }} @ {{ run.harness.short }}</a>{% else %}{{ run.harness.url }} @ {{ run.harness.short }}{% endif %}{% if run.harness.dirty %} <span class="badge fail">local changes</span>{% endif %}</dd>
+    <dt>Upstream base</dt><dd><a href="{{ run.upstream }}/commit/{{ run.base }}"><code>{{ run.base[:12] }}</code></a> (helm/helm; all three PRs start from this commit)</dd>
+    <dt>Cluster</dt><dd>kind cluster <code>{{ meta.cluster.name }}</code>, Kubernetes {{ meta.cluster.server_version }}, node image <code>{{ meta.cluster.node_image }}</code></dd>
+    <dt>Host</dt><dd>{{ meta.host.os }}/{{ meta.host.arch }}</dd>
+    <dt>Tools</dt><dd>{{ meta.tools.go }} · {{ meta.tools.kind }} · kubectl {{ meta.tools.kubectl }} · Docker {{ meta.tools.docker }} · Python {{ meta.tools.python }}</dd>
+    {% if meta.pytest_args %}<dt>pytest arguments</dt><dd><code>{{ meta.pytest_args | join(' ') }}</code></dd>{% endif %}
+  </dl>
+  <p class="hint">The source tree is the git tree ID of the assembled code. The same commits and patches always give
+    the same tree ID, so you can compare your own build with this one.</p>
+  <div class="scroll">
+  <table class="data">
+    <thead><tr><th>Tier</th><th>PR commits</th><th>Wiring patches (sha256)</th><th>Merge fix</th><th>Source tree</th><th><code>helm version</code></th><th>Binary sha256</th><th>Go</th></tr></thead>
+    <tbody>
+    {% for tv in run.tiers %}
+      <tr>
+        <td><b>{{ tv.label }}</b></td>
+        <td class="mono">{% for c in tv.commits %}<a href="{{ c.url }}">{{ c.sha[:12] }}</a><br>{% endfor %}</td>
+        {% if tv.error %}
+        <td colspan="6"><span class="badge fail">build failed</span><pre class="reason">{{ tv.error }}</pre></td>
+        {% else %}
+        <td class="mono">{% for w in tv.wiring %}{% if w.url %}<a href="{{ w.url }}">{{ w.name }}</a>{% else %}{{ w.name }}{% endif %} {{ w.sha256[:12] }}<br>{% endfor %}</td>
+        <td class="mono">{% if tv.resolve %}{% if tv.resolve.url %}<a href="{{ tv.resolve.url }}">{{ tv.resolve.file.split('/')[-1] }}</a>{% else %}{{ tv.resolve.file }}{% endif %} {{ tv.resolve.sha256[:12] }}{% else %}—{% endif %}</td>
+        <td class="mono">{{ tv.build.get('tree', '')[:12] }}</td>
+        <td class="mono">{{ tv.build.get('version', '') }}</td>
+        <td class="mono">{{ tv.build.get('binary_sha256', '')[:16] }}</td>
+        <td class="mono">{{ tv.build.get('go', '') }} {{ tv.build.get('goos', '') }}/{{ tv.build.get('goarch', '') }}</td>
+        {% endif %}
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section id="unit">
+  <h2>Go unit tests</h2>
+  <p class="hint">The Go tests of each pull request, on the pull request commit without wiring. This is what a CI
+    run on the pull request sees. A merge tier has no unit stage.</p>
+  {% for tv in run.tiers if tv.unit %}
+  <h3>{{ tv.label }} · <code>{{ tv.unit.get('base', '')[:9] }}..{{ tv.unit.get('head', '')[:9] }}</code></h3>
+  {% if tv.unit.get('error') %}
+  <pre class="reason">{{ tv.unit.error }}</pre>
+  {% else %}
+  <div class="scroll">
+  <table class="data">
+    <thead><tr><th>Package</th><th>Scope</th><th>Result</th><th>Time</th></tr></thead>
+    <tbody>
+    {% for pkg in tv.unit.packages %}
+      <tr>
+        <td class="mono">{{ pkg.package }}</td>
+        <td>{{ pkg.scope }}</td>
+        <td><a href="{{ tv.id }}/{{ pkg.log }}"><span class="badge {{ 'pass' if pkg.passed else 'fail' }}">{{ '✓ pass' if pkg.passed else '✗ FAIL' }}</span></a>{% if not pkg.passed %} <code>{{ pkg.summary }}</code>{% endif %}</td>
+        <td>{{ pkg.seconds | seconds }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% endif %}
+  {% endfor %}
+</section>
+
+<section id="files">
+  <h2>Files</h2>
+  <ul>
+    <li><a href="REPORT.md">REPORT.md</a>: the same verdicts as Markdown{% if run.harness.blob %} (<a href="{{ run.harness.url }}/blob/main/runs/{{ run.stamp }}/REPORT.md">rendered on GitHub</a>){% endif %}</li>
+    <li><a href="run.json">run.json</a>: the environment and the harness commit of the run</li>
+    <li><a href="tiers.yaml">tiers.yaml</a>: the pinned commits and the wiring of each tier</li>
+    <li><a href="requirements.yaml">requirements.yaml</a>: the requirement catalog that graded the run</li>
+    {% for tv in run.tiers %}
+    <li>{{ tv.label }}: <a href="{{ tv.id }}/results.json">results.json</a>, <a href="{{ tv.id }}/pytest.log">pytest.log</a>, <a href="{{ tv.id }}/build.json">build.json</a>{% if tv.unit %}, <a href="{{ tv.id }}/unit.json">unit.json</a>{% endif %}</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}

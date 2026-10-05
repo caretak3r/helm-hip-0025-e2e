@@ -1,0 +1,60 @@
+# kube-apiserver audit policy for the HIP-0025 tests.
+#
+# Ordering can only be proven from the order in which the apiserver received
+# Helm's requests. Events and creationTimestamp cannot prove it. This policy
+# records the requests that the tests need, on the apiserver clock:
+#   - Helm's create/patch/update/delete of the kinds it applies (Metadata level:
+#     object, verb, user agent, timestamp; no request or response bodies)
+#   - status writes (RequestResponse level), which show when an object became ready
+#   - pod creates (RequestResponse level), to map a generated pod name to its workload
+# Secrets are logged at Metadata level only, so the log never contains secret data.
+apiVersion: audit.k8s.io/v1
+kind: Policy
+# ResponseComplete is the single stage we key on; RequestReceived would double
+# every entry and carries the same requestReceivedTimestamp.
+omitStages:
+  - RequestReceived
+  - ResponseStarted
+  - Panic
+rules:
+  # Readiness transitions, same clock as the apply/delete records below: the
+  # e2e suite proves "dependency ready before dependent applied" from these.
+  - level: RequestResponse
+    verbs: ["update", "patch"]
+    resources:
+      - group: ""
+        resources: ["pods/status"]
+      - group: "apps"
+        resources: ["deployments/status", "statefulsets/status", "daemonsets/status"]
+      - group: "batch"
+        resources: ["jobs/status"]
+      - group: "readiness.hip0025.example"
+        resources: ["probes/status"]
+  - level: Metadata
+    verbs: ["create", "patch", "update", "delete"]
+    resources:
+      - group: "readiness.hip0025.example"
+        resources: ["probes"]
+  # Pod creates use generateName, so only the response body carries the name
+  # the checkers need to map a pod back to its workload.
+  - level: RequestResponse
+    verbs: ["create"]
+    resources:
+      - group: ""
+        resources: ["pods"]
+  # The kinds helm sequences and tears down. Everything the checker maps to a
+  # DAG batch is here; anything else is dropped to keep the log small.
+  # Helm v4 applies with server-side apply (PATCH), so patch/update are logged
+  # too: they carry the per-object apply timestamp at nanosecond resolution.
+  - level: Metadata
+    verbs: ["create", "patch", "update", "delete"]
+    resources:
+      - group: ""            # core
+        resources: ["configmaps", "services", "secrets", "serviceaccounts", "persistentvolumeclaims", "pods"]
+      - group: "apps"
+        resources: ["deployments", "statefulsets", "daemonsets", "replicasets"]
+      - group: "batch"
+        resources: ["jobs", "cronjobs"]
+  # Drop all other traffic (SubjectAccessReviews, events, leases, endpoints,
+  # tokenreviews, coordination, node heartbeats, ...).
+  - level: None

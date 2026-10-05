@@ -1,0 +1,70 @@
+From 798363b3f728f71fcd476d3c70fabff33d39d27e Mon Sep 17 00:00:00 2001
+From: Rohit Gudi <50377477+caretak3r@users.noreply.github.com>
+Date: Thu, 24 Sep 2026 23:04:27 -0400
+Subject: [PATCH] build(hip0025-wire): readiness overlay for trees that contain
+ PR3 (harness only)
+
+Attaches PR3's custom-readiness eligibility to every chart-v3 watcher wait,
+including each ordered batch on trees that also contain PR1.
+
+Signed-off-by: Rohit Gudi <50377477+caretak3r@users.noreply.github.com>
+---
+ pkg/action/wire_readiness_v3.go | 46 +++++++++++++++++++++++++++++++++
+ 1 file changed, 46 insertions(+)
+ create mode 100644 pkg/action/wire_readiness_v3.go
+
+diff --git a/pkg/action/wire_readiness_v3.go b/pkg/action/wire_readiness_v3.go
+new file mode 100644
+index 000000000..47bf2f6a8
+--- /dev/null
++++ b/pkg/action/wire_readiness_v3.go
+@@ -0,0 +1,46 @@
++/*
++Copyright The Helm Authors.
++
++Licensed under the Apache License, Version 2.0 (the "License");
++you may not use this file except in compliance with the License.
++You may obtain a copy of the License at
++
++http://www.apache.org/licenses/LICENSE-2.0
++
++Unless required by applicable law or agreed to in writing, software
++distributed under the License is distributed on an "AS IS" BASIS,
++WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++See the License for the specific language governing permissions and
++limitations under the License.
++*/
++
++package action
++
++// HIP-0025 e2e harness wiring (hip0025-wire/readiness) — never contributed.
++// Added only to trees that contain PR3: every chart-v3 wait (plain --wait and,
++// on combined trees, each ordered batch) evaluates the helm.sh/readiness-*
++// annotations of the operation's resources.
++
++import (
++	"fmt"
++	"slices"
++
++	"helm.sh/helm/v4/pkg/kube"
++)
++
++// orderedStrategy is PR1's kube.OrderedWaitStrategy, spelled out so this file
++// also compiles on trees without PR1.
++const orderedStrategy kube.WaitStrategy = "ordered"
++
++func init() {
++	v3WaitOptions = func(strategy kube.WaitStrategy, opts []kube.WaitOption, resources kube.ResourceList) ([]kube.WaitOption, error) {
++		if strategy != kube.StatusWatcherStrategy && strategy != orderedStrategy {
++			return opts, nil
++		}
++		eligible, err := kube.CustomReadinessEligibleResources(resources)
++		if err != nil {
++			return nil, fmt.Errorf("failed to identify resources eligible for custom readiness: %w", err)
++		}
++		return append(slices.Clone(opts), kube.WithCustomReadiness(eligible)), nil
++	}
++}
+-- 
+2.50.1 (Apple Git-155)
+

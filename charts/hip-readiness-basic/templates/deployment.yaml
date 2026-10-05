@@ -1,0 +1,3 @@
+{{- if .Values.deployment.enabled }}
+{{ include "e2e.workload.basic" (dict "root" $ "name" .Values.deployment.name) }}
+{{- end }}

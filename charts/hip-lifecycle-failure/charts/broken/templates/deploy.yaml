@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: broken
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: broken}
+  template:
+    metadata:
+      labels: {app: broken}
+    spec:
+      terminationGracePeriodSeconds: 0
+      containers:
+        - name: web
+          image: {{ .Values.image }}
+          imagePullPolicy: IfNotPresent
+          readinessProbe:
+            httpGet: {path: /, port: 81}
+            initialDelaySeconds: 2
+            periodSeconds: 1

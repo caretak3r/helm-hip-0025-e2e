@@ -1,0 +1,4 @@
+# Subchart: first depends on second (second -> first) - OPPOSITE of parent
+{{ include "e2e.workload.sub" (dict "root" $ "name" "sub-second" "group" "second") }}
+---
+{{ include "e2e.workload.sub" (dict "root" $ "name" "sub-first" "group" "first" "deps" (list "second")) }}

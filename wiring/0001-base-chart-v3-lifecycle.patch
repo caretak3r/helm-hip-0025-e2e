@@ -1,0 +1,2429 @@
+From b5b26159dba20fe670374047d8d186cbf3ee6680 Mon Sep 17 00:00:00 2001
+From: Rohit Gudi <50377477+caretak3r@users.noreply.github.com>
+Date: Thu, 24 Sep 2026 23:03:45 -0400
+Subject: [PATCH] build(hip0025-wire): plain chart-v3 lifecycle for the
+ HIP-0025 e2e suite (harness only)
+
+Upstream main cannot install chart-v3 releases, so every e2e tier carries this
+layer: release/v2 storage in action.Configuration, v3 install/upgrade/rollback/
+uninstall that apply everything at once (chart v2 semantics), lifecycle hooks,
+--rollback-on-failure, template/lint/get/status for v3. Seams in wire_v3.go let
+wire/ordered (PR1 trees) and wire/readiness (PR3 trees) plug in. Never pushed.
+
+Signed-off-by: Rohit Gudi <50377477+caretak3r@users.noreply.github.com>
+---
+ pkg/action/action.go       |  62 ++++-
+ pkg/action/hooks_v3.go     | 297 +++++++++++++++++++++
+ pkg/action/install.go      |   5 +
+ pkg/action/install_v3.go   | 520 +++++++++++++++++++++++++++++++++++++
+ pkg/action/lint.go         |  31 ++-
+ pkg/action/rollback.go     |  12 +
+ pkg/action/rollback_v3.go  | 204 +++++++++++++++
+ pkg/action/uninstall.go    |   6 +
+ pkg/action/uninstall_v3.go | 160 ++++++++++++
+ pkg/action/upgrade.go      |  31 ++-
+ pkg/action/upgrade_v3.go   | 320 +++++++++++++++++++++++
+ pkg/action/wire_v3.go      | 137 ++++++++++
+ pkg/cmd/install.go         |  11 +-
+ pkg/cmd/status.go          | 117 +++++++++
+ pkg/cmd/template.go        |  89 +++++--
+ 15 files changed, 1953 insertions(+), 49 deletions(-)
+ create mode 100644 pkg/action/hooks_v3.go
+ create mode 100644 pkg/action/install_v3.go
+ create mode 100644 pkg/action/rollback_v3.go
+ create mode 100644 pkg/action/uninstall_v3.go
+ create mode 100644 pkg/action/upgrade_v3.go
+ create mode 100644 pkg/action/wire_v3.go
+
+diff --git a/pkg/action/action.go b/pkg/action/action.go
+index e93d6181f..7fc5e5c8c 100644
+--- a/pkg/action/action.go
++++ b/pkg/action/action.go
+@@ -38,11 +38,13 @@ import (
+ 	"k8s.io/cli-runtime/pkg/genericclioptions"
+ 	"k8s.io/client-go/discovery"
+ 	"k8s.io/client-go/kubernetes"
++	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
+ 	"k8s.io/client-go/rest"
+ 	"sigs.k8s.io/kustomize/kyaml/kio"
+ 	kyaml "sigs.k8s.io/kustomize/kyaml/yaml"
+ 
+ 	"helm.sh/helm/v4/internal/logging"
++	v2driver "helm.sh/helm/v4/internal/storage/driver"
+ 	"helm.sh/helm/v4/pkg/chart/common"
+ 	chart "helm.sh/helm/v4/pkg/chart/v2"
+ 	chartutil "helm.sh/helm/v4/pkg/chart/v2/util"
+@@ -123,6 +125,9 @@ type Configuration struct {
+ 
+ 	// Releases stores records of releases.
+ 	Releases *storage.Storage
++	// ReleasesV2 stores chart v3 release records without changing the release
++	// v1 storage path used by existing actions.
++	ReleasesV2 *storage.Storage
+ 
+ 	// KubeClient is a Kubernetes API client.
+ 	KubeClient kube.Interface
+@@ -593,11 +598,33 @@ func (cfg *Configuration) releaseContent(name string, version int) (ri.Releaser,
+ 		return nil, fmt.Errorf("releaseContent: Release name is invalid: %s", name)
+ 	}
+ 
++	var rel ri.Releaser
++	var err error
+ 	if version <= 0 {
+-		return cfg.Releases.Last(name)
++		rel, err = cfg.Releases.Last(name)
++	} else {
++		rel, err = cfg.Releases.Get(name, version)
++	}
++	if err == nil || !errors.Is(err, driver.ErrReleaseNotFound) || cfg.ReleasesV2 == nil {
++		return rel, err
++	}
++
++	if version > 0 {
++		v2rel, v2err := cfg.ReleasesV2.Get(name, version)
++		if errors.Is(v2err, v2driver.ErrReleaseNotFound) {
++			return nil, err
++		}
++		return v2rel, v2err
+ 	}
+ 
+-	return cfg.Releases.Get(name, version)
++	history, v2err := cfg.ReleasesV2.History(name)
++	if errors.Is(v2err, v2driver.ErrReleaseNotFound) {
++		return nil, err
++	}
++	if v2err != nil {
++		return nil, v2err
++	}
++	return latestV3Release(history)
+ }
+ 
+ // GetVersionSet retrieves a set of available k8s API versions
+@@ -659,6 +686,26 @@ func (cfg *Configuration) recordRelease(r *release.Release) {
+ 	}
+ }
+ 
++func (cfg *Configuration) initSecretsStorage(client corev1.SecretInterface) {
++	d := driver.NewSecrets(client)
++	d.SetLogger(cfg.Logger().Handler())
++	cfg.Releases = storage.Init(d)
++
++	v2d := v2driver.NewSecrets(client)
++	v2d.SetLogger(cfg.Logger().Handler())
++	cfg.ReleasesV2 = storage.Init(v2d)
++}
++
++func (cfg *Configuration) initConfigMapsStorage(client corev1.ConfigMapInterface) {
++	d := driver.NewConfigMaps(client)
++	d.SetLogger(cfg.Logger().Handler())
++	cfg.Releases = storage.Init(d)
++
++	v2d := v2driver.NewConfigMaps(client)
++	v2d.SetLogger(cfg.Logger().Handler())
++	cfg.ReleasesV2 = storage.Init(v2d)
++}
++
+ // Init initializes the action configuration
+ func (cfg *Configuration) Init(getter genericclioptions.RESTClientGetter, namespace, helmDriver string) error {
+ 	kc := kube.New(getter)
+@@ -670,15 +717,14 @@ func (cfg *Configuration) Init(getter genericclioptions.RESTClientGetter, namesp
+ 	}
+ 
+ 	var store *storage.Storage
++	cfg.ReleasesV2 = nil
+ 	switch helmDriver {
+ 	case "secret", "secrets", "":
+-		d := driver.NewSecrets(newSecretClient(lazyClient))
+-		d.SetLogger(cfg.Logger().Handler())
+-		store = storage.Init(d)
++		cfg.initSecretsStorage(newSecretClient(lazyClient))
++		store = cfg.Releases
+ 	case "configmap", "configmaps":
+-		d := driver.NewConfigMaps(newConfigMapClient(lazyClient))
+-		d.SetLogger(cfg.Logger().Handler())
+-		store = storage.Init(d)
++		cfg.initConfigMapsStorage(newConfigMapClient(lazyClient))
++		store = cfg.Releases
+ 	case "memory":
+ 		var d *driver.Memory
+ 		if cfg.Releases != nil {
+diff --git a/pkg/action/hooks_v3.go b/pkg/action/hooks_v3.go
+new file mode 100644
+index 000000000..933726e46
+--- /dev/null
++++ b/pkg/action/hooks_v3.go
+@@ -0,0 +1,297 @@
++/*
++Copyright The Helm Authors.
++Licensed under the Apache License, Version 2.0 (the "License");
++you may not use this file except in compliance with the License.
++You may obtain a copy of the License at
++
++http://www.apache.org/licenses/LICENSE-2.0
++
++Unless required by applicable law or agreed to in writing, software
++distributed under the License is distributed on an "AS IS" BASIS,
++WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++See the License for the specific language governing permissions and
++limitations under the License.
++*/
++
++package action
++
++import (
++	"bytes"
++	"fmt"
++	"log"
++	"log/slog"
++	"slices"
++	"sort"
++	"time"
++
++	"helm.sh/helm/v4/pkg/kube"
++
++	"go.yaml.in/yaml/v3"
++	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
++
++	release "helm.sh/helm/v4/internal/release/v2"
++)
++
++// Hook execution for chart-v3 releases (internal/release/v2). Mirrors hooks.go;
++// harness-only wiring, never contributed.
++
++// execHookV3 executes all of the hooks for the given hook event.
++func (cfg *Configuration) execHookV3(rl *release.Release, hook release.HookEvent,
++	waitStrategy kube.WaitStrategy, waitOptions []kube.WaitOption,
++	timeout time.Duration, serverSideApply bool,
++) error {
++	shutdown, err := cfg.execHookWithDelayedShutdownV3(rl, hook, waitStrategy, waitOptions, timeout, serverSideApply)
++	if shutdown == nil {
++		return err
++	}
++	if err != nil {
++		if err := shutdown(); err != nil {
++			return err
++		}
++		return err
++	}
++	return shutdown()
++}
++
++// execHookWithDelayedShutdownV3 executes all of the hooks for the given hook event and returns a shutdownHook function to trigger deletions after doing other things like e.g. retrieving logs.
++func (cfg *Configuration) execHookWithDelayedShutdownV3(rl *release.Release, hook release.HookEvent,
++	waitStrategy kube.WaitStrategy, waitOptions []kube.WaitOption, timeout time.Duration,
++	serverSideApply bool,
++) (ExecuteShutdownFunc, error) {
++	executingHooks := []*release.Hook{}
++
++	for _, h := range rl.Hooks {
++		for _, e := range h.Events {
++			if e == hook {
++				executingHooks = append(executingHooks, h)
++			}
++		}
++	}
++
++	// hooke are pre-ordered by kind, so keep order stable
++	sort.Stable(hookByWeightV3(executingHooks))
++
++	for i, h := range executingHooks {
++		// Set default delete policy to before-hook-creation
++		cfg.hookSetDeletePolicyV3(h)
++
++		if err := cfg.deleteHookByPolicyV3(h, release.HookBeforeHookCreation, waitStrategy, waitOptions, timeout); err != nil {
++			return shutdownNoOp, err
++		}
++
++		resources, err := cfg.KubeClient.Build(bytes.NewBufferString(h.Manifest), true)
++		if err != nil {
++			return shutdownNoOp, fmt.Errorf("unable to build kubernetes object for %s hook %s: %w", hook, h.Path, err)
++		}
++
++		// Record the time at which the hook was applied to the cluster
++		h.LastRun = release.HookExecution{
++			StartedAt: time.Now(),
++			Phase:     release.HookPhaseRunning,
++		}
++		cfg.recordReleaseV3(rl)
++
++		// As long as the implementation of WatchUntilReady does not panic, HookPhaseFailed or HookPhaseSucceeded
++		// should always be set by this function. If we fail to do that for any reason, then HookPhaseUnknown is
++		// the most appropriate value to surface.
++		h.LastRun.Phase = release.HookPhaseUnknown
++
++		// Create hook resources
++		if _, err := cfg.KubeClient.Create(
++			resources,
++			kube.ClientCreateOptionServerSideApply(serverSideApply, false)); err != nil {
++			h.LastRun.CompletedAt = time.Now()
++			h.LastRun.Phase = release.HookPhaseFailed
++			return shutdownNoOp, fmt.Errorf("warning: Hook %s %s failed: %w", hook, h.Path, err)
++		}
++
++		var waiter kube.Waiter
++		if c, supportsOptions := cfg.KubeClient.(kube.InterfaceWaitOptions); supportsOptions {
++			waiter, err = c.GetWaiterWithOptions(waitStrategy, waitOptions...)
++		} else {
++			waiter, err = cfg.KubeClient.GetWaiter(waitStrategy)
++		}
++		if err != nil {
++			return shutdownNoOp, fmt.Errorf("unable to get waiter: %w", err)
++		}
++		// Watch hook resources until they have completed
++		err = waiter.WatchUntilReady(resources, timeout)
++		// Note the time of success/failure
++		h.LastRun.CompletedAt = time.Now()
++		// Mark hook as succeeded or failed
++		if err != nil {
++			h.LastRun.Phase = release.HookPhaseFailed
++			// If a hook is failed, check the annotation of the hook to determine if we should copy the logs client side
++			if errOutputting := cfg.outputLogsByPolicyV3(h, rl.Namespace, release.HookOutputOnFailed); errOutputting != nil {
++				// We log the error here as we want to propagate the hook failure upwards to the release object.
++				log.Printf("error outputting logs for hook failure: %v", errOutputting)
++			}
++			// If a hook is failed, check the annotation of the hook to determine whether the hook should be deleted
++			// under failed condition. If so, then clear the corresponding resource object in the hook
++			return func() error {
++				if errDeleting := cfg.deleteHookByPolicyV3(h, release.HookFailed, waitStrategy, waitOptions, timeout); errDeleting != nil {
++					// We log the error here as we want to propagate the hook failure upwards to the release object.
++					log.Printf("error deleting the hook resource on hook failure: %v", errDeleting)
++				}
++
++				// If a hook is failed, check the annotation of the previous successful hooks to determine whether the hooks
++				// should be deleted under succeeded condition.
++				if err := cfg.deleteHooksByPolicyV3(executingHooks[0:i], release.HookSucceeded, waitStrategy, waitOptions, timeout); err != nil {
++					return err
++				}
++				return err
++			}, err
++		}
++		h.LastRun.Phase = release.HookPhaseSucceeded
++	}
++
++	return func() error {
++		// If all hooks are successful, check the annotation of each hook to determine whether the hook should be deleted
++		// or output should be logged under succeeded condition. If so, then clear the corresponding resource object in each hook
++		for _, v := range slices.Backward(executingHooks) {
++			h := v
++			if err := cfg.outputLogsByPolicyV3(h, rl.Namespace, release.HookOutputOnSucceeded); err != nil {
++				// We log here as we still want to attempt hook resource deletion even if output logging fails.
++				log.Printf("error outputting logs for hook failure: %v", err)
++			}
++			if err := cfg.deleteHookByPolicyV3(h, release.HookSucceeded, waitStrategy, waitOptions, timeout); err != nil {
++				return err
++			}
++		}
++		return nil
++	}, nil
++}
++
++// hookByWeightV3 is a sorter for hooks
++type hookByWeightV3 []*release.Hook
++
++func (x hookByWeightV3) Len() int      { return len(x) }
++func (x hookByWeightV3) Swap(i, j int) { x[i], x[j] = x[j], x[i] }
++func (x hookByWeightV3) Less(i, j int) bool {
++	if x[i].Weight == x[j].Weight {
++		return x[i].Name < x[j].Name
++	}
++	return x[i].Weight < x[j].Weight
++}
++
++// deleteHookByPolicyV3 deletes a hook if the hook policy instructs it to
++func (cfg *Configuration) deleteHookByPolicyV3(h *release.Hook, policy release.HookDeletePolicy,
++	waitStrategy kube.WaitStrategy, waitOptions []kube.WaitOption, timeout time.Duration,
++) error {
++	// Never delete CustomResourceDefinitions; this could cause lots of
++	// cascading garbage collection.
++	if h.Kind == "CustomResourceDefinition" {
++		return nil
++	}
++	if cfg.hookHasDeletePolicyV3(h, policy) {
++		resources, err := cfg.KubeClient.Build(bytes.NewBufferString(h.Manifest), false)
++		if err != nil {
++			return fmt.Errorf("unable to build kubernetes object for deleting hook %s: %w", h.Path, err)
++		}
++		_, errs := cfg.KubeClient.Delete(resources, metav1.DeletePropagationBackground)
++		if len(errs) > 0 {
++			return joinErrors(errs, "; ")
++		}
++
++		var waiter kube.Waiter
++		if c, supportsOptions := cfg.KubeClient.(kube.InterfaceWaitOptions); supportsOptions {
++			waiter, err = c.GetWaiterWithOptions(waitStrategy, waitOptions...)
++		} else {
++			waiter, err = cfg.KubeClient.GetWaiter(waitStrategy)
++		}
++		if err != nil {
++			return err
++		}
++		if err := waiter.WaitForDelete(resources, timeout); err != nil {
++			return err
++		}
++	}
++	return nil
++}
++
++// deleteHooksByPolicyV3 deletes all hooks if the hook policy instructs it to
++func (cfg *Configuration) deleteHooksByPolicyV3(hooks []*release.Hook, policy release.HookDeletePolicy,
++	waitStrategy kube.WaitStrategy, waitOptions []kube.WaitOption, timeout time.Duration,
++) error {
++	for _, h := range hooks {
++		if err := cfg.deleteHookByPolicyV3(h, policy, waitStrategy, waitOptions, timeout); err != nil {
++			return err
++		}
++	}
++
++	return nil
++}
++
++// hookHasDeletePolicyV3 determines whether the defined hook deletion policy matches the hook deletion polices
++// supported by helm. If so, mark the hook as one should be deleted.
++func (cfg *Configuration) hookHasDeletePolicyV3(h *release.Hook, policy release.HookDeletePolicy) bool {
++	cfg.mutex.Lock()
++	defer cfg.mutex.Unlock()
++	return slices.Contains(h.DeletePolicies, policy)
++}
++
++// hookSetDeletePolicyV3 determines whether the defined hook deletion policy matches the hook deletion polices
++// supported by helm. If so, mark the hook as one should be deleted.
++func (cfg *Configuration) hookSetDeletePolicyV3(h *release.Hook) {
++	cfg.mutex.Lock()
++	defer cfg.mutex.Unlock()
++	if len(h.DeletePolicies) == 0 {
++		// TODO(jlegrone): Only apply before-hook-creation delete policy to run to completion
++		//                 resources. For all other resource types update in place if a
++		//                 resource with the same name already exists and is owned by the
++		//                 current release.
++		h.DeletePolicies = []release.HookDeletePolicy{release.HookBeforeHookCreation}
++	}
++}
++
++// outputLogsByPolicyV3 outputs a pods logs if the hook policy instructs it to
++func (cfg *Configuration) outputLogsByPolicyV3(h *release.Hook, releaseNamespace string, policy release.HookOutputLogPolicy) error {
++	if !hookHasOutputLogPolicyV3(h, policy) {
++		return nil
++	}
++	namespace, err := cfg.deriveNamespaceV3(h, releaseNamespace)
++	if err != nil {
++		return err
++	}
++	switch h.Kind {
++	case "Job":
++		return cfg.outputContainerLogsForListOptions(namespace, metav1.ListOptions{LabelSelector: "job-name=" + h.Name})
++	case "Pod":
++		return cfg.outputContainerLogsForListOptions(namespace, metav1.ListOptions{FieldSelector: "metadata.name=" + h.Name})
++	default:
++		return nil
++	}
++}
++
++func (cfg *Configuration) deriveNamespaceV3(h *release.Hook, namespace string) (string, error) {
++	tmp := struct {
++		Metadata struct {
++			Namespace string
++		}
++	}{}
++	err := yaml.Unmarshal([]byte(h.Manifest), &tmp)
++	if err != nil {
++		return "", fmt.Errorf("unable to parse metadata.namespace from kubernetes manifest for output logs hook %s: %w", h.Path, err)
++	}
++	if tmp.Metadata.Namespace == "" {
++		return namespace, nil
++	}
++	return tmp.Metadata.Namespace, nil
++}
++
++// hookHasOutputLogPolicyV3 determines whether the defined hook output log policy matches the hook output log policies
++// supported by helm.
++func hookHasOutputLogPolicyV3(h *release.Hook, policy release.HookOutputLogPolicy) bool {
++	return slices.Contains(h.OutputLogPolicies, policy)
++}
++
++func (cfg *Configuration) recordReleaseV3(r *release.Release) {
++	if err := cfg.ReleasesV2.Update(r); err != nil {
++		cfg.Logger().Warn(
++			"failed to update release",
++			slog.String("name", r.Name),
++			slog.Int("revision", r.Version),
++			slog.Any("error", err),
++		)
++	}
++}
+diff --git a/pkg/action/install.go b/pkg/action/install.go
+index 6fc919366..5516d931e 100644
+--- a/pkg/action/install.go
++++ b/pkg/action/install.go
+@@ -41,6 +41,7 @@ import (
+ 	"k8s.io/cli-runtime/pkg/resource"
+ 	"sigs.k8s.io/yaml"
+ 
++	chartv3 "helm.sh/helm/v4/internal/chart/v3"
+ 	ci "helm.sh/helm/v4/pkg/chart"
+ 	"helm.sh/helm/v4/pkg/chart/common"
+ 	"helm.sh/helm/v4/pkg/chart/common/util"
+@@ -282,6 +283,10 @@ func (i *Install) Run(chrt ci.Charter, vals map[string]any) (ri.Releaser, error)
+ // When the task is cancelled through ctx, the function returns and the install
+ // proceeds in the background.
+ func (i *Install) RunWithContext(ctx context.Context, ch ci.Charter, vals map[string]any) (ri.Releaser, error) {
++	if chrt, ok := ch.(*chartv3.Chart); ok {
++		return i.runV3WithContext(ctx, chrt, vals)
++	}
++
+ 	var chrt *chart.Chart
+ 	switch c := ch.(type) {
+ 	case *chart.Chart:
+diff --git a/pkg/action/install_v3.go b/pkg/action/install_v3.go
+new file mode 100644
+index 000000000..f45f18723
+--- /dev/null
++++ b/pkg/action/install_v3.go
+@@ -0,0 +1,520 @@
++/*
++Copyright The Helm Authors.
++
++Licensed under the Apache License, Version 2.0 (the "License");
++you may not use this file except in compliance with the License.
++You may obtain a copy of the License at
++
++http://www.apache.org/licenses/LICENSE-2.0
++
++Unless required by applicable law or agreed to in writing, software
++distributed under the License is distributed on an "AS IS" BASIS,
++WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++See the License for the specific language governing permissions and
++limitations under the License.
++*/
++
++package action
++
++import (
++	"bytes"
++	"context"
++	"errors"
++	"fmt"
++	"io"
++	"log/slog"
++	"path"
++	"path/filepath"
++	"slices"
++	"strings"
++	"time"
++
++	v1 "k8s.io/api/core/v1"
++	apierrors "k8s.io/apimachinery/pkg/api/errors"
++	"k8s.io/apimachinery/pkg/api/meta"
++	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
++	"k8s.io/cli-runtime/pkg/resource"
++	"sigs.k8s.io/yaml"
++
++	chart "helm.sh/helm/v4/internal/chart/v3"
++	chartutil "helm.sh/helm/v4/internal/chart/v3/util"
++	release "helm.sh/helm/v4/internal/release/v2"
++	releaseutil "helm.sh/helm/v4/internal/release/v2/util"
++	v2driver "helm.sh/helm/v4/internal/storage/driver"
++	"helm.sh/helm/v4/pkg/chart/common"
++	commonutil "helm.sh/helm/v4/pkg/chart/common/util"
++	legacychartutil "helm.sh/helm/v4/pkg/chart/v2/util"
++	"helm.sh/helm/v4/pkg/engine"
++	"helm.sh/helm/v4/pkg/kube"
++	kubefake "helm.sh/helm/v4/pkg/kube/fake"
++	ri "helm.sh/helm/v4/pkg/release"
++	rcommon "helm.sh/helm/v4/pkg/release/common"
++	"helm.sh/helm/v4/pkg/storage"
++	"helm.sh/helm/v4/pkg/storage/driver"
++)
++
++func (i *Install) runV3WithContext(ctx context.Context, chrt *chart.Chart, vals map[string]any) (*release.Release, error) {
++	if interactWithServer(i.DryRunStrategy) {
++		if err := i.cfg.KubeClient.IsReachable(); err != nil {
++			i.cfg.Logger().Error(fmt.Sprintf("cluster reachability check failed: %v", err))
++			return nil, fmt.Errorf("cluster reachability check failed: %w", err)
++		}
++	}
++
++	if !isDryRun(i.DryRunStrategy) && i.HideSecret {
++		return nil, errors.New("hiding Kubernetes secrets requires a dry-run mode")
++	}
++	if v3CheckInstall != nil {
++		if err := v3CheckInstall(i); err != nil {
++			return nil, err
++		}
++	}
++	if err := i.availableNameV3(); err != nil {
++		return nil, fmt.Errorf("release name check failed: %w", err)
++	}
++	if err := chartutil.ProcessDependencies(chrt, vals); err != nil {
++		return nil, fmt.Errorf("chart dependencies processing failed: %w", err)
++	}
++
++	if crds := chrt.CRDObjects(); interactWithServer(i.DryRunStrategy) && !i.SkipCRDs && len(crds) > 0 {
++		if isDryRun(i.DryRunStrategy) {
++			i.cfg.Logger().Warn("This chart or one of its subcharts contains CRDs. Rendering may fail or contain inaccuracies.")
++		} else if err := i.installCRDsV3(crds); err != nil {
++			return nil, err
++		}
++	}
++
++	if !interactWithServer(i.DryRunStrategy) {
++		i.cfg.Capabilities = common.DefaultCapabilities.Copy()
++		if i.KubeVersion != nil {
++			i.cfg.Capabilities.KubeVersion = *i.KubeVersion
++		}
++		i.cfg.Capabilities.APIVersions = append(i.cfg.Capabilities.APIVersions, i.APIVersions...)
++		i.cfg.KubeClient = &kubefake.PrintingKubeClient{Out: io.Discard}
++
++		mem := v2driver.NewMemory()
++		mem.SetNamespace(i.Namespace)
++		i.cfg.ReleasesV2 = storage.Init(mem)
++	} else if len(i.APIVersions) > 0 {
++		i.cfg.Logger().Debug("API Version list given outside of client only mode, this list will be ignored")
++	}
++
++	if i.WaitStrategy == kube.HookOnlyStrategy && i.RollbackOnFailure {
++		i.WaitStrategy = kube.StatusWatcherStrategy
++	}
++
++	caps, err := i.cfg.getCapabilities()
++	if err != nil {
++		return nil, err
++	}
++	isUpgrade := i.IsUpgrade && isDryRun(i.DryRunStrategy)
++	valuesToRender, err := commonutil.ToRenderValuesWithSchemaValidation(chrt, vals, common.ReleaseOptions{
++		Name:      i.ReleaseName,
++		Namespace: i.Namespace,
++		Revision:  1,
++		IsInstall: !isUpgrade,
++		IsUpgrade: isUpgrade,
++	}, caps, i.SkipSchemaValidation)
++	if err != nil {
++		return nil, err
++	}
++	if driver.ContainsSystemLabels(i.Labels) {
++		return nil, fmt.Errorf("user supplied labels contains system reserved label name. System labels: %+v", driver.GetSystemLabels())
++	}
++
++	rel := i.createReleaseV3(chrt, vals, i.Labels)
++	var sortedManifests []releaseutil.Manifest
++	rel.Hooks, rel.Manifest, rel.Info.Notes, sortedManifests, err = i.renderResourcesV3(ctx, chrt, valuesToRender)
++	if err != nil {
++		rel.SetStatus(rcommon.StatusFailed, "failed to render resource: "+err.Error())
++		return rel, err
++	}
++	rel.SetStatus(rcommon.StatusPendingInstall, "Initial install underway")
++
++	var toBeAdopted kube.ResourceList
++	resources, err := i.cfg.KubeClient.Build(bytes.NewBufferString(rel.Manifest), !i.DisableOpenAPIValidation)
++	if err != nil {
++		return nil, fmt.Errorf("unable to build kubernetes objects from release manifest: %w", err)
++	}
++	if err := resources.Visit(setMetadataVisitor(rel.Name, rel.Namespace, true)); err != nil {
++		return nil, err
++	}
++	if interactWithServer(i.DryRunStrategy) && !isUpgrade && len(resources) > 0 {
++		if i.TakeOwnership {
++			toBeAdopted, err = requireAdoption(resources)
++		} else {
++			toBeAdopted, err = existingResourceConflict(resources, rel.Name, rel.Namespace)
++		}
++		if err != nil {
++			return nil, fmt.Errorf("unable to continue with install: %w", err)
++		}
++	}
++	if isDryRun(i.DryRunStrategy) {
++		rel.Info.Description = "Dry run complete"
++		return rel, nil
++	}
++
++	apply := v3Apply(v3ApplyAll)
++	if v3PlanInstall != nil {
++		planned, err := v3PlanInstall(i, chrt, rel, sortedManifests)
++		if err != nil {
++			rel.SetStatus(rcommon.StatusFailed, "failed to build sequencing plan: "+err.Error())
++			return rel, err
++		}
++		if planned != nil {
++			apply = planned
++		}
++	}
++
++	if i.CreateNamespace {
++		if err := i.createNamespaceV3(); err != nil {
++			return nil, err
++		}
++	}
++	if i.Replace {
++		if err := i.replaceReleaseV3(rel); err != nil {
++			return nil, err
++		}
++	}
++	if i.cfg.ReleasesV2 == nil {
++		return rel, errors.New("release/v2 storage is not configured")
++	}
++	if err := i.cfg.ReleasesV2.Create(rel); err != nil {
++		return rel, err
++	}
++
++	rel, err = i.performInstallV3(ctx, rel, apply, toBeAdopted, resources)
++	if err != nil {
++		return i.failReleaseV3(rel, err)
++	}
++	return rel, nil
++}
++
++func (i *Install) failReleaseV3(rel *release.Release, err error) (*release.Release, error) {
++	rel.SetStatus(rcommon.StatusFailed, fmt.Sprintf("Release %q failed: %s", i.ReleaseName, err.Error()))
++	_ = i.recordReleaseV3(rel)
++	if i.RollbackOnFailure {
++		i.cfg.Logger().Debug("install failed and rollback-on-failure is set, uninstalling release", "release", i.ReleaseName)
++		uninstall := NewUninstall(i.cfg)
++		uninstall.DisableHooks = i.DisableHooks
++		uninstall.KeepHistory = false
++		uninstall.Timeout = i.Timeout
++		uninstall.WaitStrategy = i.WaitStrategy
++		uninstall.WaitOptions = i.WaitOptions
++		if _, uninstallErr := uninstall.Run(i.ReleaseName); uninstallErr != nil {
++			return rel, fmt.Errorf("an error occurred while uninstalling the release. original install error: %w: %w", err, uninstallErr)
++		}
++		return rel, fmt.Errorf("release %s failed, and has been uninstalled due to rollback-on-failure being set: %w", i.ReleaseName, err)
++	}
++	return rel, err
++}
++
++func (i *Install) createReleaseV3(chrt *chart.Chart, rawVals map[string]any, labels map[string]string) *release.Release {
++	ts := i.cfg.Now()
++	return &release.Release{
++		Name:      i.ReleaseName,
++		Namespace: i.Namespace,
++		Chart:     chrt,
++		Config:    rawVals,
++		Info: &release.Info{
++			FirstDeployed: ts,
++			LastDeployed:  ts,
++			Status:        rcommon.StatusUnknown,
++		},
++		Version:     1,
++		Labels:      labels,
++		ApplyMethod: string(determineReleaseSSApplyMethod(i.ServerSideApply)),
++	}
++}
++
++func (i *Install) renderResourcesV3(ctx context.Context, chrt *chart.Chart, values common.Values) ([]*release.Hook, string, string, []releaseutil.Manifest, error) {
++	var files map[string]string
++	var err error
++	if interactWithServer(i.DryRunStrategy) && i.cfg.RESTClientGetter != nil {
++		restConfig, configErr := i.cfg.RESTClientGetter.ToRESTConfig()
++		if configErr != nil {
++			return nil, "", "", nil, configErr
++		}
++		e := engine.New(restConfig)
++		e.EnableDNS = i.EnableDNS
++		e.CustomTemplateFuncs = i.cfg.CustomTemplateFuncs
++		files, err = e.RenderWithContext(ctx, chrt, values)
++	} else {
++		e := engine.Engine{EnableDNS: i.EnableDNS, CustomTemplateFuncs: i.cfg.CustomTemplateFuncs}
++		files, err = e.RenderWithContext(ctx, chrt, values)
++	}
++	if err != nil {
++		return nil, "", "", nil, err
++	}
++
++	var notes strings.Builder
++	for name, content := range files {
++		if strings.HasSuffix(name, notesFileSuffix) {
++			if i.SubNotes || name == path.Join(chrt.Name(), "templates", notesFileSuffix) {
++				if notes.Len() > 0 {
++					notes.WriteString("\n")
++				}
++				notes.WriteString(content)
++			}
++			delete(files, name)
++		}
++	}
++
++	if i.PostRenderer != nil {
++		if i.PostRenderStrategy != PostRenderStrategyCombined && i.PostRenderStrategy != "" {
++			return nil, "", notes.String(), nil, fmt.Errorf("post-render strategy %q is not supported for chart apiVersion v3", i.PostRenderStrategy)
++		}
++		merged, mergeErr := annotateAndMerge(files)
++		if mergeErr != nil {
++			return nil, "", notes.String(), nil, fmt.Errorf("error merging manifests: %w", mergeErr)
++		}
++		postRendered, renderErr := i.PostRenderer.Run(bytes.NewBufferString(merged))
++		if renderErr != nil {
++			return nil, "", notes.String(), nil, fmt.Errorf("error while running post render on files: %w", renderErr)
++		}
++		files, err = splitAndDeannotate(postRendered.String(), "")
++		if err != nil {
++			return nil, "", notes.String(), nil, fmt.Errorf("error while parsing post rendered output: %w", err)
++		}
++	}
++
++	hooks, manifests, err := releaseutil.SortManifests(files, nil, releaseutil.InstallOrder)
++	if err != nil {
++		return hooks, joinRenderedFiles(files), "", manifests, err
++	}
++
++	var manifest bytes.Buffer
++	written := make(map[string]bool)
++	if i.IncludeCRDs {
++		for _, crd := range chrt.CRDObjects() {
++			if i.OutputDir == "" {
++				fmt.Fprintf(&manifest, "---\n# Source: %s\n%s\n", crd.Filename, crd.File.Data)
++			} else if err := writeToFile(i.OutputDir, crd.Filename, string(crd.File.Data), written[crd.Filename]); err != nil {
++				return hooks, manifest.String(), notes.String(), manifests, err
++			} else {
++				written[crd.Filename] = true
++			}
++		}
++	}
++	for _, rendered := range manifests {
++		if i.OutputDir == "" {
++			if i.HideSecret && rendered.Head.Kind == "Secret" && rendered.Head.Version == "v1" {
++				fmt.Fprintf(&manifest, "---\n# Source: %s\n# HIDDEN: The Secret output has been suppressed\n", rendered.Name)
++			} else {
++				fmt.Fprintf(&manifest, "---\n# Source: %s\n%s\n", rendered.Name, rendered.Content)
++			}
++			continue
++		}
++		outputDir := i.OutputDir
++		if i.UseReleaseName {
++			outputDir = filepath.Join(outputDir, i.ReleaseName)
++		}
++		if err := writeToFile(outputDir, rendered.Name, rendered.Content, written[rendered.Name]); err != nil {
++			return hooks, manifest.String(), notes.String(), manifests, err
++		}
++		written[rendered.Name] = true
++	}
++	return hooks, manifest.String(), notes.String(), manifests, nil
++}
++
++func joinRenderedFiles(files map[string]string) string {
++	var rendered bytes.Buffer
++	keys := mapsKeys(files)
++	slices.Sort(keys)
++	for _, name := range keys {
++		if strings.TrimSpace(files[name]) != "" {
++			fmt.Fprintf(&rendered, "---\n# Source: %s\n%s\n", name, files[name])
++		}
++	}
++	return rendered.String()
++}
++
++func mapsKeys[V any](values map[string]V) []string {
++	keys := make([]string, 0, len(values))
++	for key := range values {
++		keys = append(keys, key)
++	}
++	return keys
++}
++
++func (i *Install) performInstallV3(ctx context.Context, rel *release.Release, apply v3Apply, toBeAdopted, resources kube.ResourceList) (*release.Release, error) {
++	if !i.DisableHooks {
++		if err := i.cfg.execHookV3(rel, release.HookPreInstall, i.WaitStrategy, i.WaitOptions, i.Timeout, i.ServerSideApply); err != nil {
++			return rel, fmt.Errorf("failed pre-install: %w", err)
++		}
++	}
++	op := &v3Operation{
++		cfg:                   i.cfg,
++		target:                rel,
++		current:               toBeAdopted,
++		desired:               resources,
++		waitStrategy:          i.WaitStrategy,
++		waitOptions:           i.WaitOptions,
++		waitForJobs:           i.WaitForJobs,
++		timeout:               i.Timeout,
++		serverSideApply:       i.ServerSideApply,
++		forceConflicts:        i.ForceConflicts,
++		forceReplace:          i.ForceReplace,
++		disableOpenAPI:        i.DisableOpenAPIValidation,
++		threeWayMerge:         i.TakeOwnership && !i.ServerSideApply,
++		csaFieldManagerUpdate: true,
++	}
++	if err := apply(ctx, op); err != nil {
++		return rel, err
++	}
++	if !i.DisableHooks {
++		if err := i.cfg.execHookV3(rel, release.HookPostInstall, i.WaitStrategy, i.WaitOptions, i.Timeout, i.ServerSideApply); err != nil {
++			return rel, fmt.Errorf("failed post-install: %w", err)
++		}
++	}
++	if i.Description != "" {
++		rel.SetStatus(rcommon.StatusDeployed, i.Description)
++	} else {
++		rel.SetStatus(rcommon.StatusDeployed, "Install complete")
++	}
++	if err := i.recordReleaseV3(rel); err != nil {
++		i.cfg.Logger().Error("failed to record the release", slog.Any("error", err))
++	}
++	return rel, nil
++}
++
++func (i *Install) availableNameV3() error {
++	if err := legacychartutil.ValidateReleaseName(i.ReleaseName); err != nil {
++		return fmt.Errorf("release name %q: %w", i.ReleaseName, err)
++	}
++	if isDryRun(i.DryRunStrategy) || i.cfg.ReleasesV2 == nil {
++		return nil
++	}
++	history, err := i.cfg.ReleasesV2.History(i.ReleaseName)
++	if err != nil || len(history) == 0 {
++		return nil
++	}
++	latest, err := latestV3Release(history)
++	if err != nil {
++		return err
++	}
++	if i.Replace && (latest.Info.Status == rcommon.StatusUninstalled || latest.Info.Status == rcommon.StatusFailed) {
++		return nil
++	}
++	return errors.New("cannot reuse a name that is still in use")
++}
++
++func latestV3Release(history []ri.Releaser) (*release.Release, error) {
++	var latest *release.Release
++	for _, item := range history {
++		rel, ok := item.(*release.Release)
++		if !ok {
++			return nil, fmt.Errorf("release/v2 storage returned unsupported release type %T", item)
++		}
++		if latest == nil || rel.Version > latest.Version {
++			latest = rel
++		}
++	}
++	return latest, nil
++}
++
++func (i *Install) replaceReleaseV3(rel *release.Release) error {
++	history, err := i.cfg.ReleasesV2.History(rel.Name)
++	if err != nil || len(history) == 0 {
++		return nil
++	}
++	latest, err := latestV3Release(history)
++	if err != nil {
++		return err
++	}
++	rel.Version = latest.Version + 1
++	if latest.Info.Status == rcommon.StatusFailed {
++		return nil
++	}
++	latest.SetStatus(rcommon.StatusSuperseded, "superseded by new release")
++	return i.recordReleaseV3(latest)
++}
++
++func (i *Install) recordReleaseV3(rel *release.Release) error {
++	return i.cfg.ReleasesV2.Update(rel)
++}
++
++func (i *Install) createNamespaceV3() error {
++	ns := &v1.Namespace{
++		TypeMeta: metav1.TypeMeta{APIVersion: "v1", Kind: "Namespace"},
++		ObjectMeta: metav1.ObjectMeta{
++			Name:   i.Namespace,
++			Labels: map[string]string{"name": i.Namespace},
++		},
++	}
++	buf, err := yaml.Marshal(ns)
++	if err != nil {
++		return err
++	}
++	resources, err := i.cfg.KubeClient.Build(bytes.NewBuffer(buf), true)
++	if err != nil {
++		return err
++	}
++	_, err = i.cfg.KubeClient.Create(resources, kube.ClientCreateOptionServerSideApply(i.ServerSideApply, false))
++	if apierrors.IsAlreadyExists(err) {
++		return nil
++	}
++	return err
++}
++
++func (i *Install) installCRDsV3(crds []chart.CRD) error {
++	totalItems := []*resource.Info{}
++	for _, obj := range crds {
++		if obj.File == nil {
++			return fmt.Errorf("failed to install CRD %s: file is empty", obj.Name)
++		}
++		if obj.File.Data == nil {
++			return fmt.Errorf("failed to install CRD %s: file data is empty", obj.Name)
++		}
++		resources, err := i.cfg.KubeClient.Build(bytes.NewBuffer(obj.File.Data), false)
++		if err != nil {
++			return fmt.Errorf("failed to install CRD %s: %w", obj.Name, err)
++		}
++		if len(resources) == 0 {
++			return fmt.Errorf("failed to install CRD %s: resources are empty", obj.Name)
++		}
++		if _, err := i.cfg.KubeClient.Create(resources, kube.ClientCreateOptionServerSideApply(i.ServerSideApply, i.ForceConflicts)); err != nil {
++			if apierrors.IsAlreadyExists(err) {
++				continue
++			}
++			return fmt.Errorf("failed to install CRD %s: %w", obj.Name, err)
++		}
++		totalItems = append(totalItems, resources...)
++	}
++	if len(totalItems) == 0 {
++		return nil
++	}
++
++	var waiter kube.Waiter
++	var err error
++	if client, ok := i.cfg.KubeClient.(kube.InterfaceWaitOptions); ok {
++		waiter, err = client.GetWaiterWithOptions(i.WaitStrategy, i.WaitOptions...)
++	} else {
++		waiter, err = i.cfg.KubeClient.GetWaiter(i.WaitStrategy)
++	}
++	if err != nil {
++		return fmt.Errorf("unable to get waiter: %w", err)
++	}
++	if err := waiter.Wait(totalItems, 60*time.Second); err != nil {
++		return err
++	}
++	if i.cfg.RESTClientGetter == nil || i.cfg.Capabilities == nil {
++		return nil
++	}
++	discoveryClient, err := i.cfg.RESTClientGetter.ToDiscoveryClient()
++	if err != nil {
++		return err
++	}
++	if discoveryClient != nil {
++		discoveryClient.Invalidate()
++		_, _ = discoveryClient.ServerGroups()
++	}
++	restMapper, err := i.cfg.RESTClientGetter.ToRESTMapper()
++	if err != nil {
++		return err
++	}
++	if resettable, ok := restMapper.(meta.ResettableRESTMapper); ok {
++		resettable.Reset()
++	}
++	return nil
++}
+diff --git a/pkg/action/lint.go b/pkg/action/lint.go
+index 6156fe5c8..59b650142 100644
+--- a/pkg/action/lint.go
++++ b/pkg/action/lint.go
+@@ -22,8 +22,10 @@ import (
+ 	"path/filepath"
+ 	"strings"
+ 
++	chartv3 "helm.sh/helm/v4/internal/chart/v3"
++	lintv3 "helm.sh/helm/v4/internal/chart/v3/lint"
+ 	"helm.sh/helm/v4/pkg/chart/common"
+-	"helm.sh/helm/v4/pkg/chart/v2/lint"
++	lintv2 "helm.sh/helm/v4/pkg/chart/v2/lint"
+ 	"helm.sh/helm/v4/pkg/chart/v2/lint/support"
+ 	chartutil "helm.sh/helm/v4/pkg/chart/v2/util"
+ )
+@@ -126,11 +128,32 @@ func lintChart(path string, vals map[string]any, namespace string, kubeVersion *
+ 		return linter, fmt.Errorf("unable to check Chart.yaml file in chart: %w", err)
+ 	}
+ 
+-	return lint.RunAll(
++	metadata, err := chartutil.LoadChartfile(filepath.Join(chartPath, "Chart.yaml"))
++	if err == nil && metadata.APIVersion == chartv3.APIVersionV3 {
++		result := lintv3.RunAll(
++			chartPath,
++			vals,
++			namespace,
++			lintv3.WithKubeVersion(kubeVersion),
++			lintv3.WithSkipSchemaValidation(skipSchemaValidation),
++		)
++		linter.ChartDir = result.ChartDir
++		linter.HighestSeverity = result.HighestSeverity
++		for _, msg := range result.Messages {
++			linter.Messages = append(linter.Messages, support.Message{
++				Severity: msg.Severity,
++				Path:     msg.Path,
++				Err:      msg.Err,
++			})
++		}
++		return linter, nil
++	}
++
++	return lintv2.RunAll(
+ 		chartPath,
+ 		vals,
+ 		namespace,
+-		lint.WithKubeVersion(kubeVersion),
+-		lint.WithSkipSchemaValidation(skipSchemaValidation),
++		lintv2.WithKubeVersion(kubeVersion),
++		lintv2.WithSkipSchemaValidation(skipSchemaValidation),
+ 	), nil
+ }
+diff --git a/pkg/action/rollback.go b/pkg/action/rollback.go
+index fc7f07656..1aadfd2ae 100644
+--- a/pkg/action/rollback.go
++++ b/pkg/action/rollback.go
+@@ -18,6 +18,7 @@ package action
+ 
+ import (
+ 	"bytes"
++	"context"
+ 	"errors"
+ 	"fmt"
+ 	"time"
+@@ -79,6 +80,11 @@ func NewRollback(cfg *Configuration) *Rollback {
+ 
+ // Run executes 'helm rollback' against the given release.
+ func (r *Rollback) Run(name string) error {
++	return r.RunWithContext(context.Background(), name)
++}
++
++// RunWithContext executes 'helm rollback' against the given release.
++func (r *Rollback) RunWithContext(ctx context.Context, name string) error {
+ 	if descLen := utf8.RuneCountInString(r.Description); descLen > MaxDescriptionLength {
+ 		return fmt.Errorf("description must be %d characters or less, got %d", MaxDescriptionLength, descLen)
+ 	}
+@@ -87,6 +93,12 @@ func (r *Rollback) Run(name string) error {
+ 		return err
+ 	}
+ 
++	if rels, found, err := r.v3ReleaseHistory(name); err != nil {
++		return err
++	} else if found {
++		return r.runV3(ctx, rels)
++	}
++
+ 	r.cfg.Releases.MaxHistory = r.MaxHistory
+ 
+ 	r.cfg.Logger().Debug("preparing rollback", "name", name)
+diff --git a/pkg/action/rollback_v3.go b/pkg/action/rollback_v3.go
+new file mode 100644
+index 000000000..e1517e9af
+--- /dev/null
++++ b/pkg/action/rollback_v3.go
+@@ -0,0 +1,204 @@
++/*
++Copyright The Helm Authors.
++
++Licensed under the Apache License, Version 2.0 (the "License");
++you may not use this file except in compliance with the License.
++You may obtain a copy of the License at
++
++http://www.apache.org/licenses/LICENSE-2.0
++
++Unless required by applicable law or agreed to in writing, software
++distributed under the License is distributed on an "AS IS" BASIS,
++WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++See the License for the specific language governing permissions and
++limitations under the License.
++*/
++
++package action
++
++import (
++	"bytes"
++	"context"
++	"errors"
++	"fmt"
++	"sort"
++
++	chart "helm.sh/helm/v4/internal/chart/v3"
++	release "helm.sh/helm/v4/internal/release/v2"
++	v2driver "helm.sh/helm/v4/internal/storage/driver"
++	legacychartutil "helm.sh/helm/v4/pkg/chart/v2/util"
++	"helm.sh/helm/v4/pkg/kube"
++	rcommon "helm.sh/helm/v4/pkg/release/common"
++)
++
++func (r *Rollback) v3ReleaseHistory(name string) ([]*release.Release, bool, error) {
++	if r.cfg.ReleasesV2 == nil {
++		return nil, false, nil
++	}
++	history, err := r.cfg.ReleasesV2.History(name)
++	if err != nil {
++		if errors.Is(err, v2driver.ErrReleaseNotFound) {
++			return nil, false, nil
++		}
++		return nil, false, err
++	}
++
++	rels := make([]*release.Release, 0, len(history))
++	for _, item := range history {
++		rel, ok := item.(*release.Release)
++		if !ok || rel.Chart == nil || rel.Chart.Metadata == nil || rel.Chart.Metadata.APIVersion != chart.APIVersionV3 {
++			continue
++		}
++		rels = append(rels, rel)
++	}
++	if len(rels) == 0 {
++		return nil, false, nil
++	}
++	sort.Slice(rels, func(i, j int) bool { return rels[i].Version < rels[j].Version })
++	return rels, true, nil
++}
++
++func (r *Rollback) runV3(ctx context.Context, rels []*release.Release) error {
++	if err := legacychartutil.ValidateReleaseName(rels[len(rels)-1].Name); err != nil {
++		return fmt.Errorf("prepareRollback: Release name is invalid: %s", rels[len(rels)-1].Name)
++	}
++	if r.Version < 0 {
++		return errInvalidRevision
++	}
++	if v3CheckRollback != nil {
++		if err := v3CheckRollback(r); err != nil {
++			return err
++		}
++	}
++
++	current := rels[len(rels)-1]
++	targetVersion := r.Version
++	if targetVersion == 0 {
++		targetVersion = current.Version - 1
++	}
++	var previous *release.Release
++	for _, rel := range rels {
++		if rel.Version == targetVersion {
++			previous = rel
++			break
++		}
++	}
++	if previous == nil {
++		return fmt.Errorf("release has no %d version", targetVersion)
++	}
++
++	serverSideApply, err := getUpgradeServerSideValue(r.ServerSideApply, previous.ApplyMethod)
++	if err != nil {
++		return err
++	}
++	description := r.Description
++	if description == "" {
++		description = fmt.Sprintf("Rollback to %d", targetVersion)
++	}
++	target := &release.Release{
++		Name:      current.Name,
++		Namespace: current.Namespace,
++		Chart:     previous.Chart,
++		Config:    previous.Config,
++		Info: &release.Info{
++			FirstDeployed:    current.Info.FirstDeployed,
++			LastDeployed:     Timestamper(),
++			Status:           rcommon.StatusPendingRollback,
++			Notes:            previous.Info.Notes,
++			RollbackRevision: targetVersion,
++			Description:      description,
++		},
++		Version:     current.Version + 1,
++		Labels:      previous.Labels,
++		Manifest:    previous.Manifest,
++		Hooks:       previous.Hooks,
++		ApplyMethod: string(determineReleaseSSApplyMethod(serverSideApply)),
++	}
++
++	if isDryRun(r.DryRunStrategy) {
++		return nil
++	}
++	if err := r.cfg.ReleasesV2.Create(target); err != nil {
++		return err
++	}
++	if err := r.performV3Rollback(ctx, rels, current, target, previous, serverSideApply); err != nil {
++		return err
++	}
++	return r.cfg.ReleasesV2.Update(target)
++}
++
++func (r *Rollback) performV3Rollback(ctx context.Context, history []*release.Release, current, target, previous *release.Release, serverSideApply bool) error {
++	currentResources, err := r.cfg.KubeClient.Build(bytes.NewBufferString(current.Manifest), false)
++	if err != nil {
++		return r.failV3Rollback(current, target, nil, fmt.Errorf("unable to build kubernetes objects from current release manifest: %w", err))
++	}
++	targetResources, err := r.cfg.KubeClient.Build(bytes.NewBufferString(target.Manifest), false)
++	if err != nil {
++		return r.failV3Rollback(current, target, nil, fmt.Errorf("unable to build kubernetes objects from target release manifest: %w", err))
++	}
++	apply := v3Apply(v3ApplyAll)
++	if v3PlanRollback != nil {
++		planned, err := v3PlanRollback(r, target, previous)
++		if err != nil {
++			return r.failV3Rollback(current, target, nil, fmt.Errorf("recovering sequencing plan for rollback: %w", err))
++		}
++		if planned != nil {
++			apply = planned
++		}
++	}
++	op := &v3Operation{
++		cfg:                   r.cfg,
++		target:                target,
++		source:                current,
++		current:               currentResources,
++		desired:               targetResources,
++		upgrade:               true,
++		waitStrategy:          r.WaitStrategy,
++		waitOptions:           r.WaitOptions,
++		waitForJobs:           r.WaitForJobs,
++		timeout:               r.Timeout,
++		serverSideApply:       serverSideApply,
++		forceConflicts:        r.ForceConflicts,
++		forceReplace:          r.ForceReplace,
++		csaFieldManagerUpdate: isReleaseApplyMethodClientSideApply(current.ApplyMethod) && serverSideApply,
++	}
++	if !r.DisableHooks {
++		if err := r.cfg.execHookV3(target, release.HookPreRollback, r.WaitStrategy, r.WaitOptions, r.Timeout, serverSideApply); err != nil {
++			return r.failV3Rollback(current, target, nil, fmt.Errorf("pre-rollback hooks failed: %w", err))
++		}
++	}
++	if err := apply(ctx, op); err != nil {
++		return r.failV3Rollback(current, target, op.created, err)
++	}
++	if !r.DisableHooks {
++		if err := r.cfg.execHookV3(target, release.HookPostRollback, r.WaitStrategy, r.WaitOptions, r.Timeout, serverSideApply); err != nil {
++			return r.failV3Rollback(current, target, op.created, fmt.Errorf("post-rollback hooks failed: %w", err))
++		}
++	}
++
++	for _, rel := range history {
++		if rel.Info.Status != rcommon.StatusDeployed {
++			continue
++		}
++		rel.SetStatus(rcommon.StatusSuperseded, "superseded by rollback")
++		if err := r.cfg.ReleasesV2.Update(rel); err != nil {
++			return r.failV3Rollback(current, target, op.created, err)
++		}
++	}
++	target.Info.Status = rcommon.StatusDeployed
++	return nil
++}
++
++func (r *Rollback) failV3Rollback(current, target *release.Release, created kube.ResourceList, rollbackErr error) error {
++	msg := fmt.Sprintf("Rollback %q failed: %s", target.Name, rollbackErr)
++	current.Info.Status = rcommon.StatusSuperseded
++	target.SetStatus(rcommon.StatusFailed, msg)
++	_ = r.cfg.ReleasesV2.Update(current)
++	_ = r.cfg.ReleasesV2.Update(target)
++	if r.CleanupOnFail && len(created) > 0 {
++		if _, errs := r.cfg.KubeClient.Delete(created, "Background"); len(errs) > 0 {
++			return fmt.Errorf("an error occurred while cleaning up resources after rollback failure: %w: %w", rollbackErr, joinErrors(errs, ", "))
++		}
++	}
++	return rollbackErr
++}
+diff --git a/pkg/action/uninstall.go b/pkg/action/uninstall.go
+index 4d2c728db..f61f61fb6 100644
+--- a/pkg/action/uninstall.go
++++ b/pkg/action/uninstall.go
+@@ -161,6 +161,12 @@ func (u *Uninstall) Run(name string) (*releasei.UninstallReleaseResponse, error)
+ 		return nil, fmt.Errorf("uninstall: Release name is invalid: %s", name)
+ 	}
+ 
++	if rels, found, err := u.v3ReleaseHistory(name); err != nil {
++		return nil, fmt.Errorf("uninstall: Release not loaded: %s: %w", name, err)
++	} else if found {
++		return u.runV3(rels, waiter)
++	}
++
+ 	relsi, err := u.cfg.Releases.History(name)
+ 	if err != nil {
+ 		if u.IgnoreNotFound {
+diff --git a/pkg/action/uninstall_v3.go b/pkg/action/uninstall_v3.go
+new file mode 100644
+index 000000000..9ad55cb9a
+--- /dev/null
++++ b/pkg/action/uninstall_v3.go
+@@ -0,0 +1,160 @@
++/*
++Copyright The Helm Authors.
++
++Licensed under the Apache License, Version 2.0 (the "License");
++you may not use this file except in compliance with the License.
++You may obtain a copy of the License at
++
++http://www.apache.org/licenses/LICENSE-2.0
++
++Unless required by applicable law or agreed to in writing, software
++distributed under the License is distributed on an "AS IS" BASIS,
++WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++See the License for the specific language governing permissions and
++limitations under the License.
++*/
++
++package action
++
++import (
++	"errors"
++	"fmt"
++	"sort"
++	"time"
++
++	chart "helm.sh/helm/v4/internal/chart/v3"
++	release "helm.sh/helm/v4/internal/release/v2"
++	v2driver "helm.sh/helm/v4/internal/storage/driver"
++	"helm.sh/helm/v4/pkg/kube"
++	releasei "helm.sh/helm/v4/pkg/release"
++	"helm.sh/helm/v4/pkg/release/common"
++	rv1 "helm.sh/helm/v4/pkg/release/v1"
++)
++
++func (u *Uninstall) v3ReleaseHistory(name string) ([]*release.Release, bool, error) {
++	if u.cfg.ReleasesV2 == nil {
++		return nil, false, nil
++	}
++
++	history, err := u.cfg.ReleasesV2.History(name)
++	if err != nil {
++		if errors.Is(err, v2driver.ErrReleaseNotFound) {
++			return nil, false, nil
++		}
++		return nil, false, err
++	}
++
++	rels := make([]*release.Release, 0, len(history))
++	for _, item := range history {
++		rel, ok := item.(*release.Release)
++		if !ok || rel.Chart == nil || rel.Chart.Metadata == nil || rel.Chart.Metadata.APIVersion != chart.APIVersionV3 {
++			continue
++		}
++		rels = append(rels, rel)
++	}
++	if len(rels) == 0 {
++		return nil, false, nil
++	}
++	sort.Slice(rels, func(i, j int) bool { return rels[i].Version < rels[j].Version })
++	return rels, true, nil
++}
++
++func (u *Uninstall) runV3(rels []*release.Release, waiter kube.Waiter) (*releasei.UninstallReleaseResponse, error) {
++	rel := rels[len(rels)-1]
++	if rel.Info.Status == common.StatusUninstalled {
++		if !u.KeepHistory {
++			if err := u.purgeV3Releases(rels); err != nil {
++				return nil, fmt.Errorf("uninstall: Failed to purge the release: %w", err)
++			}
++			return &releasei.UninstallReleaseResponse{Release: rel}, nil
++		}
++		return nil, fmt.Errorf("the release named %q is already deleted", rel.Name)
++	}
++
++	if u.WaitStrategy == kube.HookOnlyStrategy {
++		var err error
++		waiter, err = getWaiterForV3(u.cfg.KubeClient, kube.StatusWatcherStrategy, u.WaitOptions...)
++		if err != nil {
++			return nil, err
++		}
++	}
++
++	rel.Info.Status = common.StatusUninstalling
++	rel.Info.Deleted = time.Now()
++	rel.Info.Description = "Deletion in progress (or silently failed)"
++	res := &releasei.UninstallReleaseResponse{Release: rel}
++	if err := u.cfg.ReleasesV2.Update(rel); err != nil {
++		u.cfg.Logger().Debug("uninstall: Failed to store updated chart-v3 release", "error", err)
++	}
++
++	if !u.DisableHooks {
++		if err := u.cfg.execHookV3(rel, release.HookPreDelete, u.WaitStrategy, u.WaitOptions, u.Timeout, true); err != nil {
++			return res, err
++		}
++	} else {
++		u.cfg.Logger().Debug("delete hooks disabled", "release", rel.Name)
++	}
++
++	teardown := v3Delete(v3DeleteAll)
++	if v3PlanUninstall != nil {
++		planned, err := v3PlanUninstall(u, rel)
++		if err != nil {
++			return nil, fmt.Errorf("failed to recover release plan: %w", err)
++		}
++		if planned != nil {
++			teardown = planned
++		}
++	}
++	report, err := teardown(u, rel, waiter)
++	if err != nil {
++		return nil, fmt.Errorf("failed to delete release: %s: %w", rel.Name, err)
++	}
++	res.Info = report
++
++	if !u.DisableHooks {
++		if err := u.cfg.execHookV3(rel, release.HookPostDelete, u.WaitStrategy, u.WaitOptions, u.Timeout, true); err != nil {
++			return res, err
++		}
++	}
++
++	rel.Info.Status = common.StatusUninstalled
++	if u.Description != "" {
++		rel.Info.Description = u.Description
++	} else {
++		rel.Info.Description = "Uninstallation complete"
++	}
++
++	if !u.KeepHistory {
++		if err := u.purgeV3Releases(rels); err != nil {
++			return res, fmt.Errorf("uninstall: Failed to purge the release: %w", err)
++		}
++		return res, nil
++	}
++	if err := u.cfg.ReleasesV2.Update(rel); err != nil {
++		u.cfg.Logger().Debug("uninstall: Failed to store updated chart-v3 release", "error", err)
++	}
++	return res, nil
++}
++
++func (u *Uninstall) purgeV3Releases(rels []*release.Release) error {
++	for _, rel := range rels {
++		if _, err := u.cfg.ReleasesV2.Delete(rel.Name, rel.Version); err != nil {
++			return err
++		}
++	}
++	return nil
++}
++
++// v3DeleteAll is the chart-v2 teardown (same manifest sort, keep policy and
++// ownership checks), applied to a chart-v3 release record.
++func v3DeleteAll(u *Uninstall, rel *release.Release, waiter kube.Waiter) (string, error) {
++	shim := &rv1.Release{Name: rel.Name, Namespace: rel.Namespace, Manifest: rel.Manifest}
++	deleted, kept, errs := u.deleteRelease(shim)
++	if len(errs) > 0 {
++		return kept, joinErrors(errs, "; ")
++	}
++	if err := waiter.WaitForDelete(deleted, u.Timeout); err != nil {
++		return kept, err
++	}
++	return kept, nil
++}
+diff --git a/pkg/action/upgrade.go b/pkg/action/upgrade.go
+index 85904124b..0fb02ed44 100644
+--- a/pkg/action/upgrade.go
++++ b/pkg/action/upgrade.go
+@@ -29,6 +29,7 @@ import (
+ 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+ 	"k8s.io/cli-runtime/pkg/resource"
+ 
++	chartv3 "helm.sh/helm/v4/internal/chart/v3"
+ 	"helm.sh/helm/v4/pkg/chart"
+ 	"helm.sh/helm/v4/pkg/chart/common"
+ 	"helm.sh/helm/v4/pkg/chart/common/util"
+@@ -174,6 +175,8 @@ func (u *Upgrade) RunWithContext(ctx context.Context, name string, ch chart.Char
+ 
+ 	var chrt *chartv2.Chart
+ 	switch c := ch.(type) {
++	case *chartv3.Chart:
++		return u.runV3WithContext(ctx, name, c, vals)
+ 	case *chartv2.Chart:
+ 		chrt = c
+ 	case chartv2.Chart:
+@@ -413,7 +416,7 @@ func (u *Upgrade) performUpgrade(ctx context.Context, originalRelease, upgradedR
+ 	ctxChan := make(chan resultMessage)
+ 	doneChan := make(chan any)
+ 	defer close(doneChan)
+-	go u.releasingUpgrade(rChan, upgradedRelease, current, target, originalRelease, serverSideApply)
++	go u.releasingUpgrade(ctx, rChan, upgradedRelease, current, target, originalRelease, serverSideApply)
+ 	go u.handleContext(ctx, doneChan, ctxChan, upgradedRelease)
+ 
+ 	select {
+@@ -427,10 +430,10 @@ func (u *Upgrade) performUpgrade(ctx context.Context, originalRelease, upgradedR
+ // Function used to lock the Mutex, this is important for the case when RollbackOnFailure is set.
+ // In that case the upgrade will finish before the rollback is finished so it is necessary to wait for the rollback to finish.
+ // The rollback will be trigger by the function failRelease
+-func (u *Upgrade) reportToPerformUpgrade(c chan<- resultMessage, rel *release.Release, created kube.ResourceList, err error) {
++func (u *Upgrade) reportToPerformUpgrade(ctx context.Context, c chan<- resultMessage, rel *release.Release, created kube.ResourceList, err error) {
+ 	u.Lock.Lock()
+ 	if err != nil {
+-		rel, err = u.failRelease(rel, created, err)
++		rel, err = u.failRelease(ctx, rel, created, err)
+ 	}
+ 	c <- resultMessage{r: rel, e: err}
+ 	u.Lock.Unlock()
+@@ -443,7 +446,7 @@ func (u *Upgrade) handleContext(ctx context.Context, done chan any, c chan<- res
+ 		err := ctx.Err()
+ 
+ 		// when RollbackOnFailure is set, the ongoing release finish first and doesn't give time for the rollback happens.
+-		u.reportToPerformUpgrade(c, upgradedRelease, kube.ResourceList{}, err)
++		u.reportToPerformUpgrade(ctx, c, upgradedRelease, kube.ResourceList{}, err)
+ 	case <-done:
+ 		return
+ 	}
+@@ -453,12 +456,12 @@ func isReleaseApplyMethodClientSideApply(applyMethod string) bool {
+ 	return applyMethod == "" || applyMethod == string(release.ApplyMethodClientSideApply)
+ }
+ 
+-func (u *Upgrade) releasingUpgrade(c chan<- resultMessage, upgradedRelease *release.Release, current, target kube.ResourceList, originalRelease *release.Release, serverSideApply bool) {
++func (u *Upgrade) releasingUpgrade(ctx context.Context, c chan<- resultMessage, upgradedRelease *release.Release, current, target kube.ResourceList, originalRelease *release.Release, serverSideApply bool) {
+ 	// pre-upgrade hooks
+ 
+ 	if !u.DisableHooks {
+ 		if err := u.cfg.execHook(upgradedRelease, release.HookPreUpgrade, u.WaitStrategy, u.WaitOptions, u.Timeout, serverSideApply); err != nil {
+-			u.reportToPerformUpgrade(c, upgradedRelease, kube.ResourceList{}, fmt.Errorf("pre-upgrade hooks failed: %w", err))
++			u.reportToPerformUpgrade(ctx, c, upgradedRelease, kube.ResourceList{}, fmt.Errorf("pre-upgrade hooks failed: %w", err))
+ 			return
+ 		}
+ 	} else {
+@@ -474,7 +477,7 @@ func (u *Upgrade) releasingUpgrade(c chan<- resultMessage, upgradedRelease *rele
+ 		kube.ClientUpdateOptionUpgradeClientSideFieldManager(upgradeClientSideFieldManager))
+ 	if err != nil {
+ 		u.cfg.recordRelease(originalRelease)
+-		u.reportToPerformUpgrade(c, upgradedRelease, results.Created, err)
++		u.reportToPerformUpgrade(ctx, c, upgradedRelease, results.Created, err)
+ 		return
+ 	}
+ 
+@@ -486,19 +489,19 @@ func (u *Upgrade) releasingUpgrade(c chan<- resultMessage, upgradedRelease *rele
+ 	}
+ 	if err != nil {
+ 		u.cfg.recordRelease(originalRelease)
+-		u.reportToPerformUpgrade(c, upgradedRelease, results.Created, err)
++		u.reportToPerformUpgrade(ctx, c, upgradedRelease, results.Created, err)
+ 		return
+ 	}
+ 	if u.WaitForJobs {
+ 		if err := waiter.WaitWithJobs(target, u.Timeout); err != nil {
+ 			u.cfg.recordRelease(originalRelease)
+-			u.reportToPerformUpgrade(c, upgradedRelease, results.Created, err)
++			u.reportToPerformUpgrade(ctx, c, upgradedRelease, results.Created, err)
+ 			return
+ 		}
+ 	} else {
+ 		if err := waiter.Wait(target, u.Timeout); err != nil {
+ 			u.cfg.recordRelease(originalRelease)
+-			u.reportToPerformUpgrade(c, upgradedRelease, results.Created, err)
++			u.reportToPerformUpgrade(ctx, c, upgradedRelease, results.Created, err)
+ 			return
+ 		}
+ 	}
+@@ -506,7 +509,7 @@ func (u *Upgrade) releasingUpgrade(c chan<- resultMessage, upgradedRelease *rele
+ 	// post-upgrade hooks
+ 	if !u.DisableHooks {
+ 		if err := u.cfg.execHook(upgradedRelease, release.HookPostUpgrade, u.WaitStrategy, u.WaitOptions, u.Timeout, serverSideApply); err != nil {
+-			u.reportToPerformUpgrade(c, upgradedRelease, results.Created, fmt.Errorf("post-upgrade hooks failed: %w", err))
++			u.reportToPerformUpgrade(ctx, c, upgradedRelease, results.Created, fmt.Errorf("post-upgrade hooks failed: %w", err))
+ 			return
+ 		}
+ 	}
+@@ -520,10 +523,10 @@ func (u *Upgrade) releasingUpgrade(c chan<- resultMessage, upgradedRelease *rele
+ 	} else {
+ 		upgradedRelease.Info.Description = "Upgrade complete"
+ 	}
+-	u.reportToPerformUpgrade(c, upgradedRelease, nil, nil)
++	u.reportToPerformUpgrade(ctx, c, upgradedRelease, nil, nil)
+ }
+ 
+-func (u *Upgrade) failRelease(rel *release.Release, created kube.ResourceList, err error) (*release.Release, error) {
++func (u *Upgrade) failRelease(ctx context.Context, rel *release.Release, created kube.ResourceList, err error) (*release.Release, error) {
+ 	msg := fmt.Sprintf("Upgrade %q failed: %s", rel.Name, err)
+ 	u.cfg.Logger().Warn(
+ 		"upgrade failed",
+@@ -587,7 +590,7 @@ func (u *Upgrade) failRelease(rel *release.Release, created kube.ResourceList, e
+ 		rollin.ForceConflicts = u.ForceConflicts
+ 		rollin.ServerSideApply = u.ServerSideApply
+ 		rollin.Timeout = u.Timeout
+-		if rollErr := rollin.Run(rel.Name); rollErr != nil {
++		if rollErr := rollin.RunWithContext(ctx, rel.Name); rollErr != nil {
+ 			return rel, fmt.Errorf("an error occurred while rolling back the release. original upgrade error: %w: %w", err, rollErr)
+ 		}
+ 		return rel, fmt.Errorf("release %s failed, and has been rolled back due to rollback-on-failure being set: %w", rel.Name, err)
+diff --git a/pkg/action/upgrade_v3.go b/pkg/action/upgrade_v3.go
+new file mode 100644
+index 000000000..e1ab93484
+--- /dev/null
++++ b/pkg/action/upgrade_v3.go
+@@ -0,0 +1,320 @@
++/*
++Copyright The Helm Authors.
++
++Licensed under the Apache License, Version 2.0 (the "License");
++you may not use this file except in compliance with the License.
++You may obtain a copy of the License at
++
++http://www.apache.org/licenses/LICENSE-2.0
++
++Unless required by applicable law or agreed to in writing, software
++distributed under the License is distributed on an "AS IS" BASIS,
++WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++See the License for the specific language governing permissions and
++limitations under the License.
++*/
++
++package action
++
++import (
++	"bytes"
++	"context"
++	"errors"
++	"fmt"
++
++	"k8s.io/cli-runtime/pkg/resource"
++
++	chart "helm.sh/helm/v4/internal/chart/v3"
++	chartutil "helm.sh/helm/v4/internal/chart/v3/util"
++	release "helm.sh/helm/v4/internal/release/v2"
++	"helm.sh/helm/v4/pkg/chart/common"
++	commonutil "helm.sh/helm/v4/pkg/chart/common/util"
++	legacychartutil "helm.sh/helm/v4/pkg/chart/v2/util"
++	"helm.sh/helm/v4/pkg/kube"
++	ri "helm.sh/helm/v4/pkg/release"
++	rcommon "helm.sh/helm/v4/pkg/release/common"
++	"helm.sh/helm/v4/pkg/storage/driver"
++)
++
++func (u *Upgrade) runV3WithContext(ctx context.Context, name string, chrt *chart.Chart, vals map[string]any) (*release.Release, error) {
++	if chrt == nil {
++		return nil, errMissingChart
++	}
++	if u.cfg.ReleasesV2 == nil {
++		return nil, errors.New("release/v2 storage is not configured")
++	}
++	if v3CheckUpgrade != nil {
++		if err := v3CheckUpgrade(u); err != nil {
++			return nil, err
++		}
++	}
++	if err := legacychartutil.ValidateReleaseName(name); err != nil {
++		return nil, fmt.Errorf("release name is invalid: %s", name)
++	}
++	if !isDryRun(u.DryRunStrategy) && u.HideSecret {
++		return nil, errors.New("hiding Kubernetes secrets requires a dry-run mode")
++	}
++
++	history, err := u.cfg.ReleasesV2.History(name)
++	if err != nil {
++		if errors.Is(err, driver.ErrReleaseNotFound) {
++			return nil, driver.NewErrNoDeployedReleases(name)
++		}
++		return nil, err
++	}
++	lastRelease, err := latestV3Release(history)
++	if err != nil {
++		return nil, err
++	}
++	if lastRelease == nil {
++		return nil, driver.NewErrNoDeployedReleases(name)
++	}
++	if lastRelease.Info.Status.IsPending() {
++		return nil, errPending
++	}
++	currentRelease, err := latestDeployedV3Release(history)
++	if err != nil {
++		return nil, err
++	}
++	if currentRelease == nil {
++		return nil, driver.NewErrNoDeployedReleases(name)
++	}
++
++	vals, err = u.reuseValuesV3(chrt, currentRelease, vals)
++	if err != nil {
++		return nil, err
++	}
++	if err := chartutil.ProcessDependencies(chrt, vals); err != nil {
++		return nil, err
++	}
++
++	revision := lastRelease.Version + 1
++	caps, err := u.cfg.getCapabilities()
++	if err != nil {
++		return nil, err
++	}
++	valuesToRender, err := commonutil.ToRenderValuesWithSchemaValidation(chrt, vals, releaseOptionsForV3Upgrade(name, currentRelease.Namespace, revision), caps, u.SkipSchemaValidation)
++	if err != nil {
++		return nil, err
++	}
++	if driver.ContainsSystemLabels(u.Labels) {
++		return nil, fmt.Errorf("user supplied labels contains system reserved label name. System labels: %+v", driver.GetSystemLabels())
++	}
++	serverSideApply, err := getUpgradeServerSideValue(u.ServerSideApply, lastRelease.ApplyMethod)
++	if err != nil {
++		return nil, err
++	}
++
++	renderer := &Install{
++		cfg:                u.cfg,
++		DryRunStrategy:     u.DryRunStrategy,
++		HideSecret:         u.HideSecret,
++		SubNotes:           u.SubNotes,
++		EnableDNS:          u.EnableDNS,
++		PostRenderer:       u.PostRenderer,
++		PostRenderStrategy: u.PostRenderStrategy,
++		ReleaseName:        name,
++		Namespace:          currentRelease.Namespace,
++	}
++	hooks, manifest, notes, manifests, err := renderer.renderResourcesV3(ctx, chrt, valuesToRender)
++	if err != nil {
++		return nil, err
++	}
++
++	upgradedRelease := &release.Release{
++		Name:      name,
++		Namespace: currentRelease.Namespace,
++		Chart:     chrt,
++		Config:    vals,
++		Info: &release.Info{
++			FirstDeployed: currentRelease.Info.FirstDeployed,
++			LastDeployed:  Timestamper(),
++			Status:        rcommon.StatusPendingUpgrade,
++			Description:   "Preparing upgrade",
++			Notes:         notes,
++		},
++		Version:     revision,
++		Manifest:    manifest,
++		Hooks:       hooks,
++		Labels:      mergeCustomLabels(lastRelease.Labels, u.Labels),
++		ApplyMethod: string(determineReleaseSSApplyMethod(serverSideApply)),
++	}
++
++	apply := v3Apply(v3ApplyAll)
++	if v3PlanUpgrade != nil {
++		planned, err := v3PlanUpgrade(u, chrt, upgradedRelease, manifests)
++		if err != nil {
++			return upgradedRelease, fmt.Errorf("building sequencing plan: %w", err)
++		}
++		if planned != nil {
++			apply = planned
++		}
++	}
++
++	current, err := u.cfg.KubeClient.Build(bytes.NewBufferString(currentRelease.Manifest), false)
++	if err != nil {
++		return upgradedRelease, fmt.Errorf("unable to build kubernetes objects from current release manifest: %w", err)
++	}
++	target, err := u.cfg.KubeClient.Build(bytes.NewBufferString(upgradedRelease.Manifest), !u.DisableOpenAPIValidation)
++	if err != nil {
++		return upgradedRelease, fmt.Errorf("unable to build kubernetes objects from new release manifest: %w", err)
++	}
++	if err := target.Visit(setMetadataVisitor(upgradedRelease.Name, upgradedRelease.Namespace, true)); err != nil {
++		return upgradedRelease, err
++	}
++	if err := u.adoptNewV3UpgradeResources(current, target, upgradedRelease); err != nil {
++		return nil, err
++	}
++
++	if isDryRun(u.DryRunStrategy) {
++		if u.Description != "" {
++			upgradedRelease.Info.Description = u.Description
++		} else {
++			upgradedRelease.Info.Description = "Dry run complete"
++		}
++		return upgradedRelease, nil
++	}
++	if err := u.cfg.ReleasesV2.Create(upgradedRelease); err != nil {
++		return nil, err
++	}
++
++	op := &v3Operation{
++		cfg:                   u.cfg,
++		target:                upgradedRelease,
++		source:                currentRelease,
++		current:               current,
++		desired:               target,
++		upgrade:               true,
++		waitStrategy:          u.WaitStrategy,
++		waitOptions:           u.WaitOptions,
++		waitForJobs:           u.WaitForJobs,
++		timeout:               u.Timeout,
++		serverSideApply:       serverSideApply,
++		forceConflicts:        u.ForceConflicts,
++		forceReplace:          u.ForceReplace,
++		disableOpenAPI:        u.DisableOpenAPIValidation,
++		threeWayMerge:         u.TakeOwnership && !serverSideApply,
++		csaFieldManagerUpdate: isReleaseApplyMethodClientSideApply(currentRelease.ApplyMethod) && serverSideApply,
++	}
++	failUpgrade := func(err error) (*release.Release, error) {
++		upgradedRelease.SetStatus(rcommon.StatusFailed, fmt.Sprintf("Upgrade %q failed: %s", name, err))
++		_ = u.cfg.ReleasesV2.Update(upgradedRelease)
++		if !u.RollbackOnFailure {
++			return upgradedRelease, err
++		}
++		u.cfg.Logger().Debug("Upgrade failed and rollback-on-failure is set, rolling back to previous successful release")
++		rollin := NewRollback(u.cfg)
++		rollin.Version = currentRelease.Version
++		rollin.WaitStrategy = u.WaitStrategy
++		rollin.WaitOptions = u.WaitOptions
++		rollin.WaitForJobs = u.WaitForJobs
++		rollin.DisableHooks = u.DisableHooks
++		rollin.ForceReplace = u.ForceReplace
++		rollin.ForceConflicts = u.ForceConflicts
++		rollin.ServerSideApply = u.ServerSideApply
++		rollin.Timeout = u.Timeout
++		if rollErr := rollin.RunWithContext(ctx, name); rollErr != nil {
++			return upgradedRelease, fmt.Errorf("an error occurred while rolling back the release. original upgrade error: %w: %w", err, rollErr)
++		}
++		return upgradedRelease, fmt.Errorf("release %s failed, and has been rolled back due to rollback-on-failure being set: %w", name, err)
++	}
++	if !u.DisableHooks {
++		if err := u.cfg.execHookV3(upgradedRelease, release.HookPreUpgrade, u.WaitStrategy, u.WaitOptions, u.Timeout, serverSideApply); err != nil {
++			return failUpgrade(fmt.Errorf("pre-upgrade hooks failed: %w", err))
++		}
++	}
++	if err := apply(ctx, op); err != nil {
++		return failUpgrade(err)
++	}
++	if !u.DisableHooks {
++		if err := u.cfg.execHookV3(upgradedRelease, release.HookPostUpgrade, u.WaitStrategy, u.WaitOptions, u.Timeout, serverSideApply); err != nil {
++			return failUpgrade(fmt.Errorf("post-upgrade hooks failed: %w", err))
++		}
++	}
++
++	currentRelease.SetStatus(rcommon.StatusSuperseded, "superseded by new release")
++	if err := u.cfg.ReleasesV2.Update(currentRelease); err != nil {
++		return upgradedRelease, err
++	}
++	if u.Description != "" {
++		upgradedRelease.SetStatus(rcommon.StatusDeployed, u.Description)
++	} else {
++		upgradedRelease.SetStatus(rcommon.StatusDeployed, "Upgrade complete")
++	}
++	if err := u.cfg.ReleasesV2.Update(upgradedRelease); err != nil {
++		return upgradedRelease, err
++	}
++	return upgradedRelease, nil
++}
++
++func releaseOptionsForV3Upgrade(name, namespace string, revision int) common.ReleaseOptions {
++	return common.ReleaseOptions{Name: name, Namespace: namespace, Revision: revision, IsUpgrade: true}
++}
++
++func latestDeployedV3Release(history []ri.Releaser) (*release.Release, error) {
++	var latest *release.Release
++	for _, item := range history {
++		rel, ok := item.(*release.Release)
++		if !ok {
++			return nil, fmt.Errorf("release/v2 storage returned unsupported release type %T", item)
++		}
++		if rel.Info.Status == rcommon.StatusDeployed && (latest == nil || rel.Version > latest.Version) {
++			latest = rel
++		}
++	}
++	return latest, nil
++}
++
++func (u *Upgrade) reuseValuesV3(chrt *chart.Chart, current *release.Release, newVals map[string]any) (map[string]any, error) {
++	if u.ResetValues {
++		return newVals, nil
++	}
++	if u.ReuseValues {
++		oldVals, err := commonutil.CoalesceValues(current.Chart, current.Config)
++		if err != nil {
++			return nil, fmt.Errorf("failed to rebuild old values: %w", err)
++		}
++		newVals = commonutil.CoalesceTables(newVals, current.Config)
++		chrt.Values = oldVals
++		return newVals, nil
++	}
++	if u.ResetThenReuseValues {
++		return commonutil.CoalesceTables(newVals, current.Config), nil
++	}
++	if len(newVals) == 0 && len(current.Config) > 0 {
++		return current.Config, nil
++	}
++	return newVals, nil
++}
++
++func (u *Upgrade) adoptNewV3UpgradeResources(current, target kube.ResourceList, upgradedRelease *release.Release) error {
++	existingResources := make(map[string]bool, len(current))
++	for _, item := range current {
++		existingResources[objectKey(item)] = true
++	}
++	var toBeCreated kube.ResourceList
++	for _, item := range target {
++		if !existingResources[objectKey(item)] {
++			toBeCreated = append(toBeCreated, item)
++		}
++	}
++	var (
++		toBeUpdated kube.ResourceList
++		err         error
++	)
++	if u.TakeOwnership {
++		toBeUpdated, err = requireAdoption(toBeCreated)
++	} else {
++		toBeUpdated, err = existingResourceConflict(toBeCreated, upgradedRelease.Name, upgradedRelease.Namespace)
++	}
++	if err != nil {
++		return fmt.Errorf("unable to continue with update: %w", err)
++	}
++	return toBeUpdated.Visit(func(item *resource.Info, err error) error {
++		if err != nil {
++			return err
++		}
++		current.Append(item)
++		return nil
++	})
++}
+diff --git a/pkg/action/wire_v3.go b/pkg/action/wire_v3.go
+new file mode 100644
+index 000000000..e0cc77595
+--- /dev/null
++++ b/pkg/action/wire_v3.go
+@@ -0,0 +1,137 @@
++/*
++Copyright The Helm Authors.
++
++Licensed under the Apache License, Version 2.0 (the "License");
++you may not use this file except in compliance with the License.
++You may obtain a copy of the License at
++
++http://www.apache.org/licenses/LICENSE-2.0
++
++Unless required by applicable law or agreed to in writing, software
++distributed under the License is distributed on an "AS IS" BASIS,
++WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++See the License for the specific language governing permissions and
++limitations under the License.
++*/
++
++package action
++
++// HIP-0025 e2e harness wiring (hip0025-wire/base) — never contributed.
++//
++// Upstream main cannot install chart-v3 releases yet, so every e2e tier carries
++// this plain chart-v3 lifecycle. The feature overlays plug into the seams below:
++//
++//	wire_ordered_v3.go   (trees with PR1) sequenced apply and teardown
++//	wire_readiness_v3.go (trees with PR3) custom-readiness waiter options
++//
++// With no overlay, every chart-v3 operation applies everything at once and
++// waits the ordinary way, exactly like chart v2.
++
++import (
++	"context"
++	"time"
++
++	chart "helm.sh/helm/v4/internal/chart/v3"
++	release "helm.sh/helm/v4/internal/release/v2"
++	releaseutil "helm.sh/helm/v4/internal/release/v2/util"
++	"helm.sh/helm/v4/pkg/kube"
++)
++
++// v3Operation is one install, upgrade or rollback of a chart-v3 release.
++type v3Operation struct {
++	cfg     *Configuration
++	target  *release.Release  // revision being deployed
++	source  *release.Release  // revision being replaced; nil on install
++	current kube.ResourceList // objects owned by source (adopted objects on install)
++	desired kube.ResourceList // objects rendered for target
++	upgrade bool
++
++	waitStrategy kube.WaitStrategy
++	waitOptions  []kube.WaitOption
++	waitForJobs  bool
++	timeout      time.Duration
++
++	serverSideApply       bool
++	forceConflicts        bool
++	forceReplace          bool
++	disableOpenAPI        bool
++	threeWayMerge         bool
++	csaFieldManagerUpdate bool
++
++	created kube.ResourceList // set by the apply strategy, for cleanup on failure
++}
++
++// v3Apply deploys an operation. v3ApplyAll is the default.
++type v3Apply func(ctx context.Context, op *v3Operation) error
++
++// v3Delete tears a release down; it returns the "kept by resource policy" text.
++type v3Delete func(u *Uninstall, rel *release.Release, waiter kube.Waiter) (string, error)
++
++// Seams. A nil planner (or a planner returning nil) keeps the plain behaviour.
++var (
++	v3CheckInstall  func(*Install) error
++	v3CheckUpgrade  func(*Upgrade) error
++	v3CheckRollback func(*Rollback) error
++
++	v3PlanInstall   func(i *Install, chrt *chart.Chart, rel *release.Release, manifests []releaseutil.Manifest) (v3Apply, error)
++	v3PlanUpgrade   func(u *Upgrade, chrt *chart.Chart, rel *release.Release, manifests []releaseutil.Manifest) (v3Apply, error)
++	v3PlanRollback  func(r *Rollback, target, previous *release.Release) (v3Apply, error)
++	v3PlanUninstall func(u *Uninstall, rel *release.Release) (v3Delete, error)
++
++	v3WaitOptions = func(_ kube.WaitStrategy, opts []kube.WaitOption, _ kube.ResourceList) ([]kube.WaitOption, error) {
++		return opts, nil
++	}
++)
++
++// v3ApplyAll sends every object at once, then waits for all of them: chart v2
++// semantics. Update also deletes objects the source had and the target lacks.
++func v3ApplyAll(_ context.Context, op *v3Operation) error {
++	var result *kube.Result
++	var err error
++	if !op.upgrade && len(op.current) == 0 {
++		result, err = op.cfg.KubeClient.Create(op.desired, kube.ClientCreateOptionServerSideApply(op.serverSideApply, false))
++	} else {
++		result, err = op.cfg.KubeClient.Update(
++			op.current,
++			op.desired,
++			kube.ClientUpdateOptionForceReplace(op.forceReplace),
++			kube.ClientUpdateOptionServerSideApply(op.serverSideApply, op.forceConflicts),
++			kube.ClientUpdateOptionThreeWayMergeForUnstructured(op.threeWayMerge),
++			kube.ClientUpdateOptionUpgradeClientSideFieldManager(op.csaFieldManagerUpdate),
++		)
++	}
++	if result != nil {
++		op.created = result.Created
++	}
++	if err != nil {
++		return err
++	}
++	return op.wait(op.desired)
++}
++
++// waiter returns the operation's waiter with the tree's extra options applied.
++func (op *v3Operation) waiter(strategy kube.WaitStrategy) (kube.Waiter, error) {
++	opts, err := v3WaitOptions(strategy, op.waitOptions, op.desired)
++	if err != nil {
++		return nil, err
++	}
++	return getWaiterForV3(op.cfg.KubeClient, strategy, opts...)
++}
++
++func (op *v3Operation) wait(resources kube.ResourceList) error {
++	waiter, err := op.waiter(op.waitStrategy)
++	if err != nil {
++		return err
++	}
++	if op.waitForJobs {
++		return waiter.WaitWithJobs(resources, op.timeout)
++	}
++	return waiter.Wait(resources, op.timeout)
++}
++
++func getWaiterForV3(client kube.Interface, strategy kube.WaitStrategy, opts ...kube.WaitOption) (kube.Waiter, error) {
++	if withOptions, ok := client.(kube.InterfaceWaitOptions); ok {
++		return withOptions.GetWaiterWithOptions(strategy, opts...)
++	}
++	return client.GetWaiter(strategy)
++}
+diff --git a/pkg/cmd/install.go b/pkg/cmd/install.go
+index 182b4a7ff..21d409fba 100644
+--- a/pkg/cmd/install.go
++++ b/pkg/cmd/install.go
+@@ -38,7 +38,7 @@ import (
+ 	"helm.sh/helm/v4/pkg/cmd/require"
+ 	"helm.sh/helm/v4/pkg/downloader"
+ 	"helm.sh/helm/v4/pkg/getter"
+-	release "helm.sh/helm/v4/pkg/release/v1"
++	ri "helm.sh/helm/v4/pkg/release"
+ )
+ 
+ const installDesc = `
+@@ -252,7 +252,7 @@ func addInstallFlags(cmd *cobra.Command, f *pflag.FlagSet, client *action.Instal
+ 	}
+ }
+ 
+-func runInstall(args []string, client *action.Install, valueOpts *values.Options, out io.Writer) (*release.Release, error) {
++func runInstall(args []string, client *action.Install, valueOpts *values.Options, out io.Writer) (ri.Releaser, error) {
+ 	slog.Debug("Original chart version", "version", client.Version)
+ 	if client.Version == "" && client.Devel {
+ 		slog.Debug("setting version to >0.0.0-0")
+@@ -349,12 +349,7 @@ func runInstall(args []string, client *action.Install, valueOpts *values.Options
+ 		cancel()
+ 	}()
+ 
+-	ri, err := client.RunWithContext(ctx, chartRequested, vals)
+-	rel, rerr := releaserToV1Release(ri)
+-	if rerr != nil {
+-		return nil, rerr
+-	}
+-	return rel, err
++	return client.RunWithContext(ctx, chartRequested, vals)
+ }
+ 
+ // checkIfInstallable validates if a chart can be installed
+diff --git a/pkg/cmd/status.go b/pkg/cmd/status.go
+index 6998e341a..fe5418664 100644
+--- a/pkg/cmd/status.go
++++ b/pkg/cmd/status.go
+@@ -29,6 +29,7 @@ import (
+ 	"k8s.io/kubectl/pkg/cmd/get"
+ 
+ 	coloroutput "helm.sh/helm/v4/internal/cli/output"
++	releasev2 "helm.sh/helm/v4/internal/release/v2"
+ 	"helm.sh/helm/v4/pkg/action"
+ 	"helm.sh/helm/v4/pkg/chart/common/util"
+ 	"helm.sh/helm/v4/pkg/cli/output"
+@@ -133,10 +134,22 @@ func (s statusPrinter) getV1Release() *releasev1.Release {
+ }
+ 
+ func (s statusPrinter) WriteJSON(out io.Writer) error {
++	switch rel := s.release.(type) {
++	case releasev2.Release:
++		return output.EncodeJSON(out, &rel)
++	case *releasev2.Release:
++		return output.EncodeJSON(out, rel)
++	}
+ 	return output.EncodeJSON(out, s.getV1Release())
+ }
+ 
+ func (s statusPrinter) WriteYAML(out io.Writer) error {
++	switch rel := s.release.(type) {
++	case releasev2.Release:
++		return output.EncodeYAML(out, &rel)
++	case *releasev2.Release:
++		return output.EncodeYAML(out, rel)
++	}
+ 	return output.EncodeYAML(out, s.getV1Release())
+ }
+ 
+@@ -144,6 +157,12 @@ func (s statusPrinter) WriteTable(out io.Writer) error {
+ 	if s.release == nil {
+ 		return nil
+ 	}
++	switch rel := s.release.(type) {
++	case releasev2.Release:
++		return s.writeV2Table(out, &rel)
++	case *releasev2.Release:
++		return s.writeV2Table(out, rel)
++	}
+ 	rel := s.getV1Release()
+ 	_, _ = fmt.Fprintf(out, "NAME: %s\n", rel.Name)
+ 	if !rel.Info.LastDeployed.IsZero() {
+@@ -242,6 +261,94 @@ func (s statusPrinter) WriteTable(out io.Writer) error {
+ 	return nil
+ }
+ 
++func (s statusPrinter) writeV2Table(out io.Writer, rel *releasev2.Release) error {
++	_, _ = fmt.Fprintf(out, "NAME: %s\n", rel.Name)
++	if !rel.Info.LastDeployed.IsZero() {
++		_, _ = fmt.Fprintf(out, "LAST DEPLOYED: %s\n", rel.Info.LastDeployed.Format(time.ANSIC))
++	}
++	_, _ = fmt.Fprintf(out, "NAMESPACE: %s\n", coloroutput.ColorizeNamespace(rel.Namespace, s.noColor))
++	_, _ = fmt.Fprintf(out, "STATUS: %s\n", coloroutput.ColorizeStatus(rel.Info.Status, s.noColor))
++	_, _ = fmt.Fprintf(out, "REVISION: %d\n", rel.Version)
++	if s.showMetadata {
++		_, _ = fmt.Fprintf(out, "CHART: %s\n", rel.Chart.Metadata.Name)
++		_, _ = fmt.Fprintf(out, "VERSION: %s\n", rel.Chart.Metadata.Version)
++		_, _ = fmt.Fprintf(out, "APP_VERSION: %s\n", rel.Chart.Metadata.AppVersion)
++	}
++	_, _ = fmt.Fprintf(out, "DESCRIPTION: %s\n", rel.Info.Description)
++
++	if len(rel.Info.Resources) > 0 {
++		buf := new(bytes.Buffer)
++		printFlags := get.NewHumanPrintFlags()
++		typePrinter, _ := printFlags.ToPrinter("")
++		printer := &get.TablePrinter{Delegate: typePrinter}
++
++		var keys []string
++		for key := range rel.Info.Resources {
++			keys = append(keys, key)
++		}
++
++		for _, resourceType := range keys {
++			_, _ = fmt.Fprintf(buf, "==> %s\n", resourceType)
++			for _, resource := range rel.Info.Resources[resourceType] {
++				if err := printer.PrintObj(resource, buf); err != nil {
++					_, _ = fmt.Fprintf(buf, "failed to print object type %s: %v\n", resourceType, err)
++				}
++			}
++			buf.WriteString("\n")
++		}
++
++		_, _ = fmt.Fprintf(out, "RESOURCES:\n%s\n", buf.String())
++	}
++
++	executions := executionsByHookEventV2(rel)
++	if tests, ok := executions[releasev2.HookTest]; !ok || len(tests) == 0 {
++		_, _ = fmt.Fprintln(out, "TEST SUITE: None")
++	} else {
++		for _, hook := range tests {
++			if hook.LastRun.StartedAt.IsZero() {
++				continue
++			}
++			_, _ = fmt.Fprintf(out, "TEST SUITE:     %s\n%s\n%s\n%s\n",
++				hook.Name,
++				"Last Started:   "+hook.LastRun.StartedAt.Format(time.ANSIC),
++				"Last Completed: "+hook.LastRun.CompletedAt.Format(time.ANSIC),
++				"Phase:          "+hook.LastRun.Phase,
++			)
++		}
++	}
++
++	if s.debug {
++		_, _ = fmt.Fprintln(out, "USER-SUPPLIED VALUES:")
++		if err := output.EncodeYAML(out, rel.Config); err != nil {
++			return err
++		}
++		_, _ = fmt.Fprintln(out)
++
++		cfg, err := util.CoalesceValues(rel.Chart, rel.Config)
++		if err != nil {
++			return err
++		}
++		_, _ = fmt.Fprintln(out, "COMPUTED VALUES:")
++		if err := output.EncodeYAML(out, cfg.AsMap()); err != nil {
++			return err
++		}
++		_, _ = fmt.Fprintln(out)
++	}
++
++	if strings.EqualFold(rel.Info.Description, "Dry run complete") || s.debug {
++		_, _ = fmt.Fprintln(out, "HOOKS:")
++		for _, hook := range rel.Hooks {
++			_, _ = fmt.Fprintf(out, "---\n# Source: %s\n%s\n", hook.Path, hook.Manifest)
++		}
++		_, _ = fmt.Fprintf(out, "MANIFEST:\n%s\n", rel.Manifest)
++	}
++
++	if !s.hideNotes && rel.Info.Notes != "" {
++		_, _ = fmt.Fprintf(out, "NOTES:\n%s\n", strings.TrimSpace(rel.Info.Notes))
++	}
++	return nil
++}
++
+ func executionsByHookEvent(rel *releasev1.Release) map[releasev1.HookEvent][]*releasev1.Hook {
+ 	result := make(map[releasev1.HookEvent][]*releasev1.Hook)
+ 	for _, h := range rel.Hooks {
+@@ -255,3 +362,13 @@ func executionsByHookEvent(rel *releasev1.Release) map[releasev1.HookEvent][]*re
+ 	}
+ 	return result
+ }
++
++func executionsByHookEventV2(rel *releasev2.Release) map[releasev2.HookEvent][]*releasev2.Hook {
++	result := make(map[releasev2.HookEvent][]*releasev2.Hook)
++	for _, hook := range rel.Hooks {
++		for _, event := range hook.Events {
++			result[event] = append(result[event], hook)
++		}
++	}
++	return result
++}
+diff --git a/pkg/cmd/template.go b/pkg/cmd/template.go
+index 5645ab33d..a81a191c0 100644
+--- a/pkg/cmd/template.go
++++ b/pkg/cmd/template.go
+@@ -29,15 +29,16 @@ import (
+ 	"sort"
+ 	"strings"
+ 
+-	release "helm.sh/helm/v4/pkg/release/v1"
+-
+ 	"github.com/spf13/cobra"
+ 
++	releasev2 "helm.sh/helm/v4/internal/release/v2"
+ 	"helm.sh/helm/v4/pkg/action"
+ 	"helm.sh/helm/v4/pkg/chart/common"
+ 	"helm.sh/helm/v4/pkg/cli/values"
+ 	"helm.sh/helm/v4/pkg/cmd/require"
+-	releaseutil "helm.sh/helm/v4/pkg/release/v1/util"
++	ri "helm.sh/helm/v4/pkg/release"
++	releasev1 "helm.sh/helm/v4/pkg/release/v1"
++	releaseutilv1 "helm.sh/helm/v4/pkg/release/v1/util"
+ )
+ 
+ const templateDesc = `
+@@ -105,7 +106,11 @@ func newTemplateCmd(cfg *action.Configuration, out io.Writer) *cobra.Command {
+ 			client.Replace = true // Skip the name check
+ 			client.APIVersions = common.VersionSet(extraAPIs)
+ 			client.IncludeCRDs = includeCrds
+-			rel, err := runInstall(args, client, valueOpts, out)
++			reli, err := runInstall(args, client, valueOpts, out)
++			rel, releaseErr := newTemplateRelease(reli)
++			if releaseErr != nil {
++				return releaseErr
++			}
+ 
+ 			if err != nil && !settings.Debug {
+ 				if rel != nil {
+@@ -119,26 +124,26 @@ func newTemplateCmd(cfg *action.Configuration, out io.Writer) *cobra.Command {
+ 			// we always want to print the YAML, even if it is not valid. The error is still returned afterwards.
+ 			if rel != nil {
+ 				var manifests bytes.Buffer
+-				fmt.Fprintln(&manifests, strings.TrimSpace(rel.Manifest))
++				fmt.Fprintln(&manifests, strings.TrimSpace(rel.manifest))
+ 				if !client.DisableHooks {
+ 					fileWritten := make(map[string]bool)
+-					for _, m := range rel.Hooks {
+-						if skipTests && isTestHook(m) {
++					for _, m := range rel.hooks {
++						if skipTests && m.test {
+ 							continue
+ 						}
+ 						if client.OutputDir == "" {
+-							fmt.Fprintf(&manifests, "---\n# Source: %s\n%s\n", m.Path, m.Manifest)
++							fmt.Fprintf(&manifests, "---\n# Source: %s\n%s\n", m.path, m.manifest)
+ 						} else {
+ 							newDir := client.OutputDir
+ 							if client.UseReleaseName {
+ 								newDir = filepath.Join(client.OutputDir, client.ReleaseName)
+ 							}
+-							_, err := os.Stat(filepath.Join(newDir, m.Path))
++							_, err := os.Stat(filepath.Join(newDir, m.path))
+ 							if err == nil {
+-								fileWritten[m.Path] = true
++								fileWritten[m.path] = true
+ 							}
+ 
+-							err = writeToFile(newDir, m.Path, m.Manifest, fileWritten[m.Path])
++							err = writeToFile(newDir, m.path, m.manifest, fileWritten[m.path])
+ 							if err != nil {
+ 								return err
+ 							}
+@@ -151,12 +156,12 @@ func newTemplateCmd(cfg *action.Configuration, out io.Writer) *cobra.Command {
+ 				if len(showFiles) > 0 {
+ 					// This is necessary to ensure consistent manifest ordering when using --show-only
+ 					// with globs or directory names.
+-					splitManifests := releaseutil.SplitManifests(manifests.String())
++					splitManifests := releaseutilv1.SplitManifests(manifests.String())
+ 					manifestsKeys := make([]string, 0, len(splitManifests))
+ 					for k := range splitManifests {
+ 						manifestsKeys = append(manifestsKeys, k)
+ 					}
+-					sort.Sort(releaseutil.BySplitManifestsOrder(manifestsKeys))
++					sort.Sort(releaseutilv1.BySplitManifestsOrder(manifestsKeys))
+ 
+ 					manifestNameRegex := regexp.MustCompile("# Source: [^/]+/(.+)")
+ 					var manifestsToRender []string
+@@ -229,8 +234,62 @@ func newTemplateCmd(cfg *action.Configuration, out io.Writer) *cobra.Command {
+ 	return cmd
+ }
+ 
+-func isTestHook(h *release.Hook) bool {
+-	return slices.Contains(h.Events, release.HookTest)
++type templateRelease struct {
++	manifest string
++	hooks    []templateHook
++}
++
++type templateHook struct {
++	path     string
++	manifest string
++	test     bool
++}
++
++func newTemplateRelease(rel ri.Releaser) (*templateRelease, error) {
++	switch r := rel.(type) {
++	case releasev1.Release:
++		return newTemplateReleaseV1(&r), nil
++	case *releasev1.Release:
++		return newTemplateReleaseV1(r), nil
++	case releasev2.Release:
++		return newTemplateReleaseV2(&r), nil
++	case *releasev2.Release:
++		return newTemplateReleaseV2(r), nil
++	case nil:
++		return nil, nil
++	default:
++		return nil, fmt.Errorf("unsupported release type: %T", rel)
++	}
++}
++
++func newTemplateReleaseV1(rel *releasev1.Release) *templateRelease {
++	if rel == nil {
++		return nil
++	}
++	result := &templateRelease{manifest: rel.Manifest, hooks: make([]templateHook, len(rel.Hooks))}
++	for i, hook := range rel.Hooks {
++		result.hooks[i] = templateHook{
++			path:     hook.Path,
++			manifest: hook.Manifest,
++			test:     slices.Contains(hook.Events, releasev1.HookTest),
++		}
++	}
++	return result
++}
++
++func newTemplateReleaseV2(rel *releasev2.Release) *templateRelease {
++	if rel == nil {
++		return nil
++	}
++	result := &templateRelease{manifest: rel.Manifest, hooks: make([]templateHook, len(rel.Hooks))}
++	for i, hook := range rel.Hooks {
++		result.hooks[i] = templateHook{
++			path:     hook.Path,
++			manifest: hook.Manifest,
++			test:     slices.Contains(hook.Events, releasev2.HookTest),
++		}
++	}
++	return result
+ }
+ 
+ // The following functions (writeToFile, createOrOpenFile, and ensureDirectoryForFile)
+-- 
+2.50.1 (Apple Git-155)
+

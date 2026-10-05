@@ -1,0 +1,4 @@
+image: nginx:1.27-alpine
+# Seconds before a workload reports Ready. Long enough that an implementation
+# which does not wait for readiness applies the next group visibly too early.
+readyDelay: 3

@@ -1,0 +1,13 @@
+apiVersion: v3
+name: hip-subcharts-alias
+description: Subchart ordering with alias references (R03)
+version: 0.1.0
+dependencies:
+  - name: zeta
+    version: 0.1.0
+    repository: file://charts/zeta
+    alias: z-service
+  - name: alpha
+    version: 0.1.0
+    repository: file://charts/alpha
+    depends-on: [z-service, zeta]

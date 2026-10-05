@@ -1,0 +1,13 @@
+apiVersion: readiness.hip0025.example/v1
+kind: Probe
+metadata:
+  name: gate
+  annotations:
+    helm.sh/resource-group: first
+    helm.sh/readiness-success: '["{.phase} == Ready"]'
+    helm.sh/readiness-failure: '["{.phase} == Failed"]'
+spec:
+  target: test
+status: {}
+---
+{{ include "e2e.workload.gate" (dict "root" $ "name" "app" "group" "second" "deps" (list "first")) }}

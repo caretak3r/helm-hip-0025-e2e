@@ -1,0 +1,4 @@
+apiVersion: v2
+name: sub
+description: V2 subchart with depends-on
+version: 0.1.0

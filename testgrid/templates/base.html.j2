@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}HIP-0025 black-box tests{% endblock %}</title>
+<link rel="stylesheet" href="{{ root }}style.css">
+</head>
+<body>
+<header class="top">
+  <nav class="crumbs"><a href="{{ root }}index.html">HIP-0025 black-box tests</a>{% block crumbs %}{% endblock %}</nav>
+  <h1>{% block heading %}HIP-0025 black-box tests{% endblock %}</h1>
+</header>
+<main>
+{% block main %}{% endblock %}
+</main>
+<footer>
+  These pages are built by <code>testgrid/</code> from the evidence in <code>runs/</code>.
+  {% if repo %}Source, charts and instructions: <a href="{{ repo }}">{{ repo }}</a>.{% endif %}
+</footer>
+</body>
+</html>

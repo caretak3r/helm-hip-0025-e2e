@@ -1,0 +1,1 @@
+{{ include "e2e.workload.lifecycle" (dict "root" . "name" "parent") }}

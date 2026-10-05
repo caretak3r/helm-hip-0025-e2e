@@ -1,0 +1,4 @@
+apiVersion: v3
+name: a
+description: First subchart in sequence
+version: 0.1.0

@@ -1,0 +1,28 @@
+# V2 chart with group annotations - should work with plain --wait
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: parent-app
+  annotations:
+    helm.sh/resource-group: app
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: parent-app}
+  template:
+    metadata:
+      labels: {app: parent-app}
+    spec:
+      terminationGracePeriodSeconds: 0
+      containers:
+        - name: web
+          image: {{ .Values.image }}
+          imagePullPolicy: IfNotPresent
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: parent-db
+  annotations:
+    helm.sh/resource-group: database
+data: {component: database}

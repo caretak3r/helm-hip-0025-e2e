@@ -1,0 +1,4 @@
+apiVersion: v3
+name: c
+description: Optional third subchart, depends on b
+version: 0.1.0

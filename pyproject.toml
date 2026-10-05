@@ -1,0 +1,30 @@
+[project]
+name = "helm-hip-0025-e2e"
+version = "0.1.0"
+description = "Black-box tests for the HIP-0025 pull requests: real helm binaries on a kind cluster"
+requires-python = ">=3.12"
+dependencies = ["pytest>=8.3", "pyyaml>=6.0", "jinja2>=3.1"]
+
+[dependency-groups]
+dev = ["ruff>=0.15"]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["e2e/tests"]
+addopts = "-p no:cacheprovider -ra"
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["grade", "paths", "report", "timeline", "testgrid"]
+
+[tool.ruff.lint.per-file-ignores]
+# Test docstrings are printed in the reports; keep each on one line.
+"e2e/tests/*" = ["E501"]

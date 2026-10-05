@@ -1,0 +1,27 @@
+apiVersion: v3
+name: hip-lifecycle
+description: Parent with sequenced subcharts a -> b -> parent for lifecycle tests (upgrade, uninstall, rollback)
+version: 0.1.0
+annotations:
+  helm.sh/depends-on/subcharts: '["b"]'
+dependencies:
+  - name: a
+    version: 0.1.0
+    repository: file://charts/a
+  - name: b
+    version: 0.1.0
+    repository: file://charts/b
+    depends-on:
+      - a
+  - name: c
+    version: 0.1.0
+    repository: file://charts/c
+    condition: c.enabled
+    depends-on:
+      - b
+  - name: d
+    version: 0.1.0
+    repository: file://charts/d
+    condition: c.enabled      # c and d come and go together; d depends on c
+    depends-on:
+      - c

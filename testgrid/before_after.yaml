@@ -1,0 +1,57 @@
+# Pairs of tests for the "Before and after" section of a run page. Each pair
+# shows one kind of operation without the HIP-0025 feature (before) and with it
+# (after), on the same helm binary. The dashboard shows the helm commands and the
+# server-clock timeline that each test recorded. It does not grade anything.
+pairs:
+  - title: Install without and with --wait=ordered
+    chart: hip-subcharts
+    tier: combined
+    look_for: >-
+      Before: all Deployments are applied at the same moment. After: bar is applied
+      only after nginx and rabbitmq are ready, and foo only after bar is ready.
+    before:
+      test: test_plain_wait_applies_everything_at_once
+      caption: helm install --wait
+    after:
+      test: test_subcharts_dag_order_and_gating
+      caption: helm install --wait=ordered
+
+  - title: Uninstall of a plain release and of a sequenced release
+    chart: hip-lifecycle
+    tier: combined
+    look_for: >-
+      Before: the release was installed with plain --wait, so Helm deletes everything
+      at once. After: the release was installed with --wait=ordered, so Helm deletes in
+      reverse order and waits for each deletion.
+    before:
+      test: test_uninstall_after_plain_install_is_not_sequenced
+      caption: install --wait, then uninstall
+    after:
+      test: test_uninstall_reverse_order_for_ordered_install
+      caption: install --wait=ordered, then uninstall
+
+  - title: Readiness without and with custom readiness annotations
+    chart: hip-readiness-basic
+    tier: combined
+    look_for: >-
+      Before: a Deployment without annotations is ready when kstatus says so. After:
+      helm waits until the helm.sh/readiness-success expression of the Probe is true.
+    before:
+      test: test_deployment_without_annotations_uses_kstatus
+      caption: no readiness annotations
+    after:
+      test: test_custom_readiness_applies_to_plain_wait
+      caption: helm.sh/readiness-success and helm.sh/readiness-failure
+
+  - title: A chart v2 does not change
+    chart: v2-annotated
+    tier: combined
+    look_for: >-
+      A chart v2 with group annotations installs all at once with --wait, as before.
+      --wait=ordered refuses a chart v2 and creates no release.
+    before:
+      test: test_v2_chart_with_plain_wait_applies_in_one_burst
+      caption: chart v2 with --wait
+    after:
+      test: test_v2_chart_with_ordered_wait_fails
+      caption: chart v2 with --wait=ordered

@@ -1,0 +1,4 @@
+apiVersion: v3
+name: second
+description: Second sequenced subchart
+version: 0.1.0

@@ -1,0 +1,77 @@
+{% extends "base.html.j2" %}
+{% block title %}{{ test.name }} · {{ tier.label }} · run {{ run.stamp }}{% endblock %}
+{% block crumbs %} / <a href="../../index.html">run {{ run.stamp }}</a> / {{ tier.label }}{% endblock %}
+{% block heading %}<code>{{ test.name }}</code>{% endblock %}
+{% block main %}
+<p class="lead"><span class="badge {{ css }}">{{ outcome }}</span> on <b>{{ tier.label }}</b> ({{ tier.title }}) · {{ test.duration | seconds }}</p>
+<p>{{ test.doc }}</p>
+{% if test.reason %}<pre class="reason">{{ test.reason }}</pre>{% endif %}
+{% if others %}
+<p class="badges">Same test on other tiers:
+  {% for o in others %}{% if o.link %}<a class="badge {{ o.css }}" href="{{ o.link }}">{{ o.label }} {{ o.text }}</a>{% else %}<span class="badge {{ o.css }}">{{ o.label }} {{ o.text }}</span>{% endif %}{% endfor %}
+</p>
+{% endif %}
+
+<section>
+  <h2>Requirements</h2>
+  {% for r in reqs %}
+  <div class="reqbox">
+    <p><a href="../../index.html#{{ r.id }}"><b>{{ r.id }}</b></a> {{ r.title }} <span class="tag {{ r.status }}">{{ r.status }}</span></p>
+    <blockquote>{{ r.hip | ticks }}<span class="src">HIP-0025, {{ r.section }}</span></blockquote>
+    {% if r.note %}<p class="note">Note: {{ r.note | ticks }}</p>{% endif %}
+  </div>
+  {% endfor %}
+  {% if test.needs %}<p class="muted">The test needs these tier features: {{ test.needs | join(', ') }}.</p>{% endif %}
+</section>
+
+<section>
+  <h2>What the test observed</h2>
+  <p class="hint">The test asserts on these facts. Times come from the kube-apiserver audit log (UTC).</p>
+  {% for obs in test.observations %}
+  <div class="obs">
+    <p class="k">{{ obs.label }}</p>
+    {% if obs.value is mapping %}
+    <table class="data"><tbody>{% for k, v in obs.value.items() %}<tr><th>{{ k }}</th><td class="mono">{{ v }}</td></tr>{% endfor %}</tbody></table>
+    {% elif obs.value is string %}
+    <pre>{{ obs.value }}</pre>
+    {% elif obs.value is sequence %}
+    <pre class="timeline">{{ obs.value | lines }}</pre>
+    {% else %}
+    <pre>{{ obs.value }}</pre>
+    {% endif %}
+  </div>
+  {% else %}
+  <p class="muted">The test recorded no observations.</p>
+  {% endfor %}
+</section>
+
+<section>
+  <h2>Commands</h2>
+  <p class="hint">Every command that the test ran, in order, with the start time, the exit code and the output. The
+    paths are relative to the root of the repository.</p>
+  <pre class="log">{{ evidence.log }}</pre>
+</section>
+
+{% for name, text in evidence.inline.items() %}
+<section>
+  <h2><code>{{ name }}</code></h2>
+  <pre>{{ text }}</pre>
+</section>
+{% endfor %}
+
+<section>
+  <h2>Files</h2>
+  <table class="data">
+    <thead><tr><th>File</th><th>Size</th><th>Content</th></tr></thead>
+    <tbody>
+    {% for f in evidence.files %}
+      <tr>
+        <td class="mono"><a href="{{ f.name }}">{{ f.name }}</a></td>
+        <td>{{ f.bytes | size }}</td>
+        <td>{% if f.name == 'audit.jsonl' %}{{ f.records }} kube-apiserver audit records for the namespace of the test{% elif f.name == 'commands.log' %}the commands above{% elif f.name == 'observations.json' %}the observations above, as JSON{% else %}an input file of the test{% endif %}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

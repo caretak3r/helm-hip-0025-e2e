@@ -1,0 +1,4 @@
+apiVersion: v3
+name: hip-groups-upgrade
+description: R08 groups - upgrade patches follow group order
+version: 0.1.0
