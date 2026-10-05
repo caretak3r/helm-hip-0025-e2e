@@ -1,0 +1,25 @@
+18:46:14.342 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr1-independent-subcharts-deploy-together --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+18:46:14.378 $ kubectl --context kind-hip0025-e2e create namespace e2e-pr1-independent-subcharts-deploy-together
+[exit 0, 0.0s]
+namespace/e2e-pr1-independent-subcharts-deploy-together created
+
+
+18:46:14.409 $ .bin/helm-pr1 install r charts/hip-subcharts --namespace e2e-pr1-independent-subcharts-deploy-together --wait=ordered --timeout 3m --kube-context kind-hip0025-e2e
+[exit 0, 8.8s]
+NAME: r
+LAST DEPLOYED: Mon Oct  5 14:46:14 2026
+NAMESPACE: e2e-pr1-independent-subcharts-deploy-together
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+
+
+18:46:24.250 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr1-independent-subcharts-deploy-together --wait=false
+[exit 0, 0.0s]
+namespace "e2e-pr1-independent-subcharts-deploy-together" deleted
+
+

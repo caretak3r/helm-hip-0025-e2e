@@ -57,6 +57,19 @@ The [dashboard](https://caretak3r.github.io/helm-hip-0025-e2e/) shows each run i
 
 `runs/<stamp>/REPORT.md` contains the same verdicts as Markdown.
 
+### Run 20261005-184055
+
+This run used the harness commit `8dfe3323e78f`, a new kind cluster (Kubernetes v1.37.0) and new builds.
+All tiers are green. [Dashboard page](https://caretak3r.github.io/helm-hip-0025-e2e/20261005-184055/index.html),
+[REPORT.md](runs/20261005-184055/REPORT.md).
+
+| Tier | Commit | HIP requirements | Tests | Go unit tests |
+|---|---|---|---|---|
+| PR1 | `c7c762a4c` | 16 graded: 15 met, 1 deviation (R35) | 21 pass, 25 n/a | 11/11 packages pass |
+| PR2 | `453cda84c` | 8 graded: 7 met, 1 not implemented (R26) | 28 pass, 1 xfail (R26), 17 n/a | 5/5 packages pass |
+| PR3 | `b57469035` | 7 graded: 6 met, 1 extension (R37) | 19 pass, 27 n/a | 3/3 packages pass |
+| Combined | PR2 + PR3 | 30 graded: 27 met, 1 extension, 1 deviation, 1 not implemented | 45 pass, 1 xfail (R26) | — |
+
 ### Verdicts
 
 | Verdict | Meaning |
@@ -85,7 +98,7 @@ on all requirements.
 
 You need:
 
-- Docker, with at least 4 CPUs and 8 GB of memory for the containers
+- Docker. The published run used Docker Engine 29.8 in Docker Desktop on macOS (arm64), with 24 CPUs and 32 GB of memory.
 - [kind](https://kind.sigs.k8s.io/) and `kubectl`
 - Go 1.26 or later
 - [uv](https://docs.astral.sh/uv/)

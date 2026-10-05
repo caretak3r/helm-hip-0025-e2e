@@ -1,0 +1,14 @@
+s.......................x..ssssssssssssssss...                           [100%]
+=========================== short test summary info ============================
+SKIPPED [1] e2e/tests/test_combined.py:8: N/A: tier has no readiness
+SKIPPED [1] e2e/tests/test_pr3_readiness.py:11: N/A: tier has no readiness
+SKIPPED [1] e2e/tests/test_pr3_readiness.py:25: N/A: tier has no readiness
+SKIPPED [1] e2e/tests/test_pr3_readiness.py:59: N/A: tier has no readiness
+SKIPPED [1] e2e/tests/test_pr3_readiness.py:88: N/A: tier has no readiness
+SKIPPED [1] e2e/tests/test_pr3_readiness.py:115: N/A: tier has no readiness
+SKIPPED [1] e2e/tests/test_pr3_readiness.py:165: N/A: tier has no readiness
+SKIPPED [1] e2e/tests/test_pr3_readiness.py:201: N/A: tier has no readiness
+SKIPPED [8] e2e/tests/test_pr3_readiness.py:225: N/A: tier has no readiness
+SKIPPED [1] e2e/tests/test_pr3_readiness.py:289: N/A: tier has no readiness
+XFAIL e2e/tests/test_pr2_groups.py::test_template_prints_delimiters_for_groups - R26 not implemented: helm template does not print START/END resource-group delimiters
+28 passed, 17 skipped, 1 xfailed in 393.30s (0:06:33)

@@ -1,0 +1,58 @@
+# The code under test: one tier per HIP-0025 pull request, plus all three merged.
+#
+# Every commit is pinned. `make run` fetches these commits from GitHub, so a run
+# always tests exactly the code named here. To test new PR commits, change the
+# `commit` values and run again.
+#
+# Upstream Helm cannot install a chart-v3 release yet. For this reason every tier
+# also gets the test-only patches in wiring/ (see wiring/README.md). The patches
+# connect the helm commands to the code of each PR. They do not decide the order
+# or the readiness of resources.
+
+upstream:
+  url: https://github.com/helm/helm.git
+  branch: main
+  # The upstream commit that all three PRs are based on.
+  base: d31cd6992fc7858922de6ebe5984a06fd6aa0b80
+
+fork:
+  url: https://github.com/caretak3r/helm.git
+
+wiring:
+  base: wiring/0001-base-chart-v3-lifecycle.patch
+  ordered: wiring/0002-ordered-overlay.patch
+  readiness: wiring/0003-readiness-overlay.patch
+
+tiers:
+  pr1:
+    label: PR1
+    title: PR1 · subchart sequencing
+    branch: feat/hip-0025-v3-subcharts
+    commit: c7c762a4c7f5334a4e42f2b73d8f45f33d7051b3
+    pr: https://github.com/caretak3r/helm/pull/4
+    wiring: [base, ordered]
+    features: [ordered, subcharts]
+  pr2:
+    label: PR2
+    title: PR2 · resource-group sequencing (stacked on PR1)
+    branch: feat/hip-0025-v3-resource-groups
+    commit: 453cda84c9bbfd8276b040673153f01d75d4314b
+    pr: https://github.com/caretak3r/helm/pull/5
+    stacked_on: pr1   # the unit stage tests only the changes PR2 adds to PR1
+    wiring: [base, ordered]
+    features: [ordered, subcharts, groups]
+  pr3:
+    label: PR3
+    title: PR3 · custom readiness
+    branch: feat/hip-0025-v3-readiness
+    commit: b57469035869d096ce32df0464375662ce59e498
+    pr: https://github.com/caretak3r/helm/pull/3
+    wiring: [base, readiness]
+    features: [readiness]
+  combined:
+    label: Combined
+    title: All three PRs merged
+    merge: [pr2, pr3]   # PR2 contains PR1
+    resolve: scripts/resolve-combined.sh
+    wiring: [base, ordered, readiness]
+    features: [ordered, subcharts, groups, readiness]

@@ -1,0 +1,46 @@
+18:43:58.425 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr1-rollback-on-failure-cleans-up --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+18:43:58.458 $ kubectl --context kind-hip0025-e2e create namespace e2e-pr1-rollback-on-failure-cleans-up
+[exit 0, 0.0s]
+namespace/e2e-pr1-rollback-on-failure-cleans-up created
+
+
+18:43:58.491 $ .bin/helm-pr1 install r charts/hip-lifecycle-failure --namespace e2e-pr1-rollback-on-failure-cleans-up --wait=ordered --timeout 45s --rollback-on-failure --kube-context kind-hip0025-e2e
+[exit 1, 45.2s]
+Error: INSTALLATION FAILED: release r failed, and has been uninstalled due to rollback-on-failure being set: resource Deployment/e2e-pr1-rollback-on-failure-cleans-up/broken not ready. status: InProgress, message: Available: 0/1
+context deadline exceeded
+
+
+18:44:44.692 $ .bin/helm-pr1 list --deployed --failed --pending --superseded --uninstalled --short --namespace e2e-pr1-rollback-on-failure-cleans-up --kube-context kind-hip0025-e2e
+[exit 0, 0.0s]
+
+
+18:44:44.733 $ kubectl --context kind-hip0025-e2e get Deployment broken -n e2e-pr1-rollback-on-failure-cleans-up
+[exit 1, 0.0s]
+Error from server (NotFound): deployments.apps "broken" not found
+
+
+18:44:44.769 $ kubectl --context kind-hip0025-e2e get Deployment dependent -n e2e-pr1-rollback-on-failure-cleans-up
+[exit 1, 0.0s]
+Error from server (NotFound): deployments.apps "dependent" not found
+
+
+18:44:44.803 $ kubectl --context kind-hip0025-e2e get secret -n e2e-pr1-rollback-on-failure-cleans-up -l owner=helm,name=r -o json
+[exit 0, 0.0s]
+{
+    "apiVersion": "v1",
+    "items": [],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}
+
+
+18:44:44.838 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr1-rollback-on-failure-cleans-up --wait=false
+[exit 0, 0.0s]
+namespace "e2e-pr1-rollback-on-failure-cleans-up" deleted
+
+

@@ -1,0 +1,10 @@
+[
+  {
+    "label": "apiserver timeline",
+    "value": [
+      "18:41:48.199  apply  Probe/gate (group first)",
+      "18:41:53.115  status Probe/gate phase=Ready (test patch)",
+      "18:41:53.136  apply  Deployment/app (group second, depends on first)"
+    ]
+  }
+]

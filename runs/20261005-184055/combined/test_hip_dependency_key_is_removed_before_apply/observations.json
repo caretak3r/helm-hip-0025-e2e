@@ -1,0 +1,30 @@
+[
+  {
+    "label": "API server on the HIP key",
+    "value": "The ConfigMap \"key-probe\" is invalid: metadata.annotations: Invalid value: \"helm.sh/depends-on/resource-groups\": a valid label key must consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character (e.g. 'MyName',  or 'my.name',  or '123-abc', regex used for validation is '([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]') with an optional DNS subdomain prefix and '/' (e.g. 'example.com/MyName')"
+  },
+  {
+    "label": "my-app annotations on the cluster",
+    "value": {
+      "deployment.kubernetes.io/revision": "1",
+      "helm.sh/resource-group": "app",
+      "meta.helm.sh/release-name": "r",
+      "meta.helm.sh/release-namespace": "e2e-combined-hip-dependency-key-is-removed-before-apply"
+    }
+  },
+  {
+    "label": "key in the stored release manifest",
+    "value": true
+  },
+  {
+    "label": "apiserver timeline",
+    "value": [
+      "18:47:55.142  apply  Deployment/db-service",
+      "18:47:55.142  apply  Deployment/queue-processor",
+      "18:47:58.564  ready  Deployment/queue-processor",
+      "18:47:58.568  ready  Deployment/db-service",
+      "18:47:58.585  apply  Deployment/my-app",
+      "18:48:02.573  ready  Deployment/my-app"
+    ]
+  }
+]

@@ -1,0 +1,30 @@
+18:49:50.246 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-readiness-operators-false-true-true-ready-equality --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+18:49:50.284 $ kubectl --context kind-hip0025-e2e create namespace e2e-combined-readiness-operators-false-true-true-ready-equality
+[exit 0, 0.0s]
+namespace/e2e-combined-readiness-operators-false-true-true-ready-equality created
+
+
+18:49:53.321 $ kubectl --context kind-hip0025-e2e patch Probe probe -n e2e-combined-readiness-operators-false-true-true-ready-equality --subresource=status --type=merge -p {"status": {"ready": true}}
+[exit 0, 0.0s]
+probe.readiness.hip0025.example/probe patched
+
+
+18:49:50.317 $ .bin/helm-combined install r charts/hip-readiness-basic -f runs/20261005-184055/combined/test_readiness_operators_-false-true-true-ready-equality_boolean_/values.yaml --namespace e2e-combined-readiness-operators-false-true-true-ready-equality --wait --timeout 2m --kube-context kind-hip0025-e2e
+[exit 0, 3.1s]
+NAME: r
+LAST DEPLOYED: Mon Oct  5 14:49:50 2026
+NAMESPACE: e2e-combined-readiness-operators-false-true-true-ready-equality
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+
+
+18:49:54.379 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-readiness-operators-false-true-true-ready-equality --wait=false
+[exit 0, 0.0s]
+namespace "e2e-combined-readiness-operators-false-true-true-ready-equality" deleted
+
+

@@ -1,0 +1,31 @@
+[
+  {
+    "label": "install exit code",
+    "value": 0
+  },
+  {
+    "label": "resource applies",
+    "value": [
+      [
+        "18:48:17.108",
+        "ConfigMap/parent-db"
+      ],
+      [
+        "18:48:17.108",
+        "ConfigMap/r-sub"
+      ],
+      [
+        "18:48:17.111",
+        "Deployment/parent-app"
+      ]
+    ]
+  },
+  {
+    "label": "burst duration (seconds)",
+    "value": 0.002945
+  },
+  {
+    "label": "release record has plan",
+    "value": false
+  }
+]

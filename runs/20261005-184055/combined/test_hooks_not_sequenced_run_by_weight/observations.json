@@ -1,0 +1,31 @@
+[
+  {
+    "label": "apiserver timeline",
+    "value": [
+      "18:46:06.675  create Job/hook-weight-minus-5 (pre-install, weight -5)",
+      "18:46:09.339  create Job/hook-weight-5 (pre-install, weight 5)",
+      "18:46:12.249  apply  Deployment/first",
+      "18:46:15.208  apply  Deployment/second"
+    ]
+  },
+  {
+    "label": "hook templates",
+    "value": [
+      "hip-lifecycle-hooks/templates/hooks.yaml"
+    ]
+  },
+  {
+    "label": "plan manifests",
+    "value": [
+      "hip-lifecycle-hooks/charts/first/templates/deploy.yaml",
+      "hip-lifecycle-hooks/charts/second/templates/deploy.yaml"
+    ]
+  },
+  {
+    "label": "hook last_run phases",
+    "value": {
+      "hook-weight-minus-5": "Succeeded",
+      "hook-weight-5": "Succeeded"
+    }
+  }
+]

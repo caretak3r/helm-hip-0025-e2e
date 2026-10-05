@@ -1,0 +1,2 @@
+$ go test -count=1 ./internal/release/v2/sequence/
+ok  	helm.sh/helm/v4/internal/release/v2/sequence	0.376s

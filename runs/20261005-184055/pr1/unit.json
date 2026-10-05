@@ -1,0 +1,96 @@
+{
+  "tier": "pr1",
+  "base": "d31cd6992fc7858922de6ebe5984a06fd6aa0b80",
+  "head": "c7c762a4c7f5334a4e42f2b73d8f45f33d7051b3",
+  "packages": [
+    {
+      "package": "internal/chart/v3",
+      "scope": "all tests",
+      "passed": true,
+      "seconds": 19.9,
+      "log": "unit-internal_chart_v3.log",
+      "summary": "ok  \thelm.sh/helm/v4/internal/chart/v3\t1.217s"
+    },
+    {
+      "package": "internal/chart/v3/lint",
+      "scope": "all tests",
+      "passed": true,
+      "seconds": 3.6,
+      "log": "unit-internal_chart_v3_lint.log",
+      "summary": "ok  \thelm.sh/helm/v4/internal/chart/v3/lint\t0.929s"
+    },
+    {
+      "package": "internal/chart/v3/lint/rules",
+      "scope": "all tests",
+      "passed": true,
+      "seconds": 4.3,
+      "log": "unit-internal_chart_v3_lint_rules.log",
+      "summary": "ok  \thelm.sh/helm/v4/internal/chart/v3/lint/rules\t1.179s"
+    },
+    {
+      "package": "internal/chart/v3/util",
+      "scope": "all tests",
+      "passed": true,
+      "seconds": 2.9,
+      "log": "unit-internal_chart_v3_util.log",
+      "summary": "ok  \thelm.sh/helm/v4/internal/chart/v3/util\t0.448s"
+    },
+    {
+      "package": "internal/release/v2",
+      "scope": "all tests",
+      "passed": true,
+      "seconds": 1.8,
+      "log": "unit-internal_release_v2.log",
+      "summary": "ok  \thelm.sh/helm/v4/internal/release/v2\t0.364s"
+    },
+    {
+      "package": "internal/release/v2/manifest",
+      "scope": "all tests (package added by the PR)",
+      "passed": true,
+      "seconds": 0.1,
+      "log": "unit-internal_release_v2_manifest.log",
+      "summary": "?   \thelm.sh/helm/v4/internal/release/v2/manifest\t[no test files]"
+    },
+    {
+      "package": "internal/release/v2/sequence",
+      "scope": "all tests (package added by the PR)",
+      "passed": true,
+      "seconds": 1.8,
+      "log": "unit-internal_release_v2_sequence.log",
+      "summary": "ok  \thelm.sh/helm/v4/internal/release/v2/sequence\t0.376s"
+    },
+    {
+      "package": "internal/release/v2/util",
+      "scope": "all tests",
+      "passed": true,
+      "seconds": 1.8,
+      "log": "unit-internal_release_v2_util.log",
+      "summary": "ok  \thelm.sh/helm/v4/internal/release/v2/util\t0.374s"
+    },
+    {
+      "package": "pkg/action",
+      "scope": "all tests",
+      "passed": true,
+      "seconds": 32.5,
+      "log": "unit-pkg_action.log",
+      "summary": "ok  \thelm.sh/helm/v4/pkg/action\t28.148s"
+    },
+    {
+      "package": "pkg/cmd",
+      "scope": "8 test(s) the PR added or changed",
+      "passed": true,
+      "seconds": 7.5,
+      "log": "unit-pkg_cmd.log",
+      "summary": "ok  \thelm.sh/helm/v4/pkg/cmd\t0.841s"
+    },
+    {
+      "package": "pkg/kube",
+      "scope": "all tests",
+      "passed": true,
+      "seconds": 27.4,
+      "log": "unit-pkg_kube.log",
+      "summary": "ok  \thelm.sh/helm/v4/pkg/kube\t24.018s"
+    }
+  ],
+  "passed": true
+}

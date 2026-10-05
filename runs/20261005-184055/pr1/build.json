@@ -1,0 +1,29 @@
+{
+  "tier": "pr1",
+  "commits": {
+    "feat/hip-0025-v3-subcharts": "c7c762a4c7f5334a4e42f2b73d8f45f33d7051b3"
+  },
+  "wiring": [
+    {
+      "name": "base",
+      "file": "wiring/0001-base-chart-v3-lifecycle.patch",
+      "sha256": "5ff507228070d529cac835fe892cac77dc40ec48696fadfcd809abb51b9794de"
+    },
+    {
+      "name": "ordered",
+      "file": "wiring/0002-ordered-overlay.patch",
+      "sha256": "d040d30b9482618d74114338cce11571048cc3dd6d0ce2972f8795c3f79c257f"
+    }
+  ],
+  "base": "d31cd6992fc7858922de6ebe5984a06fd6aa0b80",
+  "tree_head": "57b303f06cbea4b122a37bfdd43f48d171ebd9ed",
+  "tree": "4647e4f3263473c56d140ecb8e0dee7544a87745",
+  "version": "v4.3+g57b303f",
+  "binary": ".bin/helm-pr1",
+  "binary_sha256": "78d5b32018a2a184ea4264ef79db55efae896c0281146c70860776cb1c8c1c31",
+  "go": "go1.27.1",
+  "goos": "darwin",
+  "goarch": "arm64",
+  "build_seconds": 15.9,
+  "rebuilt": true
+}

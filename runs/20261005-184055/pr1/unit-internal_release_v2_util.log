@@ -1,0 +1,2 @@
+$ go test -count=1 ./internal/release/v2/util/
+ok  	helm.sh/helm/v4/internal/release/v2/util	0.374s

@@ -1,0 +1,32 @@
+18:47:22.863 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-helm-dag-prints-subchart-order --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+18:47:22.902 $ kubectl --context kind-hip0025-e2e create namespace e2e-combined-helm-dag-prints-subchart-order
+[exit 0, 0.0s]
+namespace/e2e-combined-helm-dag-prints-subchart-order created
+
+
+18:47:22.934 $ .bin/helm-combined dag charts/hip-subcharts --kube-context kind-hip0025-e2e
+[exit 0, 0.0s]
+Chart: foo
+  Subchart batches:
+    Batch 1: nginx, rabbitmq
+    Batch 2: bar
+  Unsequenced (deployed last): Deployment/foo
+  Chart: foo/charts/nginx
+    Subchart batches: (none)
+    Unsequenced (deployed last): Deployment/nginx
+  Chart: foo/charts/rabbitmq
+    Subchart batches: (none)
+    Unsequenced (deployed last): Deployment/rabbitmq
+  Chart: foo/charts/bar
+    Subchart batches: (none)
+    Unsequenced (deployed last): Deployment/bar
+
+
+18:47:22.963 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-helm-dag-prints-subchart-order --wait=false
+[exit 0, 0.0s]
+namespace "e2e-combined-helm-dag-prints-subchart-order" deleted
+
+

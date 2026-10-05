@@ -1,0 +1,161 @@
+18:50:01.439 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-v2-chart-upgrade-rollback-uninstall-succeed --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+18:50:01.472 $ kubectl --context kind-hip0025-e2e create namespace e2e-combined-v2-chart-upgrade-rollback-uninstall-succeed
+[exit 0, 0.0s]
+namespace/e2e-combined-v2-chart-upgrade-rollback-uninstall-succeed created
+
+
+18:50:01.503 $ .bin/helm-combined install r charts/v2-annotated --namespace e2e-combined-v2-chart-upgrade-rollback-uninstall-succeed --wait --timeout 3m --kube-context kind-hip0025-e2e
+[exit 0, 0.8s]
+NAME: r
+LAST DEPLOYED: Mon Oct  5 14:50:01 2026
+NAMESPACE: e2e-combined-v2-chart-upgrade-rollback-uninstall-succeed
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+
+
+18:50:02.342 $ .bin/helm-combined upgrade r charts/v2-annotated --namespace e2e-combined-v2-chart-upgrade-rollback-uninstall-succeed --wait --timeout 3m --kube-context kind-hip0025-e2e
+[exit 0, 0.1s]
+Release "r" has been upgraded. Happy Helming!
+NAME: r
+LAST DEPLOYED: Mon Oct  5 14:50:02 2026
+NAMESPACE: e2e-combined-v2-chart-upgrade-rollback-uninstall-succeed
+STATUS: deployed
+REVISION: 2
+DESCRIPTION: Upgrade complete
+TEST SUITE: None
+
+
+18:50:02.472 $ kubectl --context kind-hip0025-e2e get secret -n e2e-combined-v2-chart-upgrade-rollback-uninstall-succeed -l owner=helm,name=r,version=2 -o json
+[exit 0, 0.0s]
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "v1",
+            "data": {
+                "release": "SDRzSUFBQUFBQUFDLzZSV2YyL2pxQmI5S29qOU4yNHgrVEVUUy90SG5KMDQ3a3piYWFlMUU3K3NWb0NwVFlNQkdadzByZkxkbit3bWFXZG4zNngyWCtSS0J1NDk5NXhiYytBRktsSnhHTUFhOXFCUUR4b0dML0JCMU5iOWtYTWo5WTduTUlBWTRaSG5JdzhONy94Qk1FUUI4cytHZytGbzdLRkJnQkRzUVVuK0xnT2Y5VDhPeGgveEtTWG5sdFhDT0tFVkRPQzlLV3FTYzhCMFpTUjNIUGFnZGNRMUZnYndoTHZ2UVZhUzJyVWtLKzVJVGh4cDN3OGFOdGdqU21sSEhNOWhEMjU0YlYvQjBabC85bVBKVzM4QU5oaDBpR0FyWEFtS1dqY0dIRENFVmhaNG9HcXNBMXRkcjE5RGpDUkNBYy9iRXVGNm9PYVBuTG5EOEZkZDU3enVTaE1qa2xQMURlNUtHNjV5cnBqZ0ZnYi9PWEcyRGYxTHFqVTMyZ3FuNngwTTRJT1FQRGcvNzVqYTg5Y1VyZ2lWYmE5ZDNmRDk3L3NlbEpxdFlhQWFLWHZROGNwSTRyNnZkWm84SjhhYzdVZ2xXMkpkRDJHOEM5TkxFVDZTYUxiTHAyR2ZMRzUxSE9VNzJrKzJjVFJyYURWR3k4V3RvWGo0SEU5UndYQzV5ZE9uZFR6UE42eXlSWTRsSXROd1M2T1pvV0xpdml6eWtpeHVQaThYb1VtcVpNZXczTkJIWFN3WDRaYnR4dmp5eHRRa0hhNnZSZmdwVzRTVzlxWEwwaUdhVnI3TW85bDZ1Ymd0cnd0ZHhOR3dwT245S0o2SEphdVNKcC82Slp0UFBzZlRzS1RWY0pOSE0wVFNjY09lOWVkNE9pbmlxSlEwUWczRHhZWlZ5VFB0SjdzbHZuZFovMktUTHlhak9KcHQyY1E4c3loNTdQRG5GNUpGVDJhSlo4L1hZdkkwRlpPQzRjUm02UldpL1hqVWp1TnA2SmFMMjBmeTZhbGNWb2xsejdyZ2VMWmx2K21DUmJOZHkvdExPdHV5T1dwNW9TejEyejZnN083STZVK2FwaDJtWGFZWGtzNHZSL0hjdFpyK3BERWNIMnEvY1gzTlE5bml3cEYwV09hUjNOQjF2bHVtVi9JK1NuWWtIYS92Y2ZKSThYRGRjcnljbkhMYU9iUk1aWk10THA3ZnNOby9WTkJxNXJJN1hlUTRFVk54bk8veURFMW5xbDNqZlZ0OGtWbEo1NGxrdStIci9MZHcvSER6SG10U2tOUXZNNXpjNU9tVHZZL0dscVJYdzJzUlhtVHI0U2FmaGJ0c2NTV3B1dm44NVJ0eTAycTJKVWttbWJveUZBOUc4WHo1TksyY29kWE5LUDUwdGFGVlpqTGtsMnhpWExhNExiTm9ocFpkVDhObW1mcnlXb1RiNWVLaXhYTlpGUDhmMzhSdG1VY3pzVnhjeVduVnZuOXEveWVQRlB0YmlvY3QvbmN4RHpmNlY5aURsYzZkcVBqUjdkRFl3eC91Y0QvQS9RQjlQUE0vb01GZ2lQc2ZENGEzLzcwSE4wUTI3Wlo4Z2FJaVJadXBDcUdlQXY4TWYvQ0lORUoxdnRmUU5xU1FtaElKZzVkOTd5ZmgrMzBQV2xieWloeTMvdXZvalJ4Q3lQZTY1dzZob0hzeTJPczh4UjV6L2tMS29KV0NPcXZIYU9RajNNY25LVDFZRVNVZXVIVXdnSjducmRRdjRKdHVhc1lEOE42RTN6blcrWnY1MklaMjVyTlNiellaZ0kyL1VtdWg4Z0JNdFhvUXhTVXhLM1UwK1dDbEFHaGRMQUMxWnh2YUR0L1pkTGNNUU1sbGRXYkw4NXJiam96WCtYa0FiRU83dDVVNlliWEhqRlpjdVc2MW83bFNLL1V6TFQrNjU3OFRZRWpObGZQeWZ5aWlSYUhFOG9NSThQSk93bkZ0LzI4MC9BS1N2ejBFYmFrYm1mK1BZL0Q3TmhCajdQbGJMMzdyenU2S0svZXpaaEJqL2xrM3VnUnJPT3ZpYW02a1lNUUd3RytIbGt2T25LNFBHQlZ4clB4Q0tKYzJBQy9FbVBkbDkyM01zUzNIaFBjODI1LzhXVElBSng3dHovRzZFcW9URWRXRThhKzhGanIveHBsV3VRMEFPc1l4clJ3Uml0ZjJsQXFBZDJqTGx0TzNTUUM2N1IrQUgzYi9EekZmR3ltL2FpbllMZ0R4dzVWMlgydHV1OTZ2MVB0ckJ1NTFkd0pyQ0dzM1BjZmNZN3FpUXZIYzIyQ3YreHE4NXZWSzV0VmFTa3JZMm11VVVOWVJLVDNiTU1ZUE54MGpkMzlVM0pXNnZmZFpTK0QrdndNQXhuclJIMVVLQUFBPQ=="
+            },
+            "kind": "Secret",
+            "metadata": {
+                "creationTimestamp": "2026-10-05T18:50:02Z",
+                "labels": {
+                    "modifiedAt": "1791226202",
+                    "name": "r",
+                    "owner": "helm",
+                    "status": "deployed",
+                    "version": "2"
+                },
+                "name": "sh.helm.release.v1.r.v2",
+                "namespace": "e2e-combined-v2-chart-upgrade-rollback-uninstall-succeed",
+                "resourceVersion": "10911",
+                "uid": "1cb28263-6db0-4b54-aa6f-ff1d0d740345"
+            },
+            "type": "helm.sh/release.v1"
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}
+
+
+18:50:02.506 $ .bin/helm-combined rollback r 1 --namespace e2e-combined-v2-chart-upgrade-rollback-uninstall-succeed --wait --timeout 3m --kube-context kind-hip0025-e2e
+[exit 0, 0.1s]
+Rollback was a success! Happy Helming!
+
+
+18:50:02.581 $ kubectl --context kind-hip0025-e2e get secret -n e2e-combined-v2-chart-upgrade-rollback-uninstall-succeed -l owner=helm,name=r -o json
+[exit 0, 0.0s]
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "v1",
+            "data": {
+                "release": "SDRzSUFBQUFBQUFDLzZSV2YyL2l1QmI5S3BiM1g5STZvVEJMcFAyRHNFTklweittblRhQlBGWXIvMnJpNHRoVzdFQnB4WGQvU2dvdHM3T3ZUN01iQlNtMjd6MzNuRXQ4NGhlb2NNVmhDR3ZZZzBJOWFCaSt3QWRSVy9jbjQwYnFMV2N3aEFFS2hwNlBQRFM0ODgvQ0FRcVJmekk0R3d4SEhqb0xFWUk5S1BIUFpqQnVhUzJNRTFyQkVDYktPaXdsb0xveWtqc09lOUE2N0JvTFEyZ2J3MnZMR1dkdzE0TzB4TFZyV1ZiY1lZWWRicC8zSXRhQmg1WFNEanZPWUErdWVXMWY0ZEdKZi9KajBWdi9ES3dEMENHQ2pYQWxLR3JkR0xESEVGcFo0SUdxc1E1c2RMMTZEVEVTQ3dVOGI0T0Y2NEdhUDNMcTlzUGZkTTE0M1pYR1JxUnYxZGRCVjlwd3hiaWlnbHNZL3VlTnMyM0kzMUt0dWRGV09GMXZZUWdmaE9UaDZXbkgxSjYrcG5DRmlXeWI3ZXFHNy83WTlhRFVkQVZEMVVqWmc0NVhSbUwzZmEyM3lWTnN6TWtXVjdJbDF2VVFKdHNvdXhUUkk0Nm5XemFKK25oK3E1T1liVWsvM1NUeHRDSFZDQzNtdDRZRWcrZGtnZ29hbEd1V1BhMlNHVnZUeWhZc2tBaFBvZzJKcDRhSXNidVlzeExQYjc0czVwRkpxM1JMQTdrbWo3cFl6S01OM1k2Q3l4dFQ0Mnl3dWhiUjUzd2VXZEtYTHM4R2FGTDVrc1hUMVdKK1cxNFh1a2ppUVVteSsyRXlpMHBhcFEyYitDV2RqYjhrazZnazFXRE40aW5DMmFpaHovcExNaGtYU1Z4S0VxT0dCc1dhVnVrejZhZmJSWER2OHY3NW1zM0h3eVNlYnVqWVBOTTRmZXp3WitlU3hrOW1FVXlmcjhYNGFTTEdCUTFTbTJkWGlQU1RZVHRPSnBGYnpHOGY4ZWVuY2xHbGxqN3JnZ2ZURGYxZEZ6U2VibHZlRjlsMFEyZW81WVh5ekcvN2dQSzdBNmUvYUpwMG1IYVJuVXN5dXh3bU05ZHErb3ZHYUxTdi9jNzFOUS9sODNPSHMwSEpZcmttSzdaZFpGZnlQazYzT0J1dDdvUDBrUVNEVmN2eGN2eVcwODZoUlNhYmZINysvSTdWL2xCQnFxbkw3M1RCZ2xSTXhHRyt5ek1rbTZwMmpmZHRjU0h6a3N4U1NiZUQxL2x2MGVqaDVoaHJYT0RNTC9NZ3ZXSFprNzJQUnhablY0TnJFWjNucThHYVRhTnRQcitTUk4xOHVmaUczS1NhYm5DYVM2cXVEQW5PaHNsczhUU3BuQ0hWelRENWZMVW1WVzV5NUpkMGJGdyt2eTN6ZUlvV1hVK2pacEg1OGxwRW04WDh2TVZ6ZVp6OGkzZml0bVR4VkN6bVYzSlN0YytmMi8va2tRVCtoZ1NERnYrN21JY2IvUnZzd1Vvekp5cCtzRHMwOG9KUGQwRS9EUG9oK3ZYRS80VE96Z1pCLzllOTVlMys2TUUxbGsyN0pWK2dxSERSWnFwQ3FLZlFQd2srZVZnYW9Ucm5hMGdiVWtoTnNJVGh5NjczUWZodTE0T1dscnpDaDYzL09ub25oeER5dmU2K1F5anM3aHoyT2sreGg1eS9rWExXU2tHZGN3ZG82S09nSDd4SjZjRUtLL0hBcllNaDlEeHZxWDRCMzNSVFV4NkNZeE0rY3F6VGQvT3hEZW5NWjZuZWJUSUVhMytwVmtLeEVFeTBlaERGSlRaTGRURDVjS2tBYUYwc0JMVm5HOUlPajJ5Nld3YWc1TEk2c2VWcHpXMUh4dXY4UEFTMklkM1RVcjFodFI4YXJiaHkzV3BIYzZtVzZpTXRQN3JuUHhOZ2NNMlY4OWhQaW1oUkNMWjhMd0s4SEVrNHJPMytpWVpmUVBwL1A0SzIxSTFrLytNeitIMGJzREgyOUwwWHYzZUhnb29yOTFFenNERS8xNDB1d1JwT3U3aWFHeWtvdGlIdzI2SGxrbE9uNnoxR2hSMHRMekRoMG9iZ0JSdHpYSGJYeGh6YWNrZzQ1dGxlOHFOa0FONTR0SmZqZFNWVUp5S3VNZVZmZVMwMCs4YXBWc3lHQUIzaXFGWU9DOFZyKzVZS2dMZHZ5NGFUOTBrQXV1MGZnaDkyL3c4eFh4c3B2Mm9wNkRZRXljT1ZkbDlyYnJ2ZUw5WHhNY1B2ZFdjQ2F6QnROejBQdUVkMVJZVGl6RnNIWHZjMmVJMHBhc3k0VjJzcENhWXJyMUhpOVp6bTJZWlN2ai9wR0xuOXMrS3UxTzNCejFvTWQvOGRBQVg5akRKV0NnQUE="
+            },
+            "kind": "Secret",
+            "metadata": {
+                "creationTimestamp": "2026-10-05T18:50:01Z",
+                "labels": {
+                    "modifiedAt": "1791226202",
+                    "name": "r",
+                    "owner": "helm",
+                    "status": "superseded",
+                    "version": "1"
+                },
+                "name": "sh.helm.release.v1.r.v1",
+                "namespace": "e2e-combined-v2-chart-upgrade-rollback-uninstall-succeed",
+                "resourceVersion": "10910",
+                "uid": "7b254b1a-46fc-49ed-a930-0a64691fc056"
+            },
+            "type": "helm.sh/release.v1"
+        },
+        {
+            "apiVersion": "v1",
+            "data": {
+                "release": "SDRzSUFBQUFBQUFDLzZSV2YyK2p1QmI5S3BiMzM5QWE1OGRNa1BhUGtKMFFPdE4yMm1raDRXVzFzbzBMYm94dFlaTTByZkxkbjZCSjJ0blpONnZkaDRpRTdYdlBQZWNHSC93Q0ZhazRER0FOZTFDb0J3MkRGL2dnYXV2K3lMbVJlc2R6R0VDTThNanprWWVHZC80Z0dLSUErV2ZEd1hBMDl0QWdRQWoyb0NSL2w0SFAraDhINDQvNGxKSnp5MnBobk5BS0J2RGVGRFhKT1dDNk1wSTdEbnZRT3VJYUN3Tm9HOE5yeTNPZXczMFBzcExVcnFWWmNVZHk0a2o3ZkZDeHdSNVJTanZpZUE1N2NNTnIrd3FQenZ5ekg0dmUrZ093d2FCREJGdmhTbERVdWpIZ2dDRzBzc0FEVldNZDJPcDYvUnBpSkJFS2VONldDTmNETlgva3pCMkd2K282NTNWWG1oaVJuS3B2Y0ZmYWNKVnp4UVMzTVBqUGliTnQ2RjlTcmJuUlZqaGQ3MkFBSDRUa3dmbDV4OVNldjZad1JhaHN1KzNxaHU5LzMvZWcxR3dOQTlWSTJZT09WMFlTOTMydDArUTVNZVpzUnlyWkV1dDZDT05kbUY2SzhKRkVzMTArRGZ0a2NhdmpLTi9SZnJLTm8xbERxekZhTG00TnhjUG5lSW9LaHN0Tm5qNnQ0M20rWVpVdGNpd1JtWVpiR3MwTUZSUDNaWkdYWkhIemVia0lUVklsTzRibGhqN3FZcmtJdDJ3M3hwYzNwaWJwY0gwdHdrL1pJclMwTDEyV0R0RzA4bVVlemRiTHhXMTVYZWdpam9ZbFRlOUg4VHdzV1pVMCtkUXYyWHp5T1o2R0phMkdtenlhSVpLT0cvYXNQOGZUU1JGSHBhUVJhaGd1TnF4S25tay8yUzN4dmN2NkY1dDhNUm5GMFd6TEp1YVpSY2xqaHorL2tDeDZNa3M4ZTc0V2s2ZXBtQlFNSnpaTHJ4RHR4Nk4ySEU5RHQxemNQcEpQVCtXeVNpeDcxZ1hIc3kzN1RSY3NtdTFhM2wvUzJaYk5VY3NMWmFuZjlnRmxkMGRPZjlJMDdURHRNcjJRZEg0NWl1ZXUxZlFuamVINFVQdU42MnNleWhZWGpxVERNby9raHE3ejNUSzlrdmRSc2lQcGVIMlBrMGVLaCt1VzQrWGtsTlBPb1dVcW0yeHg4ZnlHMWY1UVFhdVp5KzUwa2VORVRNVnh2c3N6TkoycGRvMzNiZkZGWmlXZEo1THRocS96MzhMeHc4MTdyRWxCVXIvTWNIS1RwMC8yUGhwYmtsNE5yMFY0a2EySG0zd1c3ckxGbGFUcTV2T1hiOGhOcTltV0pKbGs2c3BRUEJqRjgrWFR0SEtHVmplaitOUFZobGFaeVpCZnNvbHgyZUsyektJWlduWTlEWnRsNnN0ckVXNlhpNHNXejJWUi9IKzhFN2RsSHMzRWNuRWxwMVg3L0tuOVR4NHA5cmNVRDF2ODcySWVidlN2c0Fjcm5UdFI4YVBmb2JHSFA5emhmb0Q3QWZwNDVuOUFnOEVROXo4ZUxHLy9ldzl1aUd6YUxma0NSVVdLTmxNVlFqMEYvaG4rNEJGcGhPcWNyNkZ0U0NFMUpSSUdML3ZlVDhMMyt4NjByT1FWT1c3OTE5RWJPWVNRNzNYM0hVSkJkMmV3MTNtS1BlYjhoWlJCS3dWMVpvL1J5RWU0ajA5U2VyQWlTanh3NjJBQVBjOWJxVi9BTjkzVWpBZmd2UW0vYzZ6ek4vT3hEZTNNWjZYZWJESUFHMytsMWtMbEFaaHE5U0NLUzJKVzZtanl3VW9CMExwWUFHclBOclFkdnJQcGJobUFrc3Zxekpibk5iY2RHYS96OHdEWWhuWlBLM1hDYWo4MFduSGx1dFdPNWtxdDFNKzAvT2llLzA2QUlUVlh6c3Yvb1lnV2hSTExEeUxBeXpzSng3WDl2OUh3QzBqKzlpTm9TOTNJL0g5OEJyOXZBekhHbnIvMTRyZnVWRkJ4NVg3V0RHTE1QK3RHbDJBTloxMWN6WTBVak5nQStPM1Fjc21aMC9VQm95S09sVjhJNWRJRzRJVVk4Nzdzdm8wNXR1V1k4SjVuZThtZkpRTnc0dEZlanRlVlVKMklxQ2FNZitXMTBQazN6clRLYlFEUU1ZNXA1WWhRdkxhblZBQzhRMXUybkw1TkF0QnQvd0Q4c1B0L2lQbmFTUGxWUzhGMkFZZ2ZyclQ3V25QYjlYNmwzaDh6Y0s4N0UxaERXTHZwT2VZZTB4VVZpdWZlQm52ZDIrQTFyNGN5cjlaU1VzTFdYcU9Fc281STZkbUdNWDQ0NlJpNSs2UGlydFR0eWM5YUF2Zi9IUUJWREFmRVZ3b0FBQT09"
+            },
+            "kind": "Secret",
+            "metadata": {
+                "creationTimestamp": "2026-10-05T18:50:02Z",
+                "labels": {
+                    "modifiedAt": "1791226202",
+                    "name": "r",
+                    "owner": "helm",
+                    "status": "superseded",
+                    "version": "2"
+                },
+                "name": "sh.helm.release.v1.r.v2",
+                "namespace": "e2e-combined-v2-chart-upgrade-rollback-uninstall-succeed",
+                "resourceVersion": "10913",
+                "uid": "1cb28263-6db0-4b54-aa6f-ff1d0d740345"
+            },
+            "type": "helm.sh/release.v1"
+        },
+        {
+            "apiVersion": "v1",
+            "data": {
+                "release": "SDRzSUFBQUFBQUFDLzZSV2YyK2p1QmI5S3BiMzM5QWFVaklicFAwalpDZUVUbjlNT3kwa3ZLeEd0bkhCamJFdGJFalRLdC85Q1pxa25aMTVzOXA1aUVqWXZ1ZmVjMjd3d1M5UTRvckJBTlp3QUxsOFVEQjRnUSs4TnZacnpyUlFXNWJEQUhySUd6a3VjcEIvNTU0RlBncVFlK0tmK2FPeGc4NENoT0FBQ3Z4UENPL0VQMFBJSFI0aE9UTzA1dHB5SldFQWI1VVFCTk0xc0FxNGNBQ054Yll4TUlESHBBTlk3Mk8rMXF6bHBzZTV1d0drSmE1dHg3dGlGdWZZNHU1NUw2djFIQ3lsc3RqMkdWcFd2K0lnT25GUGZzRENQUU90Qi9xTVlNTnRDWXBhTlJyc2MzQWxEWEJBMVJnTE5xcGV2NFpvZ2JrRWpyUEIzQTVBelI0WnRmdmhINnJPV2QyWHhwb254K3F0MTVmV1RPWk1VczRNRFA1ejVHd2E4a09xTmRQS2NLdnFMUXpnQXhjc09EM3RtWnJUVndpVG1JaXUvYlp1Mk82djNRQUtSZGN3a0kwUUEyaFpwUVcyMzlZNlRwNWlyVSsydUJJZHNiNkhNTjZHNlNVUEgzRTAyK2JUY0lnWHR5cU84aTBaSnBzNG1qV2tHcVBsNGxZVHozK09wNmlnWHRubTZkTTZudWN0clV5UmV3TGhhYmdoMFV3VFByRVhpN3pFaTV0UHkwV29reXJaVWsrMDVGRVZ5MFc0b2R1eGQzbWphNXo2NjJzZWZzd1dvU0ZEWWJQVVI5UEtGWGswV3k4WHQrVjFvWW80OGt1UzNvL2llVmpTS21ueXFWdlMrZVJUUEExTFV2bHRIczBRVHNjTmZWYWY0dW1raUtOU2tBZzExQ3RhV2lYUFpKaHNsOTY5ellibmJiNllqT0pvdHFFVC9VeWo1TEhQUHo4WE5IclNTMi8yZk0wblQxTStLYWlYbUN5OVFtUVlqN3B4UEEzdGNuSDdpRDgrbGNzcU1mUlpGY3liYmVpZnFxRFJiTnZ4dmtobkd6cEhIUytVcFc3WEI1VGRIVGo5VGRPMHoybVc2YmtnODh0UlBMZWRwcjlwRE1mNzJtOWNYM0VvVzV4Ym5QcGxIb21XclBQdE1yMFM5MUd5eGVsNGZlOGxqOFR6MXgzSHk4a1IwODJoWlNxYWJISCsvSmFyKzZHQ1ZET2IzYWtpOXhJKzVZZjVIcWRKT3BQZEdodWE0a0prSlprbmdtNzkxL2t2NGZqaDVuMnVTWUZUdDh5ODVDWlBuOHg5TkRZNHZmS3ZlWGllcmYwMm40WGJiSEVsaUx6NWRQRUYyV2sxMitBa0UxUmVhZUtkamVMNThtbGFXVTJxbTFIODhhb2xWYVl6NUpaMG9tMjJ1QzJ6YUlhV2ZVL0RacG02NHBxSG0rWGl2TXRuc3lqK1A5NkoyektQWm55NXVCTFRxbnYrMlAwbmo4UnpOOFR6dS96ZnhEemNxRC9nQUZZcXQ3eGlCd05FWThmN2NPY05BMjhZb045UDNBL283TXozaHIvdlBYRDMxd0MyV0RUZGxueUJ2TUpGaDVRRmwwK0JlK0o5Y0xEUVhMTE9EUnZTaFJSQ0VTeGc4TEliL0NSOHR4dEFRMHRXNGNQV2Z4MjlrVU1JdVU1LzN5RVU5SGNHQjcybm1BUG1CMUxPT2ltb2QzOFBqVnprRGIyamxBR3NzT1FQekZnWVFNZHhWdkkzOEVVMU5XVUJlRy9DN3h6cjlNMThURU42ODFuSk41c01RT3V1NUpyTFBBQlRKUjk0Y1luMVNoNU1QbGhKQURvWEMwRHRtSVowdzNjMjNTOERVREpSblpqeXRHYW1KK1AwZmg0QTA1RCthU1dQdWFpcXRKSk0ybjYxcDdtU0sva3pMZCs3NTY4SjBMaG0wanI1dnhUUlpTSFlzTDBJOFBKT3dtRnQ5eXNhZmdQSlAzNEVUYWtha2YrUHorQzNiY0JhbTlPM1h2elpmOUVySnUzUG1vRzEvbmZkNkFGR005ckgxVXdMVHJFSmdOc05EUk9NV2xYdmMxVFkwdklDRXlaTUFGNncxdS9MN3JxWVExc09nUGM4dTB2OERBekFrVWQzV1ZaWFhQWWlvaHBUOXBuVlhPVmZHRlV5TndGQWh6aXFwTVZjc3RvY29RQTQrN1pzR0htYkJLRGYvZ0g0YnZkL0YvTzVFZUt6RXB4dUF4QS9YQ243dVdhbTcvMUt2ajltREFmOW1jQm9UTHROenp6bVVGVVJMbG51dEo3VHZ3MU9vNHNhNTh3NW5NU2NSbkpwTEJiQ01RMmxiSC9TMFdMN3RXSzJWTjFSMEJnTWQvOGRBQXMyanJKb0NnQUE="
+            },
+            "kind": "Secret",
+            "metadata": {
+                "creationTimestamp": "2026-10-05T18:50:02Z",
+                "labels": {
+                    "modifiedAt": "1791226202",
+                    "name": "r",
+                    "owner": "helm",
+                    "status": "deployed",
+                    "version": "3"
+                },
+                "name": "sh.helm.release.v1.r.v3",
+                "namespace": "e2e-combined-v2-chart-upgrade-rollback-uninstall-succeed",
+                "resourceVersion": "10914",
+                "uid": "3b71674f-ba7c-4e3e-a1e3-4fa64e2f84d9"
+            },
+            "type": "helm.sh/release.v1"
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}
+
+
+18:50:02.615 $ .bin/helm-combined uninstall r --namespace e2e-combined-v2-chart-upgrade-rollback-uninstall-succeed --wait --timeout 3m --kube-context kind-hip0025-e2e
+[exit 0, 0.2s]
+release "r" uninstalled
+
+
+18:50:03.784 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-v2-chart-upgrade-rollback-uninstall-succeed --wait=false
+[exit 0, 0.0s]
+namespace "e2e-combined-v2-chart-upgrade-rollback-uninstall-succeed" deleted
+
+

@@ -1,0 +1,30 @@
+18:49:29.388 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-readiness-operators-10-4-5-count-less-than --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+18:49:29.423 $ kubectl --context kind-hip0025-e2e create namespace e2e-combined-readiness-operators-10-4-5-count-less-than
+[exit 0, 0.0s]
+namespace/e2e-combined-readiness-operators-10-4-5-count-less-than created
+
+
+18:49:32.460 $ kubectl --context kind-hip0025-e2e patch Probe probe -n e2e-combined-readiness-operators-10-4-5-count-less-than --subresource=status --type=merge -p {"status": {"count": 4}}
+[exit 0, 0.0s]
+probe.readiness.hip0025.example/probe patched
+
+
+18:49:29.455 $ .bin/helm-combined install r charts/hip-readiness-basic -f runs/20261005-184055/combined/test_readiness_operators_-10-4-5-count-less_than_/values.yaml --namespace e2e-combined-readiness-operators-10-4-5-count-less-than --wait --timeout 2m --kube-context kind-hip0025-e2e
+[exit 0, 3.1s]
+NAME: r
+LAST DEPLOYED: Mon Oct  5 14:49:29 2026
+NAMESPACE: e2e-combined-readiness-operators-10-4-5-count-less-than
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+
+
+18:49:33.516 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-readiness-operators-10-4-5-count-less-than --wait=false
+[exit 0, 0.0s]
+namespace "e2e-combined-readiness-operators-10-4-5-count-less-than" deleted
+
+

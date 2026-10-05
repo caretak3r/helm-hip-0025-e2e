@@ -1,0 +1,25 @@
+18:46:10.269 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr1-plain-wait-applies-everything-at-once --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+18:46:10.303 $ kubectl --context kind-hip0025-e2e create namespace e2e-pr1-plain-wait-applies-everything-at-once
+[exit 0, 0.0s]
+namespace/e2e-pr1-plain-wait-applies-everything-at-once created
+
+
+18:46:10.335 $ .bin/helm-pr1 install r charts/hip-subcharts --namespace e2e-pr1-plain-wait-applies-everything-at-once --wait --timeout 3m --kube-context kind-hip0025-e2e
+[exit 0, 3.0s]
+NAME: r
+LAST DEPLOYED: Mon Oct  5 14:46:10 2026
+NAMESPACE: e2e-pr1-plain-wait-applies-everything-at-once
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+
+
+18:46:14.297 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr1-plain-wait-applies-everything-at-once --wait=false
+[exit 0, 0.0s]
+namespace "e2e-pr1-plain-wait-applies-everything-at-once" deleted
+
+

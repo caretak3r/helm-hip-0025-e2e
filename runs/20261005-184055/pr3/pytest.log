@@ -1,0 +1,30 @@
+sssssssssssssssssssssssssss...................                           [100%]
+=========================== short test summary info ============================
+SKIPPED [1] e2e/tests/test_combined.py:8: N/A: tier has no groups, ordered
+SKIPPED [1] e2e/tests/test_pr1_lifecycle.py:21: N/A: tier has no ordered, subcharts
+SKIPPED [1] e2e/tests/test_pr1_lifecycle.py:51: N/A: tier has no ordered, subcharts
+SKIPPED [1] e2e/tests/test_pr1_lifecycle.py:68: N/A: tier has no ordered, subcharts
+SKIPPED [1] e2e/tests/test_pr1_lifecycle.py:89: N/A: tier has no ordered, subcharts
+SKIPPED [1] e2e/tests/test_pr1_lifecycle.py:126: N/A: tier has no ordered, subcharts
+SKIPPED [1] e2e/tests/test_pr1_lifecycle.py:146: N/A: tier has no ordered, subcharts
+SKIPPED [1] e2e/tests/test_pr1_lifecycle.py:166: N/A: tier has no ordered, subcharts
+SKIPPED [1] e2e/tests/test_pr1_lifecycle.py:178: N/A: tier has no ordered, subcharts
+SKIPPED [1] e2e/tests/test_pr1_lifecycle.py:195: N/A: tier has no ordered, subcharts
+SKIPPED [1] e2e/tests/test_pr1_lifecycle.py:209: N/A: tier has no ordered, subcharts
+SKIPPED [1] e2e/tests/test_pr1_subcharts.py:17: N/A: tier has no ordered, subcharts
+SKIPPED [1] e2e/tests/test_pr1_subcharts.py:45: N/A: tier has no ordered, subcharts
+SKIPPED [1] e2e/tests/test_pr1_subcharts.py:62: N/A: tier has no ordered, subcharts
+SKIPPED [1] e2e/tests/test_pr1_subcharts.py:83: N/A: tier has no ordered, subcharts
+SKIPPED [1] e2e/tests/test_pr1_subcharts.py:110: N/A: tier has no ordered, subcharts
+SKIPPED [1] e2e/tests/test_pr1_subcharts.py:136: N/A: tier has no ordered, subcharts
+SKIPPED [1] e2e/tests/test_pr1_subcharts.py:162: N/A: tier has no ordered, subcharts
+SKIPPED [1] e2e/tests/test_pr1_subcharts.py:195: N/A: tier has no ordered, subcharts
+SKIPPED [1] e2e/tests/test_pr2_groups.py:22: N/A: tier has no groups, ordered
+SKIPPED [1] e2e/tests/test_pr2_groups.py:41: N/A: tier has no groups, ordered
+SKIPPED [1] e2e/tests/test_pr2_groups.py:61: N/A: tier has no groups, ordered, subcharts
+SKIPPED [1] e2e/tests/test_pr2_groups.py:83: N/A: tier has no groups, ordered
+SKIPPED [1] e2e/tests/test_pr2_groups.py:106: N/A: tier has no groups, ordered
+SKIPPED [1] e2e/tests/test_pr2_groups.py:136: N/A: tier has no groups
+SKIPPED [1] e2e/tests/test_pr2_groups.py:168: N/A: tier has no groups, ordered
+SKIPPED [1] e2e/tests/test_pr2_groups.py:214: N/A: tier has no groups, ordered
+19 passed, 27 skipped in 92.57s (0:01:32)

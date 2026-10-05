@@ -1,0 +1,30 @@
+18:48:07.891 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr2-uninstall-runs-in-reverse-order --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+18:48:07.926 $ kubectl --context kind-hip0025-e2e create namespace e2e-pr2-uninstall-runs-in-reverse-order
+[exit 0, 0.0s]
+namespace/e2e-pr2-uninstall-runs-in-reverse-order created
+
+
+18:48:07.966 $ .bin/helm-pr2 install r charts/hip-groups-upgrade --namespace e2e-pr2-uninstall-runs-in-reverse-order --wait=ordered --timeout 3m --kube-context kind-hip0025-e2e
+[exit 0, 7.7s]
+NAME: r
+LAST DEPLOYED: Mon Oct  5 14:48:08 2026
+NAMESPACE: e2e-pr2-uninstall-runs-in-reverse-order
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+
+
+18:48:15.648 $ .bin/helm-pr2 uninstall r --namespace e2e-pr2-uninstall-runs-in-reverse-order --wait=ordered --timeout 3m --kube-context kind-hip0025-e2e
+[exit 0, 0.3s]
+release "r" uninstalled
+
+
+18:48:16.925 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr2-uninstall-runs-in-reverse-order --wait=false
+[exit 0, 0.0s]
+namespace "e2e-pr2-uninstall-runs-in-reverse-order" deleted
+
+

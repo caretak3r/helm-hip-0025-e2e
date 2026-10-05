@@ -1,0 +1,27 @@
+18:47:16.566 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr2-unsequenced-resources-deploy-last-and-warn --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+18:47:16.599 $ kubectl --context kind-hip0025-e2e create namespace e2e-pr2-unsequenced-resources-deploy-last-and-warn
+[exit 0, 0.0s]
+namespace/e2e-pr2-unsequenced-resources-deploy-last-and-warn created
+
+
+18:47:16.633 $ .bin/helm-pr2 install r charts/hip-groups --namespace e2e-pr2-unsequenced-resources-deploy-last-and-warn --wait=ordered --timeout 3m --kube-context kind-hip0025-e2e
+[exit 0, 7.9s]
+NAME: r
+LAST DEPLOYED: Mon Oct  5 14:47:16 2026
+NAMESPACE: e2e-pr2-unsequenced-resources-deploy-last-and-warn
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+level=WARN msg="sequencing: group \"orphan\" depends-on non-existent group \"no-such-group\"; moving group to unsequenced batch" chart=hip-groups
+level=WARN msg="sequencing: resource-group \"lonely\" is isolated (no depends-on edges and no dependents); deploying it in the unsequenced batch after sequenced groups" chart=hip-groups
+
+
+18:47:25.523 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr2-unsequenced-resources-deploy-last-and-warn --wait=false
+[exit 0, 0.0s]
+namespace "e2e-pr2-unsequenced-resources-deploy-last-and-warn" deleted
+
+

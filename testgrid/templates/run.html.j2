@@ -140,7 +140,7 @@
   <h2>Builds and environment</h2>
   <dl class="kv">
     <dt>Harness</dt><dd>{% if run.harness.commit_url %}<a href="{{ run.harness.commit_url }}">{{ run.harness.url }} @ {{ run.harness.short }}</a>{% else %}{{ run.harness.url }} @ {{ run.harness.short }}{% endif %}{% if run.harness.dirty %} <span class="badge fail">local changes</span>{% endif %}</dd>
-    <dt>Upstream base</dt><dd><a href="{{ run.upstream }}/commit/{{ run.base }}"><code>{{ run.base[:12] }}</code></a> (helm/helm; all three PRs start from this commit)</dd>
+    <dt>Upstream base</dt><dd><a href="{{ run.upstream }}/commit/{{ run.base }}"><code>{{ run.base[:12] }}</code></a> in helm/helm. All three PRs start from this commit.</dd>
     <dt>Cluster</dt><dd>kind cluster <code>{{ meta.cluster.name }}</code>, Kubernetes {{ meta.cluster.server_version }}, node image <code>{{ meta.cluster.node_image }}</code></dd>
     <dt>Host</dt><dd>{{ meta.host.os }}/{{ meta.host.arch }}</dd>
     <dt>Tools</dt><dd>{{ meta.tools.go }} · {{ meta.tools.kind }} · kubectl {{ meta.tools.kubectl }} · Docker {{ meta.tools.docker }} · Python {{ meta.tools.python }}</dd>

@@ -1,0 +1,26 @@
+18:48:45.241 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-failed-probe-plus-pending-waits-for-timeout --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+18:48:45.276 $ kubectl --context kind-hip0025-e2e create namespace e2e-combined-failed-probe-plus-pending-waits-for-timeout
+[exit 0, 0.0s]
+namespace/e2e-combined-failed-probe-plus-pending-waits-for-timeout created
+
+
+18:48:47.310 $ kubectl --context kind-hip0025-e2e patch Probe probe1 -n e2e-combined-failed-probe-plus-pending-waits-for-timeout --subresource=status --type=merge -p {"status": {"phase": "Failed"}}
+[exit 0, 0.0s]
+probe.readiness.hip0025.example/probe1 patched
+
+
+18:48:45.308 $ .bin/helm-combined install r charts/hip-readiness-basic -f runs/20261005-184055/combined/test_failed_probe_plus_pending_waits_for_timeout/values.yaml --namespace e2e-combined-failed-probe-plus-pending-waits-for-timeout --wait --timeout 30s --kube-context kind-hip0025-e2e
+[exit 1, 30.1s]
+Error: INSTALLATION FAILED: resource Probe/e2e-combined-failed-probe-plus-pending-waits-for-timeout/probe1 not ready. status: Failed, message: custom readiness failure condition met
+resource Probe/e2e-combined-failed-probe-plus-pending-waits-for-timeout/probe2 not ready. status: InProgress, message: waiting for custom readiness conditions
+context deadline exceeded
+
+
+18:49:15.395 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-failed-probe-plus-pending-waits-for-timeout --wait=false
+[exit 0, 0.0s]
+namespace "e2e-combined-failed-probe-plus-pending-waits-for-timeout" deleted
+
+

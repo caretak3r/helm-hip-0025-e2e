@@ -1,0 +1,2 @@
+$ go test -count=1 ./internal/chart/v3/util/
+ok  	helm.sh/helm/v4/internal/chart/v3/util	0.448s

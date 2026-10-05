@@ -1,0 +1,2 @@
+$ go test -count=1 ./internal/release/v2/manifest/
+?   	helm.sh/helm/v4/internal/release/v2/manifest	[no test files]

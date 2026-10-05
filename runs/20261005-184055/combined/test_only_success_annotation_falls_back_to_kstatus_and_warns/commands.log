@@ -1,0 +1,26 @@
+18:49:15.436 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-only-success-annotation-falls-back-to-kstatus-and --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+18:49:15.471 $ kubectl --context kind-hip0025-e2e create namespace e2e-combined-only-success-annotation-falls-back-to-kstatus-and
+[exit 0, 0.0s]
+namespace/e2e-combined-only-success-annotation-falls-back-to-kstatus-and created
+
+
+18:49:15.503 $ .bin/helm-combined install r charts/hip-readiness-basic -f runs/20261005-184055/combined/test_only_success_annotation_falls_back_to_kstatus_and_warns/values.yaml --namespace e2e-combined-only-success-annotation-falls-back-to-kstatus-and --wait --timeout 1m --kube-context kind-hip0025-e2e
+[exit 0, 4.4s]
+NAME: r
+LAST DEPLOYED: Mon Oct  5 14:49:15 2026
+NAMESPACE: e2e-combined-only-success-annotation-falls-back-to-kstatus-and
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+level=WARN msg="custom readiness annotations must be used together; falling back to default readiness" kind=Probe namespace=e2e-combined-only-success-annotation-falls-back-to-kstatus-and name=probe successAnnotation=helm.sh/readiness-success failureAnnotation=helm.sh/readiness-failure
+
+
+18:49:20.875 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-only-success-annotation-falls-back-to-kstatus-and --wait=false
+[exit 0, 0.0s]
+namespace "e2e-combined-only-success-annotation-falls-back-to-kstatus-and" deleted
+
+

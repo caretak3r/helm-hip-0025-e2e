@@ -1,0 +1,13 @@
+[
+  {
+    "label": "apiserver timeline",
+    "value": [
+      "18:47:23.175  apply  Deployment/db-service",
+      "18:47:23.175  apply  Deployment/queue-processor",
+      "18:47:26.479  ready  Deployment/queue-processor",
+      "18:47:26.484  ready  Deployment/db-service",
+      "18:47:26.504  apply  Deployment/my-app",
+      "18:47:29.486  ready  Deployment/my-app"
+    ]
+  }
+]

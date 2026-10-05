@@ -1,0 +1,1255 @@
+{
+  "tier": "pr2",
+  "features": [
+    "groups",
+    "ordered",
+    "subcharts"
+  ],
+  "helm": ".bin/helm-pr2",
+  "helm_version": "v4.3+g0934874",
+  "finished": "2026-10-05T18:48:21.082502+00:00",
+  "tests": [
+    {
+      "nodeid": "e2e/tests/test_combined.py::test_custom_readiness_gates_sequencing",
+      "name": "test_custom_readiness_gates_sequencing",
+      "doc": "A Probe gated only by custom readiness holds back the group that depends on it.",
+      "reqs": [
+        "R36"
+      ],
+      "needs": [
+        "ordered",
+        "groups",
+        "readiness"
+      ],
+      "outcome": "n/a",
+      "reason": "N/A: tier has no readiness",
+      "duration": 0.0,
+      "observations": [],
+      "evidence": ""
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_upgrade_follows_install_order_and_waits_leaf",
+      "name": "test_upgrade_follows_install_order_and_waits_leaf",
+      "doc": "Upgrade patches a -> b -> parent, each after the previous is ready again; helm finishes after the leaf is ready.",
+      "reqs": [
+        "R08",
+        "R35"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "outcome": "passed",
+      "reason": "",
+      "duration": 22.5,
+      "observations": [
+        {
+          "label": "upgrade timeline",
+          "value": [
+            "18:41:58.110  patch  Deployment/subchart-a",
+            "18:42:01.444  ready  Deployment/subchart-a (new pod)",
+            "18:42:01.573  patch  Deployment/subchart-b",
+            "18:42:05.650  ready  Deployment/subchart-b (new pod)",
+            "18:42:05.750  patch  Deployment/parent",
+            "18:42:09.446  ready  Deployment/parent (new pod)",
+            "18:42:09.550  helm writes release record: deployed"
+          ]
+        }
+      ],
+      "evidence": "pr2/test_upgrade_follows_install_order_and_waits_leaf"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_uninstall_reverse_order_for_ordered_install",
+      "name": "test_uninstall_reverse_order_for_ordered_install",
+      "doc": "Uninstall of a sequenced release deletes in exact reverse: parent -> b -> a, each after the previous is gone.",
+      "reqs": [
+        "R09"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "outcome": "passed",
+      "reason": "",
+      "duration": 11.18,
+      "observations": [
+        {
+          "label": "uninstall timeline",
+          "value": [
+            "18:42:20.531  delete Deployment/parent",
+            "18:42:20.643  delete Deployment/subchart-b",
+            "18:42:20.751  delete Deployment/subchart-a"
+          ]
+        }
+      ],
+      "evidence": "pr2/test_uninstall_reverse_order_for_ordered_install"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_uninstall_after_plain_install_is_not_sequenced",
+      "name": "test_uninstall_after_plain_install_is_not_sequenced",
+      "doc": "A release installed all at once (plain --wait, no stored plan) is uninstalled all at once.",
+      "reqs": [
+        "R09",
+        "R02"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "outcome": "passed",
+      "reason": "",
+      "duration": 4.76,
+      "observations": [
+        {
+          "label": "uninstall timeline",
+          "value": [
+            "18:42:25.612  delete Deployment/subchart-b",
+            "18:42:25.612  delete Deployment/parent",
+            "18:42:25.612  delete Deployment/subchart-a"
+          ]
+        },
+        {
+          "label": "delete spread",
+          "value": "0.000s"
+        }
+      ],
+      "evidence": "pr2/test_uninstall_after_plain_install_is_not_sequenced"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_rollback_follows_target_revision_order",
+      "name": "test_rollback_follows_target_revision_order",
+      "doc": "Rollback to a sequenced revision re-applies it in its order, then removes the extras in reverse (d before c).",
+      "reqs": [
+        "R10"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "outcome": "passed",
+      "reason": "",
+      "duration": 43.21,
+      "observations": [
+        {
+          "label": "rollback timeline",
+          "value": [
+            "18:42:56.787  patch  Deployment/subchart-a",
+            "18:43:00.618  ready  Deployment/subchart-a",
+            "18:43:00.729  patch  Deployment/subchart-b",
+            "18:43:04.633  ready  Deployment/subchart-b",
+            "18:43:04.744  patch  Deployment/parent",
+            "18:43:08.750  delete Deployment/subchart-d (rev2 only)",
+            "18:43:08.856  delete Deployment/subchart-c (rev2 only)"
+          ]
+        },
+        {
+          "label": "plan batches rev1 / rev3",
+          "value": {
+            "rev1": [
+              "hip-lifecycle/charts/a",
+              "hip-lifecycle/charts/b",
+              "hip-lifecycle"
+            ],
+            "rev3 (rollback)": [
+              "hip-lifecycle/charts/a",
+              "hip-lifecycle/charts/b",
+              "hip-lifecycle"
+            ]
+          }
+        }
+      ],
+      "evidence": "pr2/test_rollback_follows_target_revision_order"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_failure_stops_install_dependent_never_applied",
+      "name": "test_failure_stops_install_dependent_never_applied",
+      "doc": "A dependency that never becomes ready fails the install; its dependent is never applied; the release is failed.",
+      "reqs": [
+        "R11"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "outcome": "passed",
+      "reason": "",
+      "duration": 46.16,
+      "observations": [
+        {
+          "label": "install",
+          "value": "exit 1 after 45s: context deadline exceeded"
+        },
+        {
+          "label": "apiserver timeline",
+          "value": [
+            "18:43:10.218  apply  Deployment/broken"
+          ]
+        },
+        {
+          "label": "release status",
+          "value": "failed"
+        }
+      ],
+      "evidence": "pr2/test_failure_stops_install_dependent_never_applied"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_rollback_on_failure_cleans_up",
+      "name": "test_rollback_on_failure_cleans_up",
+      "doc": "--rollback-on-failure: the install fails, then Helm deletes what it applied and leaves no release.",
+      "reqs": [
+        "R11"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "outcome": "passed",
+      "reason": "",
+      "duration": 46.33,
+      "observations": [
+        {
+          "label": "install",
+          "value": "exit 1: context deadline exceeded"
+        },
+        {
+          "label": "apiserver timeline",
+          "value": [
+            "18:43:56.483  apply  Deployment/broken",
+            "18:44:41.491  delete Deployment/broken"
+          ]
+        },
+        {
+          "label": "releases left in namespace",
+          "value": []
+        }
+      ],
+      "evidence": "pr2/test_rollback_on_failure_cleans_up"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_readiness_timeout_per_batch_cap",
+      "name": "test_readiness_timeout_per_batch_cap",
+      "doc": "--readiness-timeout 10s under --timeout 2m fails the never-ready batch after ~10s, not 1m or 2m.",
+      "reqs": [
+        "R12"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "outcome": "passed",
+      "reason": "",
+      "duration": 10.08,
+      "observations": [
+        {
+          "label": "install",
+          "value": "exit 1 after 10.1s"
+        },
+        {
+          "label": "error",
+          "value": "context deadline exceeded"
+        }
+      ],
+      "evidence": "pr2/test_readiness_timeout_per_batch_cap"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_readiness_timeout_exceeds_timeout_rejected",
+      "name": "test_readiness_timeout_exceeds_timeout_rejected",
+      "doc": "--readiness-timeout 3m --timeout 2m: rejected immediately, nothing applied.",
+      "reqs": [
+        "R12"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "outcome": "passed",
+      "reason": "",
+      "duration": 1.04,
+      "observations": [
+        {
+          "label": "error message",
+          "value": "Error: INSTALLATION FAILED: --readiness-timeout (3m0s) must not exceed --timeout (2m0s)\n"
+        },
+        {
+          "label": "applies count",
+          "value": 0
+        }
+      ],
+      "evidence": "pr2/test_readiness_timeout_exceeds_timeout_rejected"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_default_readiness_timeout_one_minute",
+      "name": "test_default_readiness_timeout_one_minute",
+      "doc": "No --readiness-timeout, --timeout 3m: fails after ~60s (default 1m readiness timeout).",
+      "reqs": [
+        "R12"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "outcome": "passed",
+      "reason": "",
+      "duration": 60.09,
+      "observations": [
+        {
+          "label": "elapsed seconds",
+          "value": 60.084016
+        }
+      ],
+      "evidence": "pr2/test_default_readiness_timeout_one_minute"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_hooks_not_sequenced_run_by_weight",
+      "name": "test_hooks_not_sequenced_run_by_weight",
+      "doc": "Hooks run before chart resources in hook-weight order, outside the plan, despite sequencing annotations.",
+      "reqs": [
+        "R13"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "outcome": "passed",
+      "reason": "",
+      "duration": 12.84,
+      "observations": [
+        {
+          "label": "apiserver timeline",
+          "value": [
+            "18:45:54.566  create Job/hook-weight-minus-5 (pre-install, weight -5)",
+            "18:45:57.282  create Job/hook-weight-5 (pre-install, weight 5)",
+            "18:46:00.195  apply  Deployment/first",
+            "18:46:03.156  apply  Deployment/second"
+          ]
+        },
+        {
+          "label": "hook templates",
+          "value": [
+            "hip-lifecycle-hooks/templates/hooks.yaml"
+          ]
+        },
+        {
+          "label": "plan manifests",
+          "value": [
+            "hip-lifecycle-hooks/charts/first/templates/deploy.yaml",
+            "hip-lifecycle-hooks/charts/second/templates/deploy.yaml"
+          ]
+        },
+        {
+          "label": "hook last_run phases",
+          "value": {
+            "hook-weight-minus-5": "Succeeded",
+            "hook-weight-5": "Succeeded"
+          }
+        }
+      ],
+      "evidence": "pr2/test_hooks_not_sequenced_run_by_weight"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_subcharts.py::test_plain_wait_applies_everything_at_once",
+      "name": "test_plain_wait_applies_everything_at_once",
+      "doc": "--wait applies all four Deployments together; at least one dependent before dependency ready.",
+      "reqs": [
+        "R01"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "outcome": "passed",
+      "reason": "",
+      "duration": 4.87,
+      "observations": [
+        {
+          "label": "apiserver timeline",
+          "value": [
+            "18:46:07.398  apply  Deployment/nginx",
+            "18:46:07.398  apply  Deployment/rabbitmq",
+            "18:46:07.398  apply  Deployment/foo",
+            "18:46:07.398  apply  Deployment/bar",
+            "18:46:10.166  ready  Deployment/foo",
+            "18:46:10.171  ready  Deployment/bar",
+            "18:46:11.167  ready  Deployment/rabbitmq",
+            "18:46:11.173  ready  Deployment/nginx"
+          ]
+        },
+        {
+          "label": "apply burst duration (seconds)",
+          "value": 7.9e-05
+        }
+      ],
+      "evidence": "pr2/test_plain_wait_applies_everything_at_once"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_subcharts.py::test_independent_subcharts_deploy_together",
+      "name": "test_independent_subcharts_deploy_together",
+      "doc": "nginx and rabbitmq (no mutual dependency) applied together before either is ready.",
+      "reqs": [
+        "R15"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "outcome": "passed",
+      "reason": "",
+      "duration": 9.93,
+      "observations": [
+        {
+          "label": "apiserver timeline",
+          "value": [
+            "18:46:12.395  apply  Deployment/nginx",
+            "18:46:12.411  apply  Deployment/rabbitmq",
+            "18:46:15.191  ready  Deployment/rabbitmq",
+            "18:46:15.200  ready  Deployment/nginx",
+            "18:46:15.228  apply  Deployment/bar",
+            "18:46:18.205  ready  Deployment/bar",
+            "18:46:18.232  apply  Deployment/foo",
+            "18:46:21.219  ready  Deployment/foo"
+          ]
+        }
+      ],
+      "evidence": "pr2/test_independent_subcharts_deploy_together"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_subcharts.py::test_subcharts_dag_order_and_gating",
+      "name": "test_subcharts_dag_order_and_gating",
+      "doc": "bar waits for nginx+rabbitmq ready; foo waits for bar ready.",
+      "reqs": [
+        "R05",
+        "R04",
+        "R03"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "outcome": "passed",
+      "reason": "",
+      "duration": 9.94,
+      "observations": [
+        {
+          "label": "apiserver timeline",
+          "value": [
+            "18:46:22.422  apply  Deployment/nginx",
+            "18:46:22.436  apply  Deployment/rabbitmq",
+            "18:46:25.229  ready  Deployment/nginx",
+            "18:46:25.234  ready  Deployment/rabbitmq",
+            "18:46:25.252  apply  Deployment/bar",
+            "18:46:28.249  ready  Deployment/bar",
+            "18:46:28.270  apply  Deployment/foo",
+            "18:46:31.263  ready  Deployment/foo"
+          ]
+        }
+      ],
+      "evidence": "pr2/test_subcharts_dag_order_and_gating"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_subcharts.py::test_release_record_has_plan_when_sequenced",
+      "name": "test_release_record_has_plan_when_sequenced",
+      "doc": "Ordered install has plan with batches; plain --wait has no plan.",
+      "reqs": [
+        "R02"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "outcome": "passed",
+      "reason": "",
+      "duration": 13.0,
+      "observations": [
+        {
+          "label": "plain --wait release plan",
+          "value": null
+        },
+        {
+          "label": "stored plan batches (chartPath, kind, manifests)",
+          "value": [
+            "('foo/charts/nginx', 'unsequenced', ['foo/charts/nginx/templates/nginx.yaml'])",
+            "('foo/charts/rabbitmq', 'unsequenced', ['foo/charts/rabbitmq/templates/rabbitmq.yaml'])",
+            "('foo/charts/bar', 'unsequenced', ['foo/charts/bar/templates/bar.yaml'])",
+            "('foo', 'unsequenced', ['foo/templates/foo.yaml'])"
+          ]
+        }
+      ],
+      "evidence": "pr2/test_release_record_has_plan_when_sequenced"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_subcharts.py::test_subchart_alias_dependency",
+      "name": "test_subchart_alias_dependency",
+      "doc": "zeta with alias z-service; alpha depends on both alias and original name; order respected.",
+      "reqs": [
+        "R03"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "outcome": "passed",
+      "reason": "",
+      "duration": 10.89,
+      "observations": [
+        {
+          "label": "apiserver timeline",
+          "value": [
+            "18:46:45.625  apply  Deployment/zeta",
+            "18:46:49.354  ready  Deployment/zeta",
+            "18:46:49.465  apply  Deployment/alpha",
+            "18:46:52.376  apply  Deployment/parent"
+          ]
+        }
+      ],
+      "evidence": "pr2/test_subchart_alias_dependency"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_subcharts.py::test_nested_subcharts_three_levels",
+      "name": "test_nested_subcharts_three_levels",
+      "doc": "grandchild-a \u2192 child-b \u2192 parent-z; each level applied after the level below is ready.",
+      "reqs": [
+        "R05"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "outcome": "passed",
+      "reason": "",
+      "duration": 10.96,
+      "observations": [
+        {
+          "label": "apiserver timeline",
+          "value": [
+            "18:46:56.585  apply  Deployment/grandchild-a",
+            "18:47:00.381  ready  Deployment/grandchild-a",
+            "18:47:00.399  apply  Deployment/child-b",
+            "18:47:03.393  ready  Deployment/child-b",
+            "18:47:03.413  apply  Deployment/parent-z"
+          ]
+        }
+      ],
+      "evidence": "pr2/test_nested_subcharts_three_levels"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_subcharts.py::test_subchart_cycle_detected",
+      "name": "test_subchart_cycle_detected",
+      "doc": "Cycle (a\u2192b, b\u2192a) fails helm install and helm lint; no objects applied.",
+      "reqs": [
+        "R06"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "outcome": "passed",
+      "reason": "",
+      "duration": 1.14,
+      "observations": [
+        {
+          "label": "install exit code",
+          "value": 1
+        },
+        {
+          "label": "install stderr",
+          "value": "Error: INSTALLATION FAILED: subchart circular dependency detected in hip-subcharts-cycle: cycle detected among nodes: a, b\n"
+        },
+        {
+          "label": "helm apply count",
+          "value": 0
+        },
+        {
+          "label": "lint exit code",
+          "value": 1
+        },
+        {
+          "label": "lint output",
+          "value": "==> Linting charts/hip-subcharts-cycle\n[INFO] Chart.yaml: icon is recommended\n[INFO] values.yaml: file does not exist\n[ERROR] /Users/rohit/Documents/helm-hip-0025-e2e/charts/hip-subcharts-cycle: subchart circular dependency detected in hip-subcharts-cycle: cycle detected among nodes: a, b\n\nError: 1 chart(s) linted, 1 chart(s) failed\n"
+        }
+      ],
+      "evidence": "pr2/test_subchart_cycle_detected"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_subcharts.py::test_helm_dag_prints_subchart_order",
+      "name": "test_helm_dag_prints_subchart_order",
+      "doc": "helm dag prints nginx and rabbitmq before bar.",
+      "reqs": [
+        "R07"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "outcome": "passed",
+      "reason": "",
+      "duration": 0.03,
+      "observations": [
+        {
+          "label": "helm dag output",
+          "value": "Chart: foo\n  Subchart batches:\n    Batch 1: nginx, rabbitmq\n    Batch 2: bar\n  Unsequenced (deployed last): Deployment/foo\n  Chart: foo/charts/nginx\n    Subchart batches: (none)\n    Unsequenced (deployed last): Deployment/nginx\n  Chart: foo/charts/rabbitmq\n    Subchart batches: (none)\n    Unsequenced (deployed last): Deployment/rabbitmq\n  Chart: foo/charts/bar\n    Subchart batches: (none)\n    Unsequenced (deployed last): Deployment/bar\n"
+        },
+        {
+          "label": "subchart batches printed for foo",
+          "value": [
+            "nginx, rabbitmq",
+            "bar"
+          ]
+        }
+      ],
+      "evidence": "pr2/test_helm_dag_prints_subchart_order"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr2_groups.py::test_groups_follow_the_hip_example",
+      "name": "test_groups_follow_the_hip_example",
+      "doc": "database and queue deploy together; app starts only after both are ready.",
+      "reqs": [
+        "R20",
+        "R21"
+      ],
+      "needs": [
+        "ordered",
+        "groups"
+      ],
+      "outcome": "passed",
+      "reason": "",
+      "duration": 7.57,
+      "observations": [
+        {
+          "label": "apiserver timeline",
+          "value": [
+            "18:47:09.067  apply  Deployment/queue-processor",
+            "18:47:09.067  apply  Deployment/db-service",
+            "18:47:12.424  ready  Deployment/queue-processor",
+            "18:47:12.428  ready  Deployment/db-service",
+            "18:47:12.546  apply  Deployment/my-app",
+            "18:47:15.439  ready  Deployment/my-app"
+          ]
+        }
+      ],
+      "evidence": "pr2/test_groups_follow_the_hip_example"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr2_groups.py::test_unsequenced_resources_deploy_last_and_warn",
+      "name": "test_unsequenced_resources_deploy_last_and_warn",
+      "doc": "No annotations, a missing dependency, an isolated group: all after app, two warnings.",
+      "reqs": [
+        "R22"
+      ],
+      "needs": [
+        "ordered",
+        "groups"
+      ],
+      "outcome": "passed",
+      "reason": "",
+      "duration": 8.89,
+      "observations": [
+        {
+          "label": "apiserver timeline",
+          "value": [
+            "18:47:20.588  apply  Deployment/my-app",
+            "18:47:24.467  ready  Deployment/my-app",
+            "18:47:24.503  apply  ConfigMap/loose",
+            "18:47:24.503  apply  ConfigMap/lonely",
+            "18:47:24.503  apply  ConfigMap/orphan"
+          ]
+        },
+        {
+          "label": "helm warnings",
+          "value": [
+            "level=WARN msg=\"sequencing: group \"orphan\" depends-on non-existent group \"no-such-group\"; moving group to unsequenced batch\" chart=hip-groups",
+            "level=WARN msg=\"sequencing: resource-group \"lonely\" is isolated (no depends-on edges and no dependents); deploying it in the unsequenced batch after sequenced groups\" chart=hip-groups"
+          ]
+        }
+      ],
+      "evidence": "pr2/test_unsequenced_resources_deploy_last_and_warn"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr2_groups.py::test_group_sandboxing_parent_and_subchart_use_same_names",
+      "name": "test_group_sandboxing_parent_and_subchart_use_same_names",
+      "doc": "Parent and subchart both define groups 'first' and 'second' with opposite edges; each chart's order holds independently.",
+      "reqs": [
+        "R23"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts",
+        "groups"
+      ],
+      "outcome": "passed",
+      "reason": "",
+      "duration": 13.9,
+      "observations": [
+        {
+          "label": "apiserver timeline",
+          "value": [
+            "18:47:25.721  apply  Deployment/sub-second",
+            "18:47:29.483  ready  Deployment/sub-second",
+            "18:47:29.502  apply  Deployment/sub-first",
+            "18:47:32.500  ready  Deployment/sub-first",
+            "18:47:32.522  apply  Deployment/parent-first",
+            "18:47:35.502  ready  Deployment/parent-first",
+            "18:47:35.523  apply  Deployment/parent-second",
+            "18:47:38.511  ready  Deployment/parent-second"
+          ]
+        }
+      ],
+      "evidence": "pr2/test_group_sandboxing_parent_and_subchart_use_same_names"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr2_groups.py::test_group_cycle_detected_and_rejected",
+      "name": "test_group_cycle_detected_and_rejected",
+      "doc": "Circular group dependency (a -> b -> c -> a) exits non-zero naming the cycle, nothing applied.",
+      "reqs": [
+        "R24"
+      ],
+      "needs": [
+        "ordered",
+        "groups"
+      ],
+      "outcome": "passed",
+      "reason": "",
+      "duration": 1.12,
+      "observations": [
+        {
+          "label": "exit code",
+          "value": 1
+        },
+        {
+          "label": "stderr",
+          "value": "Error: INSTALLATION FAILED: resource-group circular dependency detected in hip-groups-cycle: cycle detected among nodes: group-a, group-b, group-c\n"
+        },
+        {
+          "label": "apiserver applies",
+          "value": []
+        },
+        {
+          "label": "helm lint exit code",
+          "value": 1
+        }
+      ],
+      "evidence": "pr2/test_group_cycle_detected_and_rejected"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr2_groups.py::test_hip_dependency_key_is_removed_before_apply",
+      "name": "test_hip_dependency_key_is_removed_before_apply",
+      "doc": "The HIP key helm.sh/depends-on/resource-groups orders groups, is kept in the release, and never reaches the API server.",
+      "reqs": [
+        "R25"
+      ],
+      "needs": [
+        "ordered",
+        "groups"
+      ],
+      "outcome": "passed",
+      "reason": "",
+      "duration": 8.81,
+      "observations": [
+        {
+          "label": "API server on the HIP key",
+          "value": "The ConfigMap \"key-probe\" is invalid: metadata.annotations: Invalid value: \"helm.sh/depends-on/resource-groups\": a valid label key must consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character (e.g. 'MyName',  or 'my.name',  or '123-abc', regex used for validation is '([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]') with an optional DNS subdomain prefix and '/' (e.g. 'example.com/MyName')"
+        },
+        {
+          "label": "my-app annotations on the cluster",
+          "value": {
+            "deployment.kubernetes.io/revision": "1",
+            "helm.sh/resource-group": "app",
+            "meta.helm.sh/release-name": "r",
+            "meta.helm.sh/release-namespace": "e2e-pr2-hip-dependency-key-is-removed-before-apply"
+          }
+        },
+        {
+          "label": "key in the stored release manifest",
+          "value": true
+        },
+        {
+          "label": "apiserver timeline",
+          "value": [
+            "18:47:41.027  apply  Deployment/queue-processor",
+            "18:47:41.027  apply  Deployment/db-service",
+            "18:47:44.533  ready  Deployment/db-service",
+            "18:47:44.538  ready  Deployment/queue-processor",
+            "18:47:44.556  apply  Deployment/my-app",
+            "18:47:48.539  ready  Deployment/my-app"
+          ]
+        }
+      ],
+      "evidence": "pr2/test_hip_dependency_key_is_removed_before_apply"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr2_groups.py::test_template_prints_delimiters_for_groups",
+      "name": "test_template_prints_delimiters_for_groups",
+      "doc": "helm template prints resources in deploy order with ## START/END resource-group delimiters.",
+      "reqs": [
+        "R26"
+      ],
+      "needs": [
+        "groups"
+      ],
+      "outcome": "xfailed",
+      "reason": "R26 not implemented: helm template does not print START/END resource-group delimiters",
+      "duration": 0.03,
+      "observations": [
+        {
+          "label": "helm template output",
+          "value": "---\n# Source: hip-groups/templates/unsequenced.yaml\n# The three \"Unsequenced Resources\" cases: deployed after every sequenced group.\napiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: loose            # lacks annotations\ndata: {case: no-annotations}\n\n---\n# Source: hip-groups/templates/unsequenced.yaml\napiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: orphan           # depends on a group that does not exist -> warning\n  annotations:\n    helm.sh/resource-group: orphan\n    helm.sh/depends-on/resource-groups: '[\"no-such-group\"]'\ndata: {case: missing-dependency}\n\n---\n# Source: hip-groups/templates/unsequenced.yaml\napiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: lonely           # isolated group: no edges in or out -> warning\n  annotations:\n    helm.sh/resource-group: lonely\ndata: {case: isolated-group}\n\n---\n# Source: hip-groups/templates/groups.yaml\n# HIP-0025 \"Template examples\": database and queue have no mutual dependency and\n# deploy together; app waits for both. The dependency list is deliberately in the\n# opposite order to the HIP text (\"The order in which they are listed does not\n# affect deployment sequencing\").\napiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: db-service\n  annotations:\n    helm.sh/resource-group: database\nspec:\n  replicas: 1\n  selector:\n    matchLabels: {app: db-service}\n  template:\n    metadata:\n      labels: {app: db-service}\n    spec:\n      terminationGracePeriodSeconds: 0\n      containers:\n        - name: web\n          image: nginx:1.27-alpine\n          imagePullPolicy: IfNotPresent\n          readinessProbe:\n            httpGet: {path: /, port: 80}\n            initialDelaySeconds: 3\n            periodSeconds: 1\n\n---\n# Source: hip-groups/templates/groups.yaml\napiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: queue-processor\n  annotations:\n    helm.sh/resource-group: queue\nspec:\n  replicas: 1\n  selector:\n    matchLabels: {app: queue-processor}\n  template:\n    metadata:\n      labels: {app: queue-processor}\n    spec:\n      terminationGracePeriodSeconds: 0\n      containers:\n        - name: web\n          image: nginx:1.27-alpine\n          imagePullPolicy: IfNotPresent\n          readinessProbe:\n            httpGet: {path: /, port: 80}\n            initialDelaySeconds: 3\n            periodSeconds: 1\n\n---\n# Source: hip-groups/templates/groups.yaml\napiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: my-app\n  annotations:\n    helm.sh/resource-group: app\n    helm.sh/depends-on/resource-groups: \"[\\\"queue\\\",\\\"database\\\"]\"\nspec:\n  replicas: 1\n  selector:\n    matchLabels: {app: my-app}\n  template:\n    metadata:\n      labels: {app: my-app}\n    spec:\n      terminationGracePeriodSeconds: 0\n      containers:\n        - name: web\n          image: nginx:1.27-alpine\n          imagePullPolicy: IfNotPresent\n          readinessProbe:\n            httpGet: {path: /, port: 80}\n            initialDelaySeconds: 3\n            periodSeconds: 1\n"
+        }
+      ],
+      "evidence": "pr2/test_template_prints_delimiters_for_groups"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr2_groups.py::test_upgrade_follows_group_order",
+      "name": "test_upgrade_follows_group_order",
+      "doc": "Upgrade patches every Deployment; patches follow database/queue -> app, and app's patch comes after both are ready again.",
+      "reqs": [
+        "R08"
+      ],
+      "needs": [
+        "ordered",
+        "groups"
+      ],
+      "outcome": "passed",
+      "reason": "",
+      "duration": 17.93,
+      "observations": [
+        {
+          "label": "upgrade timeline",
+          "value": [
+            "18:47:57.684  apply  Deployment/db",
+            "18:47:57.691  apply  Deployment/queue",
+            "18:48:01.592  ready  Deployment/queue",
+            "18:48:01.597  ready  Deployment/db",
+            "18:48:01.705  apply  Deployment/app",
+            "18:48:05.604  ready  Deployment/app"
+          ]
+        },
+        {
+          "label": "db patch-marker",
+          "value": "v2"
+        },
+        {
+          "label": "queue patch-marker",
+          "value": "v2"
+        },
+        {
+          "label": "app patch-marker",
+          "value": "v2"
+        },
+        {
+          "label": "db patched",
+          "value": "18:47:57.684"
+        },
+        {
+          "label": "queue patched",
+          "value": "18:47:57.691"
+        },
+        {
+          "label": "app patched",
+          "value": "18:48:01.705"
+        },
+        {
+          "label": "db ready after patch",
+          "value": "18:48:01.597"
+        },
+        {
+          "label": "queue ready after patch",
+          "value": "18:48:01.592"
+        }
+      ],
+      "evidence": "pr2/test_upgrade_follows_group_order"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr2_groups.py::test_uninstall_runs_in_reverse_order",
+      "name": "test_uninstall_runs_in_reverse_order",
+      "doc": "Uninstall after ordered install deletes app before database and queue (reverse of install order).",
+      "reqs": [
+        "R09"
+      ],
+      "needs": [
+        "ordered",
+        "groups"
+      ],
+      "outcome": "passed",
+      "reason": "",
+      "duration": 8.96,
+      "observations": [
+        {
+          "label": "uninstall timeline",
+          "value": [
+            "18:48:15.699  delete Deployment/app",
+            "18:48:15.810  delete Deployment/queue",
+            "18:48:15.810  delete Deployment/db"
+          ]
+        },
+        {
+          "label": "deletion timestamps",
+          "value": {
+            "app": "18:48:15.699",
+            "queue": "18:48:15.810",
+            "db": "18:48:15.810"
+          }
+        }
+      ],
+      "evidence": "pr2/test_uninstall_runs_in_reverse_order"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_deployment_without_annotations_uses_kstatus",
+      "name": "test_deployment_without_annotations_uses_kstatus",
+      "doc": "Deployment with no readiness annotations: plain --wait returns after Available.",
+      "reqs": [
+        "R30"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "outcome": "n/a",
+      "reason": "N/A: tier has no readiness",
+      "duration": 0.0,
+      "observations": [],
+      "evidence": ""
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_success_expressions_mark_ready",
+      "name": "test_success_expressions_mark_ready",
+      "doc": "Success list with multiple expressions: install exits only after one becomes true.",
+      "reqs": [
+        "R31"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "outcome": "n/a",
+      "reason": "N/A: tier has no readiness",
+      "duration": 0.0,
+      "observations": [],
+      "evidence": ""
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_failure_takes_precedence_over_success",
+      "name": "test_failure_takes_precedence_over_success",
+      "doc": "Success AND failure both true: install fails, error names the Probe.",
+      "reqs": [
+        "R32"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "outcome": "n/a",
+      "reason": "N/A: tier has no readiness",
+      "duration": 0.0,
+      "observations": [],
+      "evidence": ""
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_failure_expression_alone_fails_install",
+      "name": "test_failure_expression_alone_fails_install",
+      "doc": "Only failure expression true: install fails.",
+      "reqs": [
+        "R32"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "outcome": "n/a",
+      "reason": "N/A: tier has no readiness",
+      "duration": 0.0,
+      "observations": [],
+      "evidence": ""
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_failed_probe_plus_pending_waits_for_timeout",
+      "name": "test_failed_probe_plus_pending_waits_for_timeout",
+      "doc": "One failed Probe + one pending: helm waits until --timeout, error names both.",
+      "reqs": [
+        "R32"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "outcome": "n/a",
+      "reason": "N/A: tier has no readiness",
+      "duration": 0.0,
+      "observations": [],
+      "evidence": ""
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_only_success_annotation_falls_back_to_kstatus_and_warns",
+      "name": "test_only_success_annotation_falls_back_to_kstatus_and_warns",
+      "doc": "Only readiness-success annotation: kstatus fallback occurs and helm warns.",
+      "reqs": [
+        "R33"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "outcome": "n/a",
+      "reason": "N/A: tier has no readiness",
+      "duration": 0.0,
+      "observations": [],
+      "evidence": ""
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_only_success_annotation_fails_helm_lint",
+      "name": "test_only_success_annotation_fails_helm_lint",
+      "doc": "Chart with only readiness-success annotation: helm lint fails.",
+      "reqs": [
+        "R33"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "outcome": "n/a",
+      "reason": "N/A: tier has no readiness",
+      "duration": 0.0,
+      "observations": [],
+      "evidence": ""
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[==-5-10-10-count-equality number]",
+      "name": "test_readiness_operators[==-5-10-10-count-equality number]",
+      "doc": "Each operator (==, !=, <, <=, >, >= on numbers; == on strings and booleans) holds the wait until the patch makes it true.",
+      "reqs": [
+        "R34"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "outcome": "n/a",
+      "reason": "N/A: tier has no readiness",
+      "duration": 0.0,
+      "observations": [],
+      "evidence": ""
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[!=-5-10-5-count-inequality number]",
+      "name": "test_readiness_operators[!=-5-10-5-count-inequality number]",
+      "doc": "Each operator (==, !=, <, <=, >, >= on numbers; == on strings and booleans) holds the wait until the patch makes it true.",
+      "reqs": [
+        "R34"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "outcome": "n/a",
+      "reason": "N/A: tier has no readiness",
+      "duration": 0.0,
+      "observations": [],
+      "evidence": ""
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[<-10-4-5-count-less than]",
+      "name": "test_readiness_operators[<-10-4-5-count-less than]",
+      "doc": "Each operator (==, !=, <, <=, >, >= on numbers; == on strings and booleans) holds the wait until the patch makes it true.",
+      "reqs": [
+        "R34"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "outcome": "n/a",
+      "reason": "N/A: tier has no readiness",
+      "duration": 0.0,
+      "observations": [],
+      "evidence": ""
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[<=-10-5-5-count-less or equal]",
+      "name": "test_readiness_operators[<=-10-5-5-count-less or equal]",
+      "doc": "Each operator (==, !=, <, <=, >, >= on numbers; == on strings and booleans) holds the wait until the patch makes it true.",
+      "reqs": [
+        "R34"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "outcome": "n/a",
+      "reason": "N/A: tier has no readiness",
+      "duration": 0.0,
+      "observations": [],
+      "evidence": ""
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[>-5-11-10-count-greater than]",
+      "name": "test_readiness_operators[>-5-11-10-count-greater than]",
+      "doc": "Each operator (==, !=, <, <=, >, >= on numbers; == on strings and booleans) holds the wait until the patch makes it true.",
+      "reqs": [
+        "R34"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "outcome": "n/a",
+      "reason": "N/A: tier has no readiness",
+      "duration": 0.0,
+      "observations": [],
+      "evidence": ""
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[>=-5-10-10-count-greater or equal]",
+      "name": "test_readiness_operators[>=-5-10-10-count-greater or equal]",
+      "doc": "Each operator (==, !=, <, <=, >, >= on numbers; == on strings and booleans) holds the wait until the patch makes it true.",
+      "reqs": [
+        "R34"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "outcome": "n/a",
+      "reason": "N/A: tier has no readiness",
+      "duration": 0.0,
+      "observations": [],
+      "evidence": ""
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[==-Pending-Ready-Ready-phase-equality string]",
+      "name": "test_readiness_operators[==-Pending-Ready-Ready-phase-equality string]",
+      "doc": "Each operator (==, !=, <, <=, >, >= on numbers; == on strings and booleans) holds the wait until the patch makes it true.",
+      "reqs": [
+        "R34"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "outcome": "n/a",
+      "reason": "N/A: tier has no readiness",
+      "duration": 0.0,
+      "observations": [],
+      "evidence": ""
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[==-false-true-true-ready-equality boolean]",
+      "name": "test_readiness_operators[==-false-true-true-ready-equality boolean]",
+      "doc": "Each operator (==, !=, <, <=, >, >= on numbers; == on strings and booleans) holds the wait until the patch makes it true.",
+      "reqs": [
+        "R34"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "outcome": "n/a",
+      "reason": "N/A: tier has no readiness",
+      "duration": 0.0,
+      "observations": [],
+      "evidence": ""
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_custom_readiness_applies_to_plain_wait",
+      "name": "test_custom_readiness_applies_to_plain_wait",
+      "doc": "Probe with custom readiness annotations gates a plain --wait install.",
+      "reqs": [
+        "R37"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "outcome": "n/a",
+      "reason": "N/A: tier has no readiness",
+      "duration": 0.0,
+      "observations": [],
+      "evidence": ""
+    },
+    {
+      "nodeid": "e2e/tests/test_v2_compat.py::test_v2_chart_with_plain_wait_applies_in_one_burst",
+      "name": "test_v2_chart_with_plain_wait_applies_in_one_burst",
+      "doc": "V2 chart with group annotations: plain --wait applies all at once (max-min < 1s), no sequencing, no plan in release.",
+      "reqs": [
+        "R14"
+      ],
+      "needs": [],
+      "outcome": "passed",
+      "reason": "",
+      "duration": 1.65,
+      "observations": [
+        {
+          "label": "install exit code",
+          "value": 0
+        },
+        {
+          "label": "resource applies",
+          "value": [
+            [
+              "18:48:17.108",
+              "ConfigMap/parent-db"
+            ],
+            [
+              "18:48:17.108",
+              "ConfigMap/r-sub"
+            ],
+            [
+              "18:48:17.111",
+              "Deployment/parent-app"
+            ]
+          ]
+        },
+        {
+          "label": "burst duration (seconds)",
+          "value": 0.002945
+        },
+        {
+          "label": "release record has plan",
+          "value": false
+        }
+      ],
+      "evidence": "pr2/test_v2_chart_with_plain_wait_applies_in_one_burst"
+    },
+    {
+      "nodeid": "e2e/tests/test_v2_compat.py::test_v2_chart_with_ordered_wait_fails",
+      "name": "test_v2_chart_with_ordered_wait_fails",
+      "doc": "V2 chart: --wait=ordered exits non-zero and creates no release.",
+      "reqs": [
+        "R14"
+      ],
+      "needs": [],
+      "outcome": "passed",
+      "reason": "",
+      "duration": 0.06,
+      "observations": [
+        {
+          "label": "install exit code",
+          "value": 1
+        },
+        {
+          "label": "stderr",
+          "value": "Error: INSTALLATION FAILED: --wait=ordered requires chart apiVersion v3 (chart \"v2-annotated\" has apiVersion v2)\n"
+        },
+        {
+          "label": "error type",
+          "value": "v2-rejected"
+        },
+        {
+          "label": "releases in namespace",
+          "value": []
+        }
+      ],
+      "evidence": "pr2/test_v2_chart_with_ordered_wait_fails"
+    },
+    {
+      "nodeid": "e2e/tests/test_v2_compat.py::test_v2_chart_upgrade_rollback_uninstall_succeed",
+      "name": "test_v2_chart_upgrade_rollback_uninstall_succeed",
+      "doc": "V2 chart: upgrade, rollback, and uninstall all succeed with plain --wait.",
+      "reqs": [
+        "R14"
+      ],
+      "needs": [],
+      "outcome": "passed",
+      "reason": "",
+      "duration": 2.07,
+      "observations": [
+        {
+          "label": "upgrade revision",
+          "value": 2
+        },
+        {
+          "label": "rollback revision",
+          "value": 3
+        },
+        {
+          "label": "deployments deleted",
+          "value": [
+            "parent-app"
+          ]
+        }
+      ],
+      "evidence": "pr2/test_v2_chart_upgrade_rollback_uninstall_succeed"
+    }
+  ]
+}

@@ -1,0 +1,2 @@
+$ go test -count=1 ./pkg/kube/
+ok  	helm.sh/helm/v4/pkg/kube	24.100s

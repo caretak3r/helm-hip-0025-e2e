@@ -1,0 +1,29 @@
+18:47:21.631 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-subchart-cycle-detected --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+18:47:21.676 $ kubectl --context kind-hip0025-e2e create namespace e2e-combined-subchart-cycle-detected
+[exit 0, 0.0s]
+namespace/e2e-combined-subchart-cycle-detected created
+
+
+18:47:21.713 $ .bin/helm-combined install cycle-test charts/hip-subcharts-cycle --wait=ordered --timeout 2m --kube-context kind-hip0025-e2e
+[exit 1, 0.1s]
+Error: INSTALLATION FAILED: subchart circular dependency detected in hip-subcharts-cycle: cycle detected among nodes: a, b
+
+
+18:47:22.792 $ .bin/helm-combined lint charts/hip-subcharts-cycle --kube-context kind-hip0025-e2e
+[exit 1, 0.0s]
+==> Linting charts/hip-subcharts-cycle
+[INFO] Chart.yaml: icon is recommended
+[INFO] values.yaml: file does not exist
+[ERROR] /Users/rohit/Documents/helm-hip-0025-e2e/charts/hip-subcharts-cycle: subchart circular dependency detected in hip-subcharts-cycle: cycle detected among nodes: a, b
+
+Error: 1 chart(s) linted, 1 chart(s) failed
+
+
+18:47:22.823 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-subchart-cycle-detected --wait=false
+[exit 0, 0.0s]
+namespace "e2e-combined-subchart-cycle-detected" deleted
+
+

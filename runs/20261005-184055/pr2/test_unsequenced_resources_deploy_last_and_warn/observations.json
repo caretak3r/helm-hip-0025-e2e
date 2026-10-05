@@ -1,0 +1,19 @@
+[
+  {
+    "label": "apiserver timeline",
+    "value": [
+      "18:47:20.588  apply  Deployment/my-app",
+      "18:47:24.467  ready  Deployment/my-app",
+      "18:47:24.503  apply  ConfigMap/loose",
+      "18:47:24.503  apply  ConfigMap/lonely",
+      "18:47:24.503  apply  ConfigMap/orphan"
+    ]
+  },
+  {
+    "label": "helm warnings",
+    "value": [
+      "level=WARN msg=\"sequencing: group \"orphan\" depends-on non-existent group \"no-such-group\"; moving group to unsequenced batch\" chart=hip-groups",
+      "level=WARN msg=\"sequencing: resource-group \"lonely\" is isolated (no depends-on edges and no dependents); deploying it in the unsequenced batch after sequenced groups\" chart=hip-groups"
+    ]
+  }
+]

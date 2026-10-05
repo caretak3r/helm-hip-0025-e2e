@@ -1,0 +1,112 @@
+18:42:37.880 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-rollback-follows-target-revision-order --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+18:42:37.917 $ kubectl --context kind-hip0025-e2e create namespace e2e-combined-rollback-follows-target-revision-order
+[exit 0, 0.0s]
+namespace/e2e-combined-rollback-follows-target-revision-order created
+
+
+18:42:37.953 $ .bin/helm-combined install r charts/hip-lifecycle --namespace e2e-combined-rollback-follows-target-revision-order --set global.rev=1 --set c.enabled=false --wait=ordered --timeout 3m --kube-context kind-hip0025-e2e
+[exit 0, 10.6s]
+NAME: r
+LAST DEPLOYED: Mon Oct  5 14:42:38 2026
+NAMESPACE: e2e-combined-rollback-follows-target-revision-order
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+
+
+18:42:48.577 $ .bin/helm-combined upgrade r charts/hip-lifecycle --namespace e2e-combined-rollback-follows-target-revision-order --set global.rev=2 --set c.enabled=true --wait=ordered --timeout 3m --kube-context kind-hip0025-e2e
+[exit 0, 20.2s]
+Release "r" has been upgraded. Happy Helming!
+NAME: r
+LAST DEPLOYED: Mon Oct  5 14:42:48 2026
+NAMESPACE: e2e-combined-rollback-follows-target-revision-order
+STATUS: deployed
+REVISION: 2
+DESCRIPTION: Upgrade complete
+TEST SUITE: None
+
+
+18:43:08.755 $ .bin/helm-combined rollback r 1 --namespace e2e-combined-rollback-follows-target-revision-order --wait --timeout 3m --kube-context kind-hip0025-e2e
+[exit 0, 12.3s]
+Rollback was a success! Happy Helming!
+
+
+18:43:22.018 $ kubectl --context kind-hip0025-e2e get secret -n e2e-combined-rollback-follows-target-revision-order -l owner=helm,name=r,version=1 -o json
+[exit 0, 0.0s]
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "v1",
+            "data": {
+                "release": "SDRzSUFBQUFBQUFDLyt4WVhYUGFQQmIrS3g3dHplNk1TZndSU1BITWV3R2tHQ2RwbXBDOEdGd3lIVWtXdGhKWmNpMFpRanI4OXgzWndZRTIvVzUzYjE1S0o3WTRIODg1NTdHT2pqOENEak1DUEZBQUUxQytFTUQ3Q0JhMGtPcDlUSEltMWlRR0huQXNwOU95clpiVnZyR1B2Q1BIYzE4ZFdIYW4yMmxaUjU1bEFSTXcrS01hTVpHNG9MbWlnZ01QeURJbmhTUXhpUTIwTmpoWkdRVmhCRW9DVENBVlZLWGNFd0liRStBVUZrckR6WWlDTVZSUVh6OUZrOUs4eGVpQzREVm0yc1NTRkxKMlpCM1lCNSs3djRRRjRjcFlVWlVha253b0NjY2tObVNKS2lmU2dFWnJYbHFXU3d6VVhPVzF6a0lVUnVQS1VFUXFhZnk3ekpNQ3hzUTBTazY1VkpBeDB5Z0VZd2ppKy84QUU4Q2NUaHBJUzFldmNDNFUxSENramlNbExEdVE2V0ZNY3NKajJSTDhzRUVEUFBCdUR0QWMzT28wMUJLRVkwb2s4TjQxS1lBdmhsMlFYRWlxUkxFR0hsaFFScnpEdzlycW9WWWdIQ0ttQzZpS2ttek14aGo2VVdQb1UyTW1lQTRGZU84QUJMZWIyNDBKbU1EM3dPTWxZeVpRSk1zWlZQdHhOSXVINzFlaXVHY0N4Z2NxWjdxRVZjMEJjYVVLQnE4K0JLTUxpVnlzY0RaSm85RjlNdlluSytSMzJ5aWNsUEdnbnlFM1NKRFBzaWk4YU0rY0J4YU14Z3k3NDhlM3RDY2luOTNGZ3g3RldYY1pENExrZE5DaktCdXE2RHBJQXA3UXMrdmVoL04xVHkybTFsbmx6eCt6S0dObGROMmowYzBwTytmeEVtZEtJbWQ0ZjU0OTVGRTJ1U1BoaGRUNjUxTzdPOGlHS3ppSkdPWVhPWEtPT29FL1hPSFJtMlY4OS9vTU9xeU1Uc1ErM2w2dW91azRqZnloTmJzUlo4R2dYODVDbTcybC9XT3k3cFUxdG41M2NTV1N3QitXS090YXMrazRSMDc3OFcwaWttRFFTM0EyY2JieWRWenRjQlkrMk5IMFRSazVEOHRaTnBUbi9KVEZ0UDhxR0ExdDVJNVpNTEs3QTM2eGlzSTNuUUd0Ykt5UXorNW0wemVkNE9TMXh2RVloUTlzNW82WCtFN2o2aVdCYjZleGZ5RnUvQ0dOd29kSDdYTTI3YTgrd3pxMXRMNFZoZllLK1VNcnVtbjBXZXdQNzJmVGNickZIZ3o2Y2hhZU1qUjYwd2xHS3NXam52NTdIQXphVlI0MHpzVlZJNXVpckwyTS9hRUZ3MjZKSDUvczFyK3RvK2xzcTd0R1R0YzZaMUdLUmhPRzEyMk8vQzZkaGF0UzV5b1lyUkk4blN4ai8rK2t4dHBMZ3RGekx1cjdNY09abmFPczlqVjJUOU9aTTdtS3BxYzVjc1kzVVhpeFJGbkZxVldqNDE4c0VSK25NR3d6ekhkc0RYckorWFZUVnpjS2d4M2NXbytwV1Jpekw5VVFobllhT1R0WVA5SDdlelNSYU5oZjZ2cVJHNUZjaDlGYjVJNnZjRFo1ak1LMnRZdWp5bE00dks4d3VoZFhPT3ZTcGo0Ny8rRm9iT0hYTVl0UFJFTGNmaHI3U1NjWXZKTEJxTC9FL0tvVG5DU3I1N28wdG5PVU1RdUdRem4ySjNJMlpUdDVlam0yK2hsbXI2UHdJU1ZibnUvYlhMMlE4NGNCVjhmbjEzMkdzcXY2dVV2KytndVlJQk94b2huWjlpV3IyM0tPYmh6WHMyelA3aDQ0SGNleG5XUExmdXBORy9PRnphZmU3US9XTU52ZmVoSVl0dS9RYUhML1BWdkJtVC9PWis1VkV2RFRKWEt2YURBNFNvS3NuYUx3YnhvTVRsZXo2U2xEL0lxZTFTRi9HYnJqdGJ1ZTFUMncyazZuNDNTZm9kK2FZQWxaU2FvbVVuWEVoQWtFbWI0cXlCSjR3TlpOZzJZdzBUWjVRdm1EWng4NHh5M0ljc3BKdGF2RGVIMUNHRndEejkyWUFQMFdLMWpyTmgxaEFaa2tHL1BYelVxY2tneHVHMGg5OTV3eXk5S1owZDhieS9LcWJ3VE1xbFhKcmM2WHVLSHBjWFRndE4yTzJ6NDZiamZjQUZqd0JVMDA1dStLeWQ1c1RKQkJUaGRFS3VDQlZxczE1Lzh5cmtWWllPSVpleWVWcGhVZlBoT3ZQbFJWeEp2ejUzT0RaOEE4bDRkTGU4N3ZLWTg5NDZTU3l3aFhjNzQ5RVhsemJoaWF5bDV6bG1sQnZiWnoycWhrREtNZ1M4K1lBM3NPNWx6bUJGZkxCY2taeFZCNmhxMXZKV0VFSzFFOHFXUlE0ZlFjSXNLa1ozeUVlYjdyWmFObHRsRnNGWFpoNlEvN21ySmh2SVR6VTZ6NnZzR3JQNG9VR2VXVmpsOUFUQzVKUVVWOFRiRGdzZlFNYXl1SEJWZVFjbExzV200OVpXdEYwUE9pWVZTTTlJelBDUG1aekdYSjJLVmdGSzg5STFoY0NIVlpFRm1WNUZsUVU1aHlJdVZsSVJEeGRuOHlqRlNwM0NmS016N21VS1dlY1dnYXVTaVVaN3l5TnZ1U2xGTkZJYXVlaFNZNmQxOG0zNC9kbnZNNS94NytvVC9JUC9RLzRSLzZGZjZoZi9qM2YrTGZpLzMyVjJoWG0vbVRsS3M5L0FUZGRoVC9vZG9mb1Jvd1FjNGcxNjI0R1Y1dEV6Q3lKS3llTWJYbkYxNFh4Q1RYNjVZSnRudENYeGUrR2t5cjBkVjhCeEM0dlRVQmlaT25jWFZSaU94cDdGYWlHcG4xWWF3dThrazkrcjZ0Smw4RWJqZm15NjUzUi9FbkRQYTNaTkd1N0swSlVJUDBZLzJLNVBJN0habEFQMUhBQXlWdlhvRUFiYThvS0NtMlUvejJKRk03b0R3bUQxV2l2aHJPeSsya1NsQlNpRExmRy9qQjczYXlxZkw5elZ5ZzM1TUwrK3N3MFcvSnhVODcrVVl1OXJqLzB5bHd2b0R1NVducXh5TC9VZHZWUDNQditkY2VaQTZ4ZGtNYzBzSWlRNVNUdUxWOVE5ZGFDTWJFU3JZVUxCS2lXZ1ZaVXEzZEVrVk1pdXIxWGM3Vzd6T2lVcUV6SkNVRW0vOE9BSEN6RFRKS0ZRQUE="
+            },
+            "kind": "Secret",
+            "metadata": {
+                "creationTimestamp": "2026-10-05T18:42:38Z",
+                "labels": {
+                    "modifiedAt": "1791225768",
+                    "name": "r",
+                    "owner": "helm",
+                    "status": "superseded",
+                    "version": "1"
+                },
+                "name": "sh.helm.release.v1.r.v1",
+                "namespace": "e2e-combined-rollback-follows-target-revision-order",
+                "resourceVersion": "3165",
+                "uid": "d8579aec-8351-42bf-a1e5-58b2b77b4380"
+            },
+            "type": "helm.sh/release.v2"
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}
+
+
+18:43:22.058 $ kubectl --context kind-hip0025-e2e get secret -n e2e-combined-rollback-follows-target-revision-order -l owner=helm,name=r,version=3 -o json
+[exit 0, 0.0s]
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "v1",
+            "data": {
+                "release": "SDRzSUFBQUFBQUFDLyt4WWJYUGFPaGIrS3g3dGw5MFpRL3dTU1BETS9RQ2tHQ2RwbXBCY0RDNlpqaVFMVzRrcytWb3loSFQ0N3p1eWcwTnUwL2QyOTh1bGRHS2I4L0tjY3g3cjZPZ2o0REFqd0FNRk1BSGxTd0c4ajJCSkM2ayt4Q1JuWWtOaTRBSEhjcm90MjJwWm5SdjcwRHQwUFBlNGJkbmRYcmRsSFhxV0JVekE0QmMxWE04NmJoOGQ5NDZQN1VZbEpoSVhORmRVY09DQmlXQU1RWHh2S0dIWXdBUlNRVlZLNElIR3FBbUtKNWtQQlZsUldlblpXeFBnRkJaSzQ4NklnakZVVUY4L2haWFN2TVhva3VBTlpnU1lZRVdLV2hGWWJidjlLWXhMV0JDdWpEVlZxU0hKWHlYaG1NU0dMRkhsUkJyUWFDMUt5M0tKZ1pxcnZOWlppc0pvWEJtS1NDV05mNWQ1VXNDWW1FYkpLWmNLTW1ZYXV6RCtBMHdBY3pwdElLMWMvWVJ6b2FDR0kzVWNLV0ZaVzZZSE1ja0pqMlZMOElNR0RmREErd1ZBQzNBTHRpYW9KUWpIbEVqZ3ZXOVNBRjhOdXlDNWtGU0pZZ004c0tTTWVBY0h0ZFVEclVBNFJFeFhVaFVsMlpxTk1mUzl4dERmalpuZ09SVGd2UWNRM0c1dnR5WmdBdDhEajVlTW1VQ1JMR2RRdll5amVYandZUzJLZXlaZzNGWTUweVdzYWc2SUsxVXdQUDRyR0Y5STVHS0ZzMmthamUrVGlUOWRJNy9YUWVHMGpJZURETGxCZ255V1JlRkZaKzQ4c0dBOFlkaWRQTDZqZlJINTdDNGU5aW5PZXF0NEdDU253ejVGMlVoRjEwRVM4SVNlWGZmL090LzAxWEptblZYKy9BbUxNbFpHMTMwYTNaeXljeDZ2Y0tZa2NrYjM1OWxESG1YVE94SmVTSzEvUHJON3cyeTBodE9JWVg2UkkrZXdHL2lqTlI2L1hjVjNiODZndzhyb1JMekUyODlWTkp1a2tUK3k1amZpTEJnT3lubG9zM2QwY0VRMi9iTEdOdWd0cjBRUytLTVNaVDFyUHB2a3lPazh2a3RFRWd6N0NjNm16azYranFzVHpzTUhPNXE5TFNQbllUWFBSdktjbjdLWURvNkQ4Y2hHN29RRlk3czM1QmZyS0h6YkhkTEt4aHI1N0c0K2U5c05UdDVvSEk5UitNRG03bVNGN3pTdWZoTDRkaHI3RitMR0g5RW9mSGpVUHVlendmb1RyRE5MNjF0UmFLK1JQN0tpbTBhZnhmN29majZicER2c3dYQWc1K0VwUStPMzNXQ3NVanp1Njc5SHdiQlQ1VUhqWEY0MXNpbktPcXZZSDFrdzdKWDQ4Y2x1L2RzbW1zMTN1aHZrOUt4ekZxVm9QR1Y0MCtISTc5RjV1QzUxcm9MeE9zR3o2U3IyLzB4cXJQMGtHRC9ub3I2Zk1KelpPY3BxWHhQM05KMDcwNnRvZHBvalozSVRoUmNybEZXY1dqYzYvc1VLOFVrS3d3N0RmTS9Xc0orY1h6ZDFkYU13Mk1PdDlaaWFoekg3WEExaGFLZVJzNGYxYjNwL2pxY1NqUVlyWFQ5eUk1THJNSHFIM01rVnpxYVBVZGl4OW5GVWVRcEg5eFZHOStJS1p6M2ExR2Z2UHh4UExQd21adkdKU0lnN1NHTS82UWJEWXhtTUJ5dk1yN3JCU2JKK3JrdGpPMGNaczJBNGtoTi9LdWN6dHBlbjEyT3IzMkgySmdvZlVyTGorVXViNjFkeS9qRGs2dWo4ZXNCUWRsVy9kOGtmZndBVFpDSldOQ083Qm1YMVdzN2hqZU42bHUzWnZiYlRkUnpiT2JKMlBXcHJ2ckw0MUt0OWV3T3psMHRQQXNQT0hScFA3NzlsS1RqekovbmN2VW9DZnJwQzdoVU5ob2RKa0hWU0ZQNUpnK0hwZWo0N1pZaGYwYk02NU05RGQ3eE96N042YmF2amRMdE83eG42clFsV2tKV2thaUpWUjB5WVFKRHBxNEtzZ0FkczNUUm9CaE50a3llVVAzaDIyemxxUVpaVFRxcFZIY2FiRThMZ0JuanUxZ1RvbDFqQldyZnBDRXZJSk5tYVAyOVc0cFJrY05kQTZydm5sRm1Xem96KzNsaVdWMzBqWUZhdFN1NTBQc2NOVFkvRHR0Tnh1MjduOEtqVGNBTmd3WmMwMFppL0tTWjd1elZCQmpsZEVxbUFCMXF0MW9ML3k3Z1daWUdKWjd6WXFUU3QrT0NaZVBWR3FDTGVnai92R3p3RDVyazhXTmtMZms5NTdCa25sVnhHdUZydzNZN0lXM0REMEZUMm1yMU1DK3BuZTd1TlNzWXdDckx5akFXd0YyREJaVTV3OWJnZ09hTVlTcyt3OWEwa2pHQWxpaWVWRENxY25rTkVtUFNNanpEUDk3MXN0Y3d1aXAzQ1BpejlZVjlTTm96WGNQNGRxNzV2OE9xUElrVkdlYVhqRnhDVFMxSlFFVjhUTEhnc1BjUGF5V0hCRmFTY0ZQdVdXMC9aV2hQMC9OQXdLa1o2eGllRS9FVG1zbVRzVWpDS041NFJMQytFdWl5SXJFcnlMS2dwVERtUjhySVFpSGo3UHhsR3FsVHVFK1VaSDNPb1VzODRNSTFjRk1vempxM3RTMG5LcWFLUVZlOUNFNTM3VWlaL0didTk0QXYrTGZ4RHY1Ri82SC9DUC9Rei9FUC84Ty8veEw5WCsrM1AwSzQyOHpzcFYzdjRBYnJ0S2Y1RHRkOUNOV0NDbkVHdVczRXp2Tm9tWUdSRldEMWphcyt2SEJmRUpOZlBMUlBzMW9TQkxudzFtRmFqcS9rZUlIQjdhd0lTSjAvajZySVEyZFBZclVRMU11dk5XRjNrazNyMGZWZE52Z2pjYnMzWFhlK1A0azhZN0svSm9uM1pXeE9nQnVuSCtvams4aHNkbVVDL1VjQURKVytPUUlDMlZ4U1VGTHNwZnJlVHFSMVFIcE9IS2xGZkRPZjFkbElsS0NsRW1iOFkrTUd2ZHJLdDh2M1ZYS0Jma3d2N3l6RFJMOG5GRHp2NVNpNWVjUCtIVStCOEJ0M3IwOVQzUmY2OXRxdC9lNGRYcmxsNWtEbkUyZzF4U0F1TERGRk80dGJ1aEs2MUZJeUp0V3dwV0NSRXRYYm5qaTFSeEtTb2p1OXl0dm1RRVpVS25TRXBJZGorZHdDM25RamdVeFVBQUE9PQ=="
+            },
+            "kind": "Secret",
+            "metadata": {
+                "creationTimestamp": "2026-10-05T18:43:08Z",
+                "labels": {
+                    "modifiedAt": "1791225768",
+                    "name": "r",
+                    "owner": "helm",
+                    "status": "deployed",
+                    "version": "3"
+                },
+                "name": "sh.helm.release.v1.r.v3",
+                "namespace": "e2e-combined-rollback-follows-target-revision-order",
+                "resourceVersion": "3720",
+                "uid": "37af3d6d-2ff9-44b5-aabc-fdfc90c5f435"
+            },
+            "type": "helm.sh/release.v2"
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}
+
+
+18:43:22.093 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-rollback-follows-target-revision-order --wait=false
+[exit 0, 0.0s]
+namespace "e2e-combined-rollback-follows-target-revision-order" deleted
+
+

@@ -1,0 +1,44 @@
+{
+  "stamp": "20261005-184055",
+  "started_utc": "2026-10-05T18:40:55Z",
+  "harness": {
+    "url": "https://github.com/caretak3r/helm-hip-0025-e2e",
+    "commit": "8dfe3323e78fb0a67c780fb4ba2d7e5e057839a5",
+    "dirty": false
+  },
+  "host": {
+    "os": "darwin",
+    "arch": "arm64"
+  },
+  "tools": {
+    "go": "go1.27.1",
+    "kind": "kind v0.33.0 go1.27.0 darwin/arm64",
+    "kubectl": "v1.37.0",
+    "docker": "29.8.0",
+    "python": "3.13.13"
+  },
+  "cluster": {
+    "name": "hip0025-e2e",
+    "context": "kind-hip0025-e2e",
+    "node_image": "kindest/node:v1.37.0@sha256:a1ed56cfb0e7b93589bdf97c8cd566405a265939e3620fc4f5de89adff580ae5",
+    "server_version": "v1.37.0"
+  },
+  "sources": {
+    "upstream": {
+      "url": "https://github.com/helm/helm.git",
+      "base": "d31cd6992fc7858922de6ebe5984a06fd6aa0b80"
+    },
+    "fork": {
+      "url": "https://github.com/caretak3r/helm.git"
+    }
+  },
+  "tiers": [
+    "pr1",
+    "pr2",
+    "pr3",
+    "combined"
+  ],
+  "pytest_args": [],
+  "finished_utc": "2026-10-05T18:50:03Z",
+  "exit_code": 0
+}

@@ -1,0 +1,37 @@
+18:41:47.955 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr1-upgrade-follows-install-order-and-waits-leaf --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.1s]
+
+
+18:41:48.018 $ kubectl --context kind-hip0025-e2e create namespace e2e-pr1-upgrade-follows-install-order-and-waits-leaf
+[exit 0, 0.0s]
+namespace/e2e-pr1-upgrade-follows-install-order-and-waits-leaf created
+
+
+18:41:48.072 $ .bin/helm-pr1 install r charts/hip-lifecycle --namespace e2e-pr1-upgrade-follows-install-order-and-waits-leaf --set global.rev=1 --wait=ordered --timeout 3m --kube-context kind-hip0025-e2e
+[exit 0, 9.4s]
+NAME: r
+LAST DEPLOYED: Mon Oct  5 14:41:48 2026
+NAMESPACE: e2e-pr1-upgrade-follows-install-order-and-waits-leaf
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+
+
+18:41:57.451 $ .bin/helm-pr1 upgrade r charts/hip-lifecycle --namespace e2e-pr1-upgrade-follows-install-order-and-waits-leaf --set global.rev=2 --wait=ordered --timeout 3m --kube-context kind-hip0025-e2e
+[exit 0, 12.1s]
+Release "r" has been upgraded. Happy Helming!
+NAME: r
+LAST DEPLOYED: Mon Oct  5 14:41:57 2026
+NAMESPACE: e2e-pr1-upgrade-follows-install-order-and-waits-leaf
+STATUS: deployed
+REVISION: 2
+DESCRIPTION: Upgrade complete
+TEST SUITE: None
+
+
+18:42:10.571 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr1-upgrade-follows-install-order-and-waits-leaf --wait=false
+[exit 0, 0.0s]
+namespace "e2e-pr1-upgrade-follows-install-order-and-waits-leaf" deleted
+
+

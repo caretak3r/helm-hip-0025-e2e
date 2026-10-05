@@ -1,0 +1,23 @@
+18:42:37.621 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr3-only-success-annotation-fails-helm-lint --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+18:42:37.659 $ kubectl --context kind-hip0025-e2e create namespace e2e-pr3-only-success-annotation-fails-helm-lint
+[exit 0, 0.0s]
+namespace/e2e-pr3-only-success-annotation-fails-helm-lint created
+
+
+18:42:37.694 $ .bin/helm-pr3 lint charts/hip-readiness-basic -f runs/20261005-184055/pr3/test_only_success_annotation_fails_helm_lint/lint-values.yaml --kube-context kind-hip0025-e2e
+[exit 1, 0.0s]
+==> Linting charts/hip-readiness-basic
+[INFO] Chart.yaml: icon is recommended
+[ERROR] hip-readiness-basic/templates/probe.yaml: resource "Probe/probe" has only one of "helm.sh/readiness-success" / "helm.sh/readiness-failure" annotations; both must be present or absent together
+
+Error: 1 chart(s) linted, 1 chart(s) failed
+
+
+18:42:37.733 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr3-only-success-annotation-fails-helm-lint --wait=false
+[exit 0, 0.0s]
+namespace "e2e-pr3-only-success-annotation-fails-helm-lint" deleted
+
+

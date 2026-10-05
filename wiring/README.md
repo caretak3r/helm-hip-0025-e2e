@@ -19,7 +19,7 @@ The patches in this directory connect the `helm` commands to that code, so that 
 
 | Patch | Applied to | Content |
 |---|---|---|
-| `0001-base-chart-v3-lifecycle.patch` | every tier | A plain chart-v3 lifecycle: release/v2 storage in `action.Configuration`; install, upgrade, rollback and uninstall for chart v3 that apply everything at once and wait like a chart v2; hooks; `--rollback-on-failure`; `template`, `lint`, `get` and `status` for chart v3. `pkg/action/wire_v3.go` defines the seams that the next two patches use. |
+| `0001-base-chart-v3-lifecycle.patch` | every tier | A plain chart-v3 lifecycle. It adds release/v2 storage to `action.Configuration`. It adds install, upgrade, rollback and uninstall for chart v3, which apply everything at once and wait like a chart v2. It adds hooks, `--rollback-on-failure`, and `template`, `lint`, `get` and `status` for chart v3. `pkg/action/wire_v3.go` defines the seams that the next two patches use. |
 | `0002-ordered-overlay.patch` | PR1, PR2, combined | `pkg/action/wire_ordered_v3.go` (212 lines). It sends `--wait=ordered` installs and upgrades to the sequencing code of PR1 and stores the plan on the release. It makes rollback follow the plan of the target revision, and uninstall delete in reverse order when the release was installed sequenced. |
 | `0003-readiness-overlay.patch` | PR3, combined | `pkg/action/wire_readiness_v3.go` (46 lines). It gives the `helm.sh/readiness-*` annotations of the resources to each chart-v3 wait, for a plain `--wait` and for each batch of `--wait=ordered`. |
 

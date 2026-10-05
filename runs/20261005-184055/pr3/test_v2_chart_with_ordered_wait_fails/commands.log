@@ -1,0 +1,24 @@
+18:43:18.054 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr3-v2-chart-with-ordered-wait-fails --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+18:43:18.088 $ kubectl --context kind-hip0025-e2e create namespace e2e-pr3-v2-chart-with-ordered-wait-fails
+[exit 0, 0.0s]
+namespace/e2e-pr3-v2-chart-with-ordered-wait-fails created
+
+
+18:43:18.119 $ .bin/helm-pr3 install r charts/v2-annotated --namespace e2e-pr3-v2-chart-with-ordered-wait-fails --wait=ordered --timeout 3m --kube-context kind-hip0025-e2e
+[exit 1, 0.0s]
+Error: invalid argument "ordered" for "--wait" flag: invalid wait input "ordered". Valid inputs are watcher, hookOnly, and legacy
+
+
+18:43:18.144 $ .bin/helm-pr3 list -o json --kube-context kind-hip0025-e2e
+[exit 0, 0.0s]
+[]
+
+
+18:43:18.177 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr3-v2-chart-with-ordered-wait-fails --wait=false
+[exit 0, 0.0s]
+namespace "e2e-pr3-v2-chart-with-ordered-wait-fails" deleted
+
+
