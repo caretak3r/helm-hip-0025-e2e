@@ -1,0 +1,25 @@
+08:48:32.792 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr1-subchart-alias-dependency --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+08:48:32.831 $ kubectl --context kind-hip0025-e2e create namespace e2e-pr1-subchart-alias-dependency
+[exit 0, 0.0s]
+namespace/e2e-pr1-subchart-alias-dependency created
+
+
+08:48:32.868 $ .bin/helm-pr1 install r charts/hip-subcharts-alias --namespace e2e-pr1-subchart-alias-dependency --wait=ordered --timeout 3m --kube-context kind-hip0025-e2e
+[exit 0, 11.9s]
+NAME: r
+LAST DEPLOYED: Thu Oct  8 04:48:32 2026
+NAMESPACE: e2e-pr1-subchart-alias-dependency
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+
+
+08:48:45.762 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr1-subchart-alias-dependency --wait=false
+[exit 0, 0.1s]
+namespace "e2e-pr1-subchart-alias-dependency" deleted
+
+

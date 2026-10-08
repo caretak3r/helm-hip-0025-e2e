@@ -1,0 +1,32 @@
+{
+  "tier": "pr3",
+  "base": "d31cd6992fc7858922de6ebe5984a06fd6aa0b80",
+  "head": "b57469035869d096ce32df0464375662ce59e498",
+  "packages": [
+    {
+      "package": "internal/chart/v3/lint",
+      "scope": "all tests",
+      "passed": true,
+      "seconds": 8.1,
+      "log": "unit-internal_chart_v3_lint.log",
+      "summary": "ok  \thelm.sh/helm/v4/internal/chart/v3/lint\t0.622s"
+    },
+    {
+      "package": "internal/chart/v3/lint/rules",
+      "scope": "all tests",
+      "passed": true,
+      "seconds": 5.8,
+      "log": "unit-internal_chart_v3_lint_rules.log",
+      "summary": "ok  \thelm.sh/helm/v4/internal/chart/v3/lint/rules\t0.931s"
+    },
+    {
+      "package": "pkg/kube",
+      "scope": "all tests",
+      "passed": true,
+      "seconds": 31.9,
+      "log": "unit-pkg_kube.log",
+      "summary": "ok  \thelm.sh/helm/v4/pkg/kube\t25.989s"
+    }
+  ],
+  "passed": true
+}

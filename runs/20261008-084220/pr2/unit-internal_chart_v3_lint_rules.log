@@ -1,0 +1,2 @@
+$ go test -count=1 ./internal/chart/v3/lint/rules/
+ok  	helm.sh/helm/v4/internal/chart/v3/lint/rules	0.794s

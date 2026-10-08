@@ -1,0 +1,25 @@
+08:48:45.816 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr1-nested-subcharts-three-levels --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+08:48:45.866 $ kubectl --context kind-hip0025-e2e create namespace e2e-pr1-nested-subcharts-three-levels
+[exit 0, 0.0s]
+namespace/e2e-pr1-nested-subcharts-three-levels created
+
+
+08:48:45.917 $ .bin/helm-pr1 install r charts/hip-subcharts-nested --namespace e2e-pr1-nested-subcharts-three-levels --wait=ordered --timeout 3m --kube-context kind-hip0025-e2e
+[exit 0, 11.9s]
+NAME: r
+LAST DEPLOYED: Thu Oct  8 04:48:45 2026
+NAMESPACE: e2e-pr1-nested-subcharts-three-levels
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+
+
+08:48:58.798 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr1-nested-subcharts-three-levels --wait=false
+[exit 0, 0.0s]
+namespace "e2e-pr1-nested-subcharts-three-levels" deleted
+
+

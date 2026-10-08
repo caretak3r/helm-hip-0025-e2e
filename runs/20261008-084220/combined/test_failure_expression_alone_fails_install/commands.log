@@ -1,0 +1,24 @@
+08:50:35.563 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-failure-expression-alone-fails-install --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+08:50:35.609 $ kubectl --context kind-hip0025-e2e create namespace e2e-combined-failure-expression-alone-fails-install
+[exit 0, 0.0s]
+namespace/e2e-combined-failure-expression-alone-fails-install created
+
+
+08:50:37.657 $ kubectl --context kind-hip0025-e2e patch Probe probe -n e2e-combined-failure-expression-alone-fails-install --subresource=status --type=merge -p {"status": {"phase": "Failed"}}
+[exit 0, 0.0s]
+probe.readiness.hip0025.example/probe patched
+
+
+08:50:35.654 $ .bin/helm-combined install r charts/hip-readiness-basic -f runs/20261008-084220/combined/test_failure_expression_alone_fails_install/values.yaml --namespace e2e-combined-failure-expression-alone-fails-install --wait --timeout 1m --kube-context kind-hip0025-e2e
+[exit 1, 2.1s]
+Error: INSTALLATION FAILED: resource Probe/e2e-combined-failure-expression-alone-fails-install/probe not ready. status: Failed, message: custom readiness failure condition met
+
+
+08:50:37.711 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-failure-expression-alone-fails-install --wait=false
+[exit 0, 0.0s]
+namespace "e2e-combined-failure-expression-alone-fails-install" deleted
+
+

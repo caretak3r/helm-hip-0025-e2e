@@ -1,0 +1,4 @@
+........................x.....................                           [100%]
+=========================== short test summary info ============================
+XFAIL e2e/tests/test_pr2_groups.py::test_template_prints_delimiters_for_groups - R26 not implemented: helm template does not print START/END resource-group delimiters
+45 passed, 1 xfailed in 518.34s (0:08:38)

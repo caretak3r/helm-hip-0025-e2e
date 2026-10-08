@@ -1,0 +1,28 @@
+08:49:46.025 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-group-cycle-detected-and-rejected --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+08:49:46.074 $ kubectl --context kind-hip0025-e2e create namespace e2e-combined-group-cycle-detected-and-rejected
+[exit 0, 0.0s]
+namespace/e2e-combined-group-cycle-detected-and-rejected created
+
+
+08:49:46.119 $ .bin/helm-combined install r charts/hip-groups-cycle --namespace e2e-combined-group-cycle-detected-and-rejected --wait=ordered --kube-context kind-hip0025-e2e
+[exit 1, 0.1s]
+Error: INSTALLATION FAILED: resource-group circular dependency detected in hip-groups-cycle: cycle detected among nodes: group-a, group-b, group-c
+
+
+08:49:47.213 $ .bin/helm-combined lint charts/hip-groups-cycle --kube-context kind-hip0025-e2e
+[exit 1, 0.0s]
+==> Linting charts/hip-groups-cycle
+[INFO] Chart.yaml: icon is recommended
+[ERROR] /Users/rohit/Documents/helm-hip-0025-e2e/charts/hip-groups-cycle: resource-group circular dependency detected in hip-groups-cycle: cycle detected among nodes: group-a, group-b, group-c
+
+Error: 1 chart(s) linted, 1 chart(s) failed
+
+
+08:49:47.250 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-group-cycle-detected-and-rejected --wait=false
+[exit 0, 0.1s]
+namespace "e2e-combined-group-cycle-detected-and-rejected" deleted
+
+

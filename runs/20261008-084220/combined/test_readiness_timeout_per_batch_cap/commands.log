@@ -1,0 +1,20 @@
+08:46:29.303 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-readiness-timeout-per-batch-cap --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+08:46:29.346 $ kubectl --context kind-hip0025-e2e create namespace e2e-combined-readiness-timeout-per-batch-cap
+[exit 0, 0.0s]
+namespace/e2e-combined-readiness-timeout-per-batch-cap created
+
+
+08:46:29.388 $ .bin/helm-combined install r charts/hip-lifecycle-failure --namespace e2e-combined-readiness-timeout-per-batch-cap --wait=ordered --readiness-timeout 10s --timeout 2m --kube-context kind-hip0025-e2e
+[exit 1, 10.1s]
+Error: INSTALLATION FAILED: resource Deployment/e2e-combined-readiness-timeout-per-batch-cap/broken not ready. status: InProgress, message: Available: 0/1
+context deadline exceeded
+
+
+08:46:39.492 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-readiness-timeout-per-batch-cap --wait=false
+[exit 0, 0.0s]
+namespace "e2e-combined-readiness-timeout-per-batch-cap" deleted
+
+

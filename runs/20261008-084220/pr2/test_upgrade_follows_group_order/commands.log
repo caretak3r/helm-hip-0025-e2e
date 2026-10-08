@@ -1,0 +1,379 @@
+08:49:45.308 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr2-upgrade-follows-group-order --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+08:49:45.356 $ kubectl --context kind-hip0025-e2e create namespace e2e-pr2-upgrade-follows-group-order
+[exit 0, 0.0s]
+namespace/e2e-pr2-upgrade-follows-group-order created
+
+
+08:49:45.396 $ .bin/helm-pr2 install r charts/hip-groups-upgrade --namespace e2e-pr2-upgrade-follows-group-order --set patchValue=v1 --wait=ordered --timeout 3m --kube-context kind-hip0025-e2e
+[exit 0, 7.6s]
+NAME: r
+LAST DEPLOYED: Thu Oct  8 04:49:45 2026
+NAMESPACE: e2e-pr2-upgrade-follows-group-order
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+
+
+08:49:52.974 $ .bin/helm-pr2 upgrade r charts/hip-groups-upgrade --namespace e2e-pr2-upgrade-follows-group-order --set patchValue=v2 --wait=ordered --timeout 3m --kube-context kind-hip0025-e2e
+[exit 0, 8.1s]
+Release "r" has been upgraded. Happy Helming!
+NAME: r
+LAST DEPLOYED: Thu Oct  8 04:49:53 2026
+NAMESPACE: e2e-pr2-upgrade-follows-group-order
+STATUS: deployed
+REVISION: 2
+DESCRIPTION: Upgrade complete
+TEST SUITE: None
+
+
+08:50:02.118 $ kubectl --context kind-hip0025-e2e get Deployment db -n e2e-pr2-upgrade-follows-group-order -o json
+[exit 0, 0.0s]
+{
+    "apiVersion": "apps/v1",
+    "kind": "Deployment",
+    "metadata": {
+        "annotations": {
+            "deployment.kubernetes.io/revision": "2",
+            "helm.sh/resource-group": "database",
+            "meta.helm.sh/release-name": "r",
+            "meta.helm.sh/release-namespace": "e2e-pr2-upgrade-follows-group-order",
+            "patch-marker": "v2"
+        },
+        "creationTimestamp": "2026-10-08T08:49:45Z",
+        "generation": 2,
+        "labels": {
+            "app.kubernetes.io/managed-by": "Helm"
+        },
+        "name": "db",
+        "namespace": "e2e-pr2-upgrade-follows-group-order",
+        "resourceVersion": "9668",
+        "uid": "2878c1a2-d9a2-49f4-bfd5-ddfcbb124df7"
+    },
+    "spec": {
+        "progressDeadlineSeconds": 600,
+        "replicas": 1,
+        "revisionHistoryLimit": 10,
+        "selector": {
+            "matchLabels": {
+                "app": "db"
+            }
+        },
+        "strategy": {
+            "rollingUpdate": {
+                "maxSurge": "25%",
+                "maxUnavailable": "25%"
+            },
+            "type": "RollingUpdate"
+        },
+        "template": {
+            "metadata": {
+                "annotations": {
+                    "patch-marker": "v2"
+                },
+                "labels": {
+                    "app": "db"
+                }
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "env": [
+                            {
+                                "name": "PATCH_VALUE",
+                                "value": "v2"
+                            }
+                        ],
+                        "image": "nginx:1.27-alpine",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "web",
+                        "readinessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/",
+                                "port": 80,
+                                "scheme": "HTTP"
+                            },
+                            "initialDelaySeconds": 3,
+                            "periodSeconds": 1,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 1
+                        },
+                        "resources": {},
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File"
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "terminationGracePeriodSeconds": 0
+            }
+        }
+    },
+    "status": {
+        "availableReplicas": 1,
+        "conditions": [
+            {
+                "lastTransitionTime": "2026-10-08T08:49:48Z",
+                "lastUpdateTime": "2026-10-08T08:49:48Z",
+                "message": "Deployment has minimum availability.",
+                "reason": "MinimumReplicasAvailable",
+                "status": "True",
+                "type": "Available"
+            },
+            {
+                "lastTransitionTime": "2026-10-08T08:49:45Z",
+                "lastUpdateTime": "2026-10-08T08:49:56Z",
+                "message": "ReplicaSet \"db-7d4b9df77c\" has successfully progressed.",
+                "reason": "NewReplicaSetAvailable",
+                "status": "True",
+                "type": "Progressing"
+            }
+        ],
+        "observedGeneration": 2,
+        "readyReplicas": 1,
+        "replicas": 1,
+        "terminatingReplicas": 0,
+        "updatedReplicas": 1
+    }
+}
+
+
+08:50:02.162 $ kubectl --context kind-hip0025-e2e get Deployment queue -n e2e-pr2-upgrade-follows-group-order -o json
+[exit 0, 0.0s]
+{
+    "apiVersion": "apps/v1",
+    "kind": "Deployment",
+    "metadata": {
+        "annotations": {
+            "deployment.kubernetes.io/revision": "2",
+            "helm.sh/resource-group": "queue",
+            "meta.helm.sh/release-name": "r",
+            "meta.helm.sh/release-namespace": "e2e-pr2-upgrade-follows-group-order",
+            "patch-marker": "v2"
+        },
+        "creationTimestamp": "2026-10-08T08:49:45Z",
+        "generation": 2,
+        "labels": {
+            "app.kubernetes.io/managed-by": "Helm"
+        },
+        "name": "queue",
+        "namespace": "e2e-pr2-upgrade-follows-group-order",
+        "resourceVersion": "9669",
+        "uid": "8ede219a-ef3f-425e-89ad-640917500951"
+    },
+    "spec": {
+        "progressDeadlineSeconds": 600,
+        "replicas": 1,
+        "revisionHistoryLimit": 10,
+        "selector": {
+            "matchLabels": {
+                "app": "queue"
+            }
+        },
+        "strategy": {
+            "rollingUpdate": {
+                "maxSurge": "25%",
+                "maxUnavailable": "25%"
+            },
+            "type": "RollingUpdate"
+        },
+        "template": {
+            "metadata": {
+                "annotations": {
+                    "patch-marker": "v2"
+                },
+                "labels": {
+                    "app": "queue"
+                }
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "env": [
+                            {
+                                "name": "PATCH_VALUE",
+                                "value": "v2"
+                            }
+                        ],
+                        "image": "nginx:1.27-alpine",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "web",
+                        "readinessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/",
+                                "port": 80,
+                                "scheme": "HTTP"
+                            },
+                            "initialDelaySeconds": 3,
+                            "periodSeconds": 1,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 1
+                        },
+                        "resources": {},
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File"
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "terminationGracePeriodSeconds": 0
+            }
+        }
+    },
+    "status": {
+        "availableReplicas": 1,
+        "conditions": [
+            {
+                "lastTransitionTime": "2026-10-08T08:49:48Z",
+                "lastUpdateTime": "2026-10-08T08:49:48Z",
+                "message": "Deployment has minimum availability.",
+                "reason": "MinimumReplicasAvailable",
+                "status": "True",
+                "type": "Available"
+            },
+            {
+                "lastTransitionTime": "2026-10-08T08:49:45Z",
+                "lastUpdateTime": "2026-10-08T08:49:56Z",
+                "message": "ReplicaSet \"queue-58f7d7b9db\" has successfully progressed.",
+                "reason": "NewReplicaSetAvailable",
+                "status": "True",
+                "type": "Progressing"
+            }
+        ],
+        "observedGeneration": 2,
+        "readyReplicas": 1,
+        "replicas": 1,
+        "terminatingReplicas": 0,
+        "updatedReplicas": 1
+    }
+}
+
+
+08:50:02.206 $ kubectl --context kind-hip0025-e2e get Deployment app -n e2e-pr2-upgrade-follows-group-order -o json
+[exit 0, 0.0s]
+{
+    "apiVersion": "apps/v1",
+    "kind": "Deployment",
+    "metadata": {
+        "annotations": {
+            "deployment.kubernetes.io/revision": "2",
+            "helm.sh/resource-group": "app",
+            "meta.helm.sh/release-name": "r",
+            "meta.helm.sh/release-namespace": "e2e-pr2-upgrade-follows-group-order",
+            "patch-marker": "v2"
+        },
+        "creationTimestamp": "2026-10-08T08:49:48Z",
+        "generation": 2,
+        "labels": {
+            "app.kubernetes.io/managed-by": "Helm"
+        },
+        "name": "app",
+        "namespace": "e2e-pr2-upgrade-follows-group-order",
+        "resourceVersion": "9749",
+        "uid": "0b56df00-00c8-483b-ba5a-054b53857bb5"
+    },
+    "spec": {
+        "progressDeadlineSeconds": 600,
+        "replicas": 1,
+        "revisionHistoryLimit": 10,
+        "selector": {
+            "matchLabels": {
+                "app": "app"
+            }
+        },
+        "strategy": {
+            "rollingUpdate": {
+                "maxSurge": "25%",
+                "maxUnavailable": "25%"
+            },
+            "type": "RollingUpdate"
+        },
+        "template": {
+            "metadata": {
+                "annotations": {
+                    "patch-marker": "v2"
+                },
+                "labels": {
+                    "app": "app"
+                }
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "env": [
+                            {
+                                "name": "PATCH_VALUE",
+                                "value": "v2"
+                            }
+                        ],
+                        "image": "nginx:1.27-alpine",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "web",
+                        "readinessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/",
+                                "port": 80,
+                                "scheme": "HTTP"
+                            },
+                            "initialDelaySeconds": 3,
+                            "periodSeconds": 1,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 1
+                        },
+                        "resources": {},
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File"
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "terminationGracePeriodSeconds": 0
+            }
+        }
+    },
+    "status": {
+        "availableReplicas": 1,
+        "conditions": [
+            {
+                "lastTransitionTime": "2026-10-08T08:49:52Z",
+                "lastUpdateTime": "2026-10-08T08:49:52Z",
+                "message": "Deployment has minimum availability.",
+                "reason": "MinimumReplicasAvailable",
+                "status": "True",
+                "type": "Available"
+            },
+            {
+                "lastTransitionTime": "2026-10-08T08:49:48Z",
+                "lastUpdateTime": "2026-10-08T08:50:01Z",
+                "message": "ReplicaSet \"app-6b6c9d6f6b\" has successfully progressed.",
+                "reason": "NewReplicaSetAvailable",
+                "status": "True",
+                "type": "Progressing"
+            }
+        ],
+        "observedGeneration": 2,
+        "readyReplicas": 1,
+        "replicas": 1,
+        "terminatingReplicas": 0,
+        "updatedReplicas": 1
+    }
+}
+
+
+08:50:03.268 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr2-upgrade-follows-group-order --wait=false
+[exit 0, 0.0s]
+namespace "e2e-pr2-upgrade-follows-group-order" deleted
+
+

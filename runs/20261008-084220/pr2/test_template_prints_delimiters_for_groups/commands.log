@@ -1,0 +1,130 @@
+08:49:45.129 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr2-template-prints-delimiters-for-groups --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+08:49:45.173 $ kubectl --context kind-hip0025-e2e create namespace e2e-pr2-template-prints-delimiters-for-groups
+[exit 0, 0.0s]
+namespace/e2e-pr2-template-prints-delimiters-for-groups created
+
+
+08:49:45.213 $ .bin/helm-pr2 template test-release charts/hip-groups --kube-context kind-hip0025-e2e
+[exit 0, 0.0s]
+---
+# Source: hip-groups/templates/unsequenced.yaml
+# The three "Unsequenced Resources" cases: deployed after every sequenced group.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: loose            # lacks annotations
+data: {case: no-annotations}
+
+---
+# Source: hip-groups/templates/unsequenced.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: orphan           # depends on a group that does not exist -> warning
+  annotations:
+    helm.sh/resource-group: orphan
+    helm.sh/depends-on/resource-groups: '["no-such-group"]'
+data: {case: missing-dependency}
+
+---
+# Source: hip-groups/templates/unsequenced.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lonely           # isolated group: no edges in or out -> warning
+  annotations:
+    helm.sh/resource-group: lonely
+data: {case: isolated-group}
+
+---
+# Source: hip-groups/templates/groups.yaml
+# HIP-0025 "Template examples": database and queue have no mutual dependency and
+# deploy together; app waits for both. The dependency list is deliberately in the
+# opposite order to the HIP text ("The order in which they are listed does not
+# affect deployment sequencing").
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-service
+  annotations:
+    helm.sh/resource-group: database
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: db-service}
+  template:
+    metadata:
+      labels: {app: db-service}
+    spec:
+      terminationGracePeriodSeconds: 0
+      containers:
+        - name: web
+          image: nginx:1.27-alpine
+          imagePullPolicy: IfNotPresent
+          readinessProbe:
+            httpGet: {path: /, port: 80}
+            initialDelaySeconds: 3
+            periodSeconds: 1
+
+---
+# Source: hip-groups/templates/groups.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: queue-processor
+  annotations:
+    helm.sh/resource-group: queue
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: queue-processor}
+  template:
+    metadata:
+      labels: {app: queue-processor}
+    spec:
+      terminationGracePeriodSeconds: 0
+      containers:
+        - name: web
+          image: nginx:1.27-alpine
+          imagePullPolicy: IfNotPresent
+          readinessProbe:
+            httpGet: {path: /, port: 80}
+            initialDelaySeconds: 3
+            periodSeconds: 1
+
+---
+# Source: hip-groups/templates/groups.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app
+  annotations:
+    helm.sh/resource-group: app
+    helm.sh/depends-on/resource-groups: "[\"queue\",\"database\"]"
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: my-app}
+  template:
+    metadata:
+      labels: {app: my-app}
+    spec:
+      terminationGracePeriodSeconds: 0
+      containers:
+        - name: web
+          image: nginx:1.27-alpine
+          imagePullPolicy: IfNotPresent
+          readinessProbe:
+            httpGet: {path: /, port: 80}
+            initialDelaySeconds: 3
+            periodSeconds: 1
+
+
+08:49:45.264 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr2-template-prints-delimiters-for-groups --wait=false
+[exit 0, 0.0s]
+namespace "e2e-pr2-template-prints-delimiters-for-groups" deleted
+
+

@@ -1,0 +1,24 @@
+08:51:53.318 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-v2-chart-with-ordered-wait-fails --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+08:51:53.361 $ kubectl --context kind-hip0025-e2e create namespace e2e-combined-v2-chart-with-ordered-wait-fails
+[exit 0, 0.0s]
+namespace/e2e-combined-v2-chart-with-ordered-wait-fails created
+
+
+08:51:53.400 $ .bin/helm-combined install r charts/v2-annotated --namespace e2e-combined-v2-chart-with-ordered-wait-fails --wait=ordered --timeout 3m --kube-context kind-hip0025-e2e
+[exit 1, 0.0s]
+Error: INSTALLATION FAILED: --wait=ordered requires chart apiVersion v3 (chart "v2-annotated" has apiVersion v2)
+
+
+08:51:53.432 $ .bin/helm-combined list -o json --kube-context kind-hip0025-e2e
+[exit 0, 0.0s]
+[]
+
+
+08:51:53.471 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-v2-chart-with-ordered-wait-fails --wait=false
+[exit 0, 0.0s]
+namespace "e2e-combined-v2-chart-with-ordered-wait-fails" deleted
+
+

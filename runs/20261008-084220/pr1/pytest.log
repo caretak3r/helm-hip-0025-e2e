@@ -1,0 +1,21 @@
+s..................ssssssssssssssssssssssss...                           [100%]
+=========================== short test summary info ============================
+SKIPPED [1] e2e/tests/test_combined.py:8: N/A: tier has no groups, readiness
+SKIPPED [1] e2e/tests/test_pr2_groups.py:22: N/A: tier has no groups
+SKIPPED [1] e2e/tests/test_pr2_groups.py:41: N/A: tier has no groups
+SKIPPED [1] e2e/tests/test_pr2_groups.py:61: N/A: tier has no groups
+SKIPPED [1] e2e/tests/test_pr2_groups.py:83: N/A: tier has no groups
+SKIPPED [1] e2e/tests/test_pr2_groups.py:106: N/A: tier has no groups
+SKIPPED [1] e2e/tests/test_pr2_groups.py:136: N/A: tier has no groups
+SKIPPED [1] e2e/tests/test_pr2_groups.py:168: N/A: tier has no groups
+SKIPPED [1] e2e/tests/test_pr2_groups.py:214: N/A: tier has no groups
+SKIPPED [1] e2e/tests/test_pr3_readiness.py:11: N/A: tier has no readiness
+SKIPPED [1] e2e/tests/test_pr3_readiness.py:25: N/A: tier has no readiness
+SKIPPED [1] e2e/tests/test_pr3_readiness.py:59: N/A: tier has no readiness
+SKIPPED [1] e2e/tests/test_pr3_readiness.py:88: N/A: tier has no readiness
+SKIPPED [1] e2e/tests/test_pr3_readiness.py:115: N/A: tier has no readiness
+SKIPPED [1] e2e/tests/test_pr3_readiness.py:165: N/A: tier has no readiness
+SKIPPED [1] e2e/tests/test_pr3_readiness.py:201: N/A: tier has no readiness
+SKIPPED [8] e2e/tests/test_pr3_readiness.py:225: N/A: tier has no readiness
+SKIPPED [1] e2e/tests/test_pr3_readiness.py:289: N/A: tier has no readiness
+21 passed, 25 skipped in 347.40s (0:05:47)

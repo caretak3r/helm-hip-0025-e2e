@@ -1,0 +1,27 @@
+08:49:10.332 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-groups-follow-the-hip-example --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+08:49:10.375 $ kubectl --context kind-hip0025-e2e create namespace e2e-combined-groups-follow-the-hip-example
+[exit 0, 0.0s]
+namespace/e2e-combined-groups-follow-the-hip-example created
+
+
+08:49:10.418 $ .bin/helm-combined install r charts/hip-groups --namespace e2e-combined-groups-follow-the-hip-example --wait=ordered --timeout 3m --kube-context kind-hip0025-e2e
+[exit 0, 8.5s]
+NAME: r
+LAST DEPLOYED: Thu Oct  8 04:49:10 2026
+NAMESPACE: e2e-combined-groups-follow-the-hip-example
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+level=WARN msg="sequencing: group \"orphan\" depends-on non-existent group \"no-such-group\"; moving group to unsequenced batch" chart=hip-groups
+level=WARN msg="sequencing: resource-group \"lonely\" is isolated (no depends-on edges and no dependents); deploying it in the unsequenced batch after sequenced groups" chart=hip-groups
+
+
+08:49:19.907 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-groups-follow-the-hip-example --wait=false
+[exit 0, 0.0s]
+namespace "e2e-combined-groups-follow-the-hip-example" deleted
+
+

@@ -1,0 +1,15 @@
+[
+  {
+    "label": "plain --wait release plan",
+    "value": null
+  },
+  {
+    "label": "stored plan batches (chartPath, kind, manifests)",
+    "value": [
+      "('foo/charts/nginx', 'unsequenced', ['foo/charts/nginx/templates/nginx.yaml'])",
+      "('foo/charts/rabbitmq', 'unsequenced', ['foo/charts/rabbitmq/templates/rabbitmq.yaml'])",
+      "('foo/charts/bar', 'unsequenced', ['foo/charts/bar/templates/bar.yaml'])",
+      "('foo', 'unsequenced', ['foo/templates/foo.yaml'])"
+    ]
+  }
+]

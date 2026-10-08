@@ -1,0 +1,18 @@
+[
+  {
+    "label": "uninstall timeline",
+    "value": [
+      "08:50:22.137  delete Deployment/app",
+      "08:50:22.351  delete Deployment/db",
+      "08:50:22.351  delete Deployment/queue"
+    ]
+  },
+  {
+    "label": "deletion timestamps",
+    "value": {
+      "app": "08:50:22.137",
+      "db": "08:50:22.351",
+      "queue": "08:50:22.351"
+    }
+  }
+]

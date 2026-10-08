@@ -60,11 +60,13 @@ The [dashboard](https://caretak3r.github.io/helm-hip-0025-e2e/) shows each run i
 
 `runs/<stamp>/REPORT.md` contains the same verdicts as Markdown.
 
-### Run 20261005-184055
+### Run 20261008-084220
 
-This run used the harness commit `8dfe3323e78f`, a new kind cluster (Kubernetes v1.37.0) and new builds.
-All tiers are green. [Dashboard page](https://caretak3r.github.io/helm-hip-0025-e2e/20261005-184055/index.html),
-[REPORT.md](runs/20261005-184055/REPORT.md).
+This run used the harness commit `768299181667`, a new kind cluster (Kubernetes v1.37.0) and new builds. The builds
+are byte-identical to the builds of run 20261005-184055. All tiers are green.
+[Dashboard page](https://caretak3r.github.io/helm-hip-0025-e2e/20261008-084220/index.html),
+[REPORT.md](runs/20261008-084220/REPORT.md),
+[charts](https://caretak3r.github.io/helm-hip-0025-e2e/20261008-084220/charts/index.html).
 
 | Tier | Commit | HIP requirements | Tests | Go unit tests |
 |---|---|---|---|---|

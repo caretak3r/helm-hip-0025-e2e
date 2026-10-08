@@ -1,0 +1,158 @@
+{
+  "stamp": "20261008-084220",
+  "started_utc": "2026-10-08T08:42:20Z",
+  "harness": {
+    "url": "https://github.com/caretak3r/helm-hip-0025-e2e",
+    "commit": "768299181667ec00fbbdf99caae2e501f8e34f6d",
+    "dirty": false
+  },
+  "host": {
+    "os": "darwin",
+    "arch": "arm64"
+  },
+  "tools": {
+    "go": "go1.27.1",
+    "kind": "kind v0.33.0 go1.27.0 darwin/arm64",
+    "kubectl": "v1.37.0",
+    "docker": "29.8.0",
+    "python": "3.13.13"
+  },
+  "cluster": {
+    "name": "hip0025-e2e",
+    "context": "kind-hip0025-e2e",
+    "node_image": "kindest/node:v1.37.0@sha256:a1ed56cfb0e7b93589bdf97c8cd566405a265939e3620fc4f5de89adff580ae5",
+    "server_version": "v1.37.0"
+  },
+  "sources": {
+    "upstream": {
+      "url": "https://github.com/helm/helm.git",
+      "base": "d31cd6992fc7858922de6ebe5984a06fd6aa0b80"
+    },
+    "fork": {
+      "url": "https://github.com/caretak3r/helm.git"
+    }
+  },
+  "tiers": [
+    "pr1",
+    "pr2",
+    "pr3",
+    "combined"
+  ],
+  "pytest_args": [],
+  "charts": [
+    {
+      "source": "charts/hip-groups",
+      "name": "hip-groups",
+      "version": "0.1.0",
+      "apiVersion": "v3",
+      "archive": "hip-groups-0.1.0.tgz",
+      "sha256": "bf37c35e80bb2a8c9fe01a5aaf8c0b1d489c900bcbe2953a077c367e0dfcf7a4"
+    },
+    {
+      "source": "charts/hip-groups-cycle",
+      "name": "hip-groups-cycle",
+      "version": "0.1.0",
+      "apiVersion": "v3",
+      "archive": "hip-groups-cycle-0.1.0.tgz",
+      "sha256": "bdd5a76bd42fc9944fcdbe0d6b210e34f3244bec3ddb02e610a8275298a3963c"
+    },
+    {
+      "source": "charts/hip-groups-sandbox",
+      "name": "hip-groups-sandbox",
+      "version": "0.1.0",
+      "apiVersion": "v3",
+      "archive": "hip-groups-sandbox-0.1.0.tgz",
+      "sha256": "1e072a95bca3590140541d2625a7225babd891a5ca89ab98decca3e11d1119be"
+    },
+    {
+      "source": "charts/hip-groups-upgrade",
+      "name": "hip-groups-upgrade",
+      "version": "0.1.0",
+      "apiVersion": "v3",
+      "archive": "hip-groups-upgrade-0.1.0.tgz",
+      "sha256": "92fbce0f03b11ddb3d10cce652f836ca9768c6772d461c30f45c4b47f3ad288b"
+    },
+    {
+      "source": "charts/hip-lifecycle",
+      "name": "hip-lifecycle",
+      "version": "0.1.0",
+      "apiVersion": "v3",
+      "archive": "hip-lifecycle-0.1.0.tgz",
+      "sha256": "a06bfada6ae70d40af6663b9623c1f428a400fe5a96a90387450c86e6e31ac5c"
+    },
+    {
+      "source": "charts/hip-lifecycle-failure",
+      "name": "hip-lifecycle-failure",
+      "version": "0.1.0",
+      "apiVersion": "v3",
+      "archive": "hip-lifecycle-failure-0.1.0.tgz",
+      "sha256": "81e8152aaa1933a7b0b80d787bb8622d75d773712e5416c99b0916521777b912"
+    },
+    {
+      "source": "charts/hip-lifecycle-hooks",
+      "name": "hip-lifecycle-hooks",
+      "version": "0.1.0",
+      "apiVersion": "v3",
+      "archive": "hip-lifecycle-hooks-0.1.0.tgz",
+      "sha256": "ff795f70d0fc5a7dfd934c6c329dfd5d61128389c6b3dc3354fcb2509a404533"
+    },
+    {
+      "source": "charts/hip-readiness-basic",
+      "name": "hip-readiness-basic",
+      "version": "0.1.0",
+      "apiVersion": "v3",
+      "archive": "hip-readiness-basic-0.1.0.tgz",
+      "sha256": "2534a8588e3d9ccf9834f1757ed48ede56dcd930bd7478e784352ce53d2172f7"
+    },
+    {
+      "source": "charts/hip-readiness-gate",
+      "name": "hip-readiness-gate",
+      "version": "0.1.0",
+      "apiVersion": "v3",
+      "archive": "hip-readiness-gate-0.1.0.tgz",
+      "sha256": "e75229a71dc975b47d7a4d0c1ab2ffaa7da4ed9f5721f8d2538785e6c9fc8754"
+    },
+    {
+      "source": "charts/hip-subcharts",
+      "name": "foo",
+      "version": "0.1.0",
+      "apiVersion": "v3",
+      "archive": "foo-0.1.0.tgz",
+      "sha256": "e5cb6705dbea067f70cddcf9d0549cd38647ea73ba45e6fa9a04b7cd397e6fb7"
+    },
+    {
+      "source": "charts/hip-subcharts-alias",
+      "name": "hip-subcharts-alias",
+      "version": "0.1.0",
+      "apiVersion": "v3",
+      "archive": "hip-subcharts-alias-0.1.0.tgz",
+      "sha256": "2ad3522e71c23a882040ade1fd685658e19fdca1213a7535ec433435c360af55"
+    },
+    {
+      "source": "charts/hip-subcharts-cycle",
+      "name": "hip-subcharts-cycle",
+      "version": "0.1.0",
+      "apiVersion": "v3",
+      "archive": "hip-subcharts-cycle-0.1.0.tgz",
+      "sha256": "3bb3813a3d5898e193a14daee0d4d02fd2967cca92a6ad7c1ce913c3a05cdc13"
+    },
+    {
+      "source": "charts/hip-subcharts-nested",
+      "name": "parent-z",
+      "version": "0.1.0",
+      "apiVersion": "v3",
+      "archive": "parent-z-0.1.0.tgz",
+      "sha256": "81410cb307cfa7030ea46af0e2e9a8c61f436791eee3b9a44506b5d37344acb2"
+    },
+    {
+      "source": "charts/v2-annotated",
+      "name": "v2-annotated",
+      "version": "0.1.0",
+      "apiVersion": "v2",
+      "archive": "v2-annotated-0.1.0.tgz",
+      "sha256": "d1010167fd1c25c457100ac8954f9c6df255c145042129f36cec770696ef19b9"
+    }
+  ],
+  "finished_utc": "2026-10-08T08:51:55Z",
+  "exit_code": 0
+}

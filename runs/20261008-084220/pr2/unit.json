@@ -1,0 +1,48 @@
+{
+  "tier": "pr2",
+  "base": "c7c762a4c7f5334a4e42f2b73d8f45f33d7051b3",
+  "head": "453cda84c9bbfd8276b040673153f01d75d4314b",
+  "packages": [
+    {
+      "package": "internal/chart/v3/lint/rules",
+      "scope": "all tests",
+      "passed": true,
+      "seconds": 7.8,
+      "log": "unit-internal_chart_v3_lint_rules.log",
+      "summary": "ok  \thelm.sh/helm/v4/internal/chart/v3/lint/rules\t0.794s"
+    },
+    {
+      "package": "internal/release/v2/manifest",
+      "scope": "all tests",
+      "passed": true,
+      "seconds": 0.1,
+      "log": "unit-internal_release_v2_manifest.log",
+      "summary": "?   \thelm.sh/helm/v4/internal/release/v2/manifest\t[no test files]"
+    },
+    {
+      "package": "internal/release/v2/resourcegroup",
+      "scope": "all tests (package added by the PR)",
+      "passed": true,
+      "seconds": 3.4,
+      "log": "unit-internal_release_v2_resourcegroup.log",
+      "summary": "ok  \thelm.sh/helm/v4/internal/release/v2/resourcegroup\t1.018s"
+    },
+    {
+      "package": "internal/release/v2/sequence",
+      "scope": "all tests",
+      "passed": true,
+      "seconds": 2.6,
+      "log": "unit-internal_release_v2_sequence.log",
+      "summary": "ok  \thelm.sh/helm/v4/internal/release/v2/sequence\t0.532s"
+    },
+    {
+      "package": "pkg/action",
+      "scope": "all tests",
+      "passed": true,
+      "seconds": 36.9,
+      "log": "unit-pkg_action.log",
+      "summary": "ok  \thelm.sh/helm/v4/pkg/action\t30.501s"
+    }
+  ],
+  "passed": true
+}

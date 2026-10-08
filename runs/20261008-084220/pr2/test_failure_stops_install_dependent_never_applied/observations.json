@@ -1,0 +1,16 @@
+[
+  {
+    "label": "install",
+    "value": "exit 1 after 45s: context deadline exceeded"
+  },
+  {
+    "label": "apiserver timeline",
+    "value": [
+      "08:44:46.662  apply  Deployment/broken"
+    ]
+  },
+  {
+    "label": "release status",
+    "value": "failed"
+  }
+]

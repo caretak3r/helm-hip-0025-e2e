@@ -1,0 +1,18 @@
+[
+  {
+    "label": "Probe count changes",
+    "value": [
+      [
+        "08:50:32.307",
+        3
+      ]
+    ]
+  },
+  {
+    "label": "apiserver timeline",
+    "value": [
+      "08:50:32.307  status Probe/probe count=3 (test patch)",
+      "08:50:32.312  helm writes release record: deployed"
+    ]
+  }
+]

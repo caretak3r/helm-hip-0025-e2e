@@ -1,0 +1,18 @@
+[
+  {
+    "label": "phase changes",
+    "value": [
+      [
+        "08:44:45.821",
+        "Ready"
+      ]
+    ]
+  },
+  {
+    "label": "apiserver timeline",
+    "value": [
+      "08:44:45.821  status Probe/probe phase=Ready (test patch)",
+      "08:44:45.829  helm writes release record: deployed"
+    ]
+  }
+]

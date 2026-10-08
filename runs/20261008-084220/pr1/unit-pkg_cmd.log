@@ -1,0 +1,2 @@
+$ go test -count=1 ./pkg/cmd/ -run ^(TestDagCmd|TestDagCmd_Errors|TestDagCmd_GateDisabled|TestDagCmd_NonexistentChart|TestDagCmd_RequiresChartArg|TestOrderedWaitRequiresChartV3|TestReadinessTimeout|TestWaitFlag)$
+ok  	helm.sh/helm/v4/pkg/cmd	0.914s

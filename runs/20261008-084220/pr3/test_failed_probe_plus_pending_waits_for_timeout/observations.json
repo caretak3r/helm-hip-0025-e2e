@@ -1,0 +1,14 @@
+[
+  {
+    "label": "install exit code",
+    "value": 1
+  },
+  {
+    "label": "elapsed seconds",
+    "value": 30.1
+  },
+  {
+    "label": "error message",
+    "value": "Error: INSTALLATION FAILED: resource Probe/e2e-pr3-failed-probe-plus-pending-waits-for-timeout/probe1 not ready. status: Failed, message: custom readiness failure condition met\nresource Probe/e2e-pr3-failed-probe-plus-pending-waits-for-timeout/probe2 not ready. status: InProgress, message: waiting for custom readiness conditions\ncontext deadline exceeded\n"
+  }
+]

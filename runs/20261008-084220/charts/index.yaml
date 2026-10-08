@@ -1,0 +1,133 @@
+apiVersion: v1
+entries:
+  hip-groups:
+  - apiVersion: v3
+    name: hip-groups
+    version: 0.1.0
+    description: HIP-0025 "Template examples" (database, queue -> app) plus the three
+      unsequenced cases
+    created: '2026-10-08T08:42:20Z'
+    digest: bf37c35e80bb2a8c9fe01a5aaf8c0b1d489c900bcbe2953a077c367e0dfcf7a4
+    urls:
+    - hip-groups-0.1.0.tgz
+  hip-groups-cycle:
+  - apiVersion: v3
+    name: hip-groups-cycle
+    version: 0.1.0
+    description: R24 circular group dependency - A -> B -> C -> A
+    created: '2026-10-08T08:42:20Z'
+    digest: bdd5a76bd42fc9944fcdbe0d6b210e34f3244bec3ddb02e610a8275298a3963c
+    urls:
+    - hip-groups-cycle-0.1.0.tgz
+  hip-groups-sandbox:
+  - apiVersion: v3
+    name: hip-groups-sandbox
+    version: 0.1.0
+    description: R23 sandbox - parent and subchart both define groups with opposite
+      edges
+    created: '2026-10-08T08:42:20Z'
+    digest: 1e072a95bca3590140541d2625a7225babd891a5ca89ab98decca3e11d1119be
+    urls:
+    - hip-groups-sandbox-0.1.0.tgz
+  hip-groups-upgrade:
+  - apiVersion: v3
+    name: hip-groups-upgrade
+    version: 0.1.0
+    description: R08 groups - upgrade patches follow group order
+    created: '2026-10-08T08:42:20Z'
+    digest: 92fbce0f03b11ddb3d10cce652f836ca9768c6772d461c30f45c4b47f3ad288b
+    urls:
+    - hip-groups-upgrade-0.1.0.tgz
+  hip-lifecycle:
+  - apiVersion: v3
+    name: hip-lifecycle
+    version: 0.1.0
+    description: Parent with sequenced subcharts a -> b -> parent for lifecycle tests
+      (upgrade, uninstall, rollback)
+    created: '2026-10-08T08:42:20Z'
+    digest: a06bfada6ae70d40af6663b9623c1f428a400fe5a96a90387450c86e6e31ac5c
+    urls:
+    - hip-lifecycle-0.1.0.tgz
+  hip-lifecycle-failure:
+  - apiVersion: v3
+    name: hip-lifecycle-failure
+    version: 0.1.0
+    description: Chart with a never-ready subchart to test failure handling
+    created: '2026-10-08T08:42:20Z'
+    digest: 81e8152aaa1933a7b0b80d787bb8622d75d773712e5416c99b0916521777b912
+    urls:
+    - hip-lifecycle-failure-0.1.0.tgz
+  hip-lifecycle-hooks:
+  - apiVersion: v3
+    name: hip-lifecycle-hooks
+    version: 0.1.0
+    description: Chart with hooks that should not be sequenced, plus sequenced subcharts
+    created: '2026-10-08T08:42:20Z'
+    digest: ff795f70d0fc5a7dfd934c6c329dfd5d61128389c6b3dc3354fcb2509a404533
+    urls:
+    - hip-lifecycle-hooks-0.1.0.tgz
+  hip-readiness-basic:
+  - apiVersion: v3
+    name: hip-readiness-basic
+    version: 0.1.0
+    description: HIP-0025 PR3 readiness annotations - Probe with configurable expressions
+    created: '2026-10-08T08:42:20Z'
+    digest: 2534a8588e3d9ccf9834f1757ed48ede56dcd930bd7478e784352ce53d2172f7
+    urls:
+    - hip-readiness-basic-0.1.0.tgz
+  hip-readiness-gate:
+  - apiVersion: v3
+    name: hip-readiness-gate
+    version: 0.1.0
+    description: HIP-0025 R36 custom readiness gates sequencing - Probe gates Deployment
+    created: '2026-10-08T08:42:20Z'
+    digest: e75229a71dc975b47d7a4d0c1ab2ffaa7da4ed9f5721f8d2538785e6c9fc8754
+    urls:
+    - hip-readiness-gate-0.1.0.tgz
+  foo:
+  - apiVersion: v3
+    name: foo
+    version: 0.1.0
+    description: HIP-0025 Chart dependencies example (nginx,rabbitmq -> bar -> foo)
+    created: '2026-10-08T08:42:20Z'
+    digest: e5cb6705dbea067f70cddcf9d0549cd38647ea73ba45e6fa9a04b7cd397e6fb7
+    urls:
+    - foo-0.1.0.tgz
+  hip-subcharts-alias:
+  - apiVersion: v3
+    name: hip-subcharts-alias
+    version: 0.1.0
+    description: Subchart ordering with alias references (R03)
+    created: '2026-10-08T08:42:20Z'
+    digest: 2ad3522e71c23a882040ade1fd685658e19fdca1213a7535ec433435c360af55
+    urls:
+    - hip-subcharts-alias-0.1.0.tgz
+  hip-subcharts-cycle:
+  - apiVersion: v3
+    name: hip-subcharts-cycle
+    version: 0.1.0
+    description: Subchart dependency cycle (a depends-on b, b depends-on a)
+    created: '2026-10-08T08:42:20Z'
+    digest: 3bb3813a3d5898e193a14daee0d4d02fd2967cca92a6ad7c1ce913c3a05cdc13
+    urls:
+    - hip-subcharts-cycle-0.1.0.tgz
+  parent-z:
+  - apiVersion: v3
+    name: parent-z
+    version: 0.1.0
+    description: 3-level nesting test (parent-z -> child-b -> grandchild-a)
+    created: '2026-10-08T08:42:20Z'
+    digest: 81410cb307cfa7030ea46af0e2e9a8c61f436791eee3b9a44506b5d37344acb2
+    urls:
+    - parent-z-0.1.0.tgz
+  v2-annotated:
+  - apiVersion: v2
+    name: v2-annotated
+    version: 0.1.0
+    description: R14 v2 chart with group annotations - must work with plain --wait,
+      reject --wait=ordered
+    created: '2026-10-08T08:42:20Z'
+    digest: d1010167fd1c25c457100ac8954f9c6df255c145042129f36cec770696ef19b9
+    urls:
+    - v2-annotated-0.1.0.tgz
+generated: '2026-10-08T08:42:20Z'

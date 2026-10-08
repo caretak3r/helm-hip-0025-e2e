@@ -1,0 +1,22 @@
+[
+  {
+    "label": "install exit code",
+    "value": 1
+  },
+  {
+    "label": "install stderr",
+    "value": "Error: INSTALLATION FAILED: subchart circular dependency detected in hip-subcharts-cycle: cycle detected among nodes: a, b\n"
+  },
+  {
+    "label": "helm apply count",
+    "value": 0
+  },
+  {
+    "label": "lint exit code",
+    "value": 1
+  },
+  {
+    "label": "lint output",
+    "value": "==> Linting charts/hip-subcharts-cycle\n[INFO] Chart.yaml: icon is recommended\n[INFO] values.yaml: file does not exist\n[ERROR] /Users/rohit/Documents/helm-hip-0025-e2e/charts/hip-subcharts-cycle: subchart circular dependency detected in hip-subcharts-cycle: cycle detected among nodes: a, b\n\nError: 1 chart(s) linted, 1 chart(s) failed\n"
+  }
+]

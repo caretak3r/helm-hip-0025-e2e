@@ -1,0 +1,14 @@
+[
+  {
+    "label": "uninstall timeline",
+    "value": [
+      "08:44:01.045  delete Deployment/parent",
+      "08:44:01.045  delete Deployment/subchart-b",
+      "08:44:01.045  delete Deployment/subchart-a"
+    ]
+  },
+  {
+    "label": "delete spread",
+    "value": "0.000s"
+  }
+]

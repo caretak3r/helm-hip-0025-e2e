@@ -1,0 +1,30 @@
+08:51:37.646 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-readiness-operators-pending-ready-ready-phase-equa --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+08:51:37.693 $ kubectl --context kind-hip0025-e2e create namespace e2e-combined-readiness-operators-pending-ready-ready-phase-equa
+[exit 0, 0.0s]
+namespace/e2e-combined-readiness-operators-pending-ready-ready-phase-equa created
+
+
+08:51:40.742 $ kubectl --context kind-hip0025-e2e patch Probe probe -n e2e-combined-readiness-operators-pending-ready-ready-phase-equa --subresource=status --type=merge -p {"status": {"phase": "Ready"}}
+[exit 0, 0.1s]
+probe.readiness.hip0025.example/probe patched
+
+
+08:51:37.738 $ .bin/helm-combined install r charts/hip-readiness-basic -f runs/20261008-084220/combined/test_readiness_operators_-Pending-Ready-Ready-phase-equality_string_/values.yaml --namespace e2e-combined-readiness-operators-pending-ready-ready-phase-equa --wait --timeout 2m --kube-context kind-hip0025-e2e
+[exit 0, 3.1s]
+NAME: r
+LAST DEPLOYED: Thu Oct  8 04:51:37 2026
+NAMESPACE: e2e-combined-readiness-operators-pending-ready-ready-phase-equa
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+
+
+08:51:41.807 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-readiness-operators-pending-ready-ready-phase-equa --wait=false
+[exit 0, 0.0s]
+namespace "e2e-combined-readiness-operators-pending-ready-ready-phase-equa" deleted
+
+

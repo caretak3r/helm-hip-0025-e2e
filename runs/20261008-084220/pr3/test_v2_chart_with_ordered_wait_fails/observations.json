@@ -1,0 +1,18 @@
+[
+  {
+    "label": "install exit code",
+    "value": 1
+  },
+  {
+    "label": "stderr",
+    "value": "Error: invalid argument \"ordered\" for \"--wait\" flag: invalid wait input \"ordered\". Valid inputs are watcher, hookOnly, and legacy\n"
+  },
+  {
+    "label": "error type",
+    "value": "flag-invalid"
+  },
+  {
+    "label": "releases in namespace",
+    "value": []
+  }
+]

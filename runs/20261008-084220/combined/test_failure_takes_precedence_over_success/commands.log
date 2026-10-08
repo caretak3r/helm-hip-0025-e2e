@@ -1,0 +1,24 @@
+08:50:33.371 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-failure-takes-precedence-over-success --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+08:50:33.417 $ kubectl --context kind-hip0025-e2e create namespace e2e-combined-failure-takes-precedence-over-success
+[exit 0, 0.0s]
+namespace/e2e-combined-failure-takes-precedence-over-success created
+
+
+08:50:35.461 $ kubectl --context kind-hip0025-e2e patch Probe probe -n e2e-combined-failure-takes-precedence-over-success --subresource=status --type=merge -p {"status": {"phase": "Ready"}}
+[exit 0, 0.1s]
+probe.readiness.hip0025.example/probe patched
+
+
+08:50:33.457 $ .bin/helm-combined install r charts/hip-readiness-basic -f runs/20261008-084220/combined/test_failure_takes_precedence_over_success/values.yaml --namespace e2e-combined-failure-takes-precedence-over-success --wait --timeout 1m --kube-context kind-hip0025-e2e
+[exit 1, 2.1s]
+Error: INSTALLATION FAILED: resource Probe/e2e-combined-failure-takes-precedence-over-success/probe not ready. status: Failed, message: custom readiness failure condition met
+
+
+08:50:35.519 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-failure-takes-precedence-over-success --wait=false
+[exit 0, 0.0s]
+namespace "e2e-combined-failure-takes-precedence-over-success" deleted
+
+

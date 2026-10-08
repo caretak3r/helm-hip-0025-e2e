@@ -1,0 +1,19 @@
+08:46:30.579 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr1-readiness-timeout-exceeds-timeout-rejected --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+08:46:30.622 $ kubectl --context kind-hip0025-e2e create namespace e2e-pr1-readiness-timeout-exceeds-timeout-rejected
+[exit 0, 0.0s]
+namespace/e2e-pr1-readiness-timeout-exceeds-timeout-rejected created
+
+
+08:46:30.663 $ .bin/helm-pr1 install r charts/hip-lifecycle-failure --namespace e2e-pr1-readiness-timeout-exceeds-timeout-rejected --wait=ordered --readiness-timeout 3m --timeout 2m --kube-context kind-hip0025-e2e
+[exit 1, 0.0s]
+Error: INSTALLATION FAILED: --readiness-timeout (3m0s) must not exceed --timeout (2m0s)
+
+
+08:46:31.707 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr1-readiness-timeout-exceeds-timeout-rejected --wait=false
+[exit 0, 0.0s]
+namespace "e2e-pr1-readiness-timeout-exceeds-timeout-rejected" deleted
+
+

@@ -1,0 +1,11 @@
+probes:
+- failureExpressions:
+  - '{.phase} == Failed'
+  name: probe1
+  successExpressions:
+  - '{.phase} == Ready'
+- failureExpressions:
+  - '{.phase} == Failed'
+  name: probe2
+  successExpressions:
+  - '{.phase} == Ready'
