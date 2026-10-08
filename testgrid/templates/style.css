@@ -116,3 +116,9 @@ pre.reason { white-space: pre-wrap; border-left: 3px solid var(--fail); }
 dl.kv { display: grid; grid-template-columns: max-content 1fr; gap: 0.3rem 1rem; font-size: 0.85rem; }
 dl.kv dt { color: var(--muted); font-weight: 600; }
 dl.kv dd { margin: 0; }
+
+/* charts */
+table.data .doc { display: block; color: var(--muted); font-size: 0.76rem; }
+ul.files { font-size: 0.82rem; margin: 0.3rem 0 0.8rem; }
+.filename { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.82rem; font-weight: 700;
+  margin: 1.1rem 0 0.2rem; }

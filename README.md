@@ -24,8 +24,9 @@ The three pull requests split the umbrella pull request
 2. It runs the Go unit tests of each pull request on the pull request commit, without other changes.
 3. For each tier, it applies the patches in `wiring/` and builds a `helm` binary, `.bin/helm-<tier>`.
 4. It creates a kind cluster with kube-apiserver audit logging (`scripts/cluster-up.sh`).
-5. It runs the tests in `e2e/tests/` for all tiers at the same time. Each test uses its own namespace.
-6. It writes the evidence to `runs/<stamp>/` and grades the run against the HIP requirements in `requirements.yaml`.
+5. It packs each chart in `charts/` into `runs/<stamp>/charts/`, a Helm chart repository.
+6. It runs the tests in `e2e/tests/` for all tiers at the same time. Each test uses its own namespace.
+7. It writes the evidence to `runs/<stamp>/` and grades the run against the HIP requirements in `requirements.yaml`.
 
 Each test runs the real `helm` command and then reads the result from the cluster. The order of the requests and
 the readiness of the objects come from the kube-apiserver audit log. Thus all timestamps in the evidence come from
@@ -52,6 +53,8 @@ The [dashboard](https://caretak3r.github.io/helm-hip-0025-e2e/) shows each run i
 - a grid of requirements × tiers and a grid of tests × tiers,
 - before-and-after pairs (the same operation without and with the feature),
 - the commands, observations and audit records of each test,
+- the charts that the tests read: one page for each chart with all of its files, and the chart archives as a Helm
+  chart repository,
 - the commits, patch checksums, source tree IDs and binary checksums of each build,
 - the Go unit tests of each pull request.
 
@@ -171,6 +174,36 @@ foo        2026-10-05T18:36:44Z
 
 `charts/README.md` describes the other charts.
 
+### Inspect or install the charts of a run
+
+Each run keeps the charts that its tests read in `runs/<stamp>/charts/`. This folder is a Helm chart repository:
+`index.yaml` and one archive for each chart directory. An archive holds the files that helm loads from the chart
+directory, byte for byte. On the dashboard, the run page links to a page for each chart with all of its files and
+the tests that read it.
+
+The charts use apiVersion v3, so use a `helm` binary of a tier:
+
+```bash
+make build TIERS=combined
+make cluster
+export HELM_EXPERIMENTAL_CHART_V3=1
+helm=.bin/helm-combined
+ctx=kind-hip0025-e2e
+stamp=$(ls runs | tail -n 1)   # the newest run
+
+# From the dashboard
+$helm repo add hip0025-$stamp https://caretak3r.github.io/helm-hip-0025-e2e/$stamp/charts
+$helm search repo hip0025-$stamp
+$helm show all hip0025-$stamp/hip-groups
+$helm install r hip0025-$stamp/hip-groups --wait=ordered --kube-context $ctx -n demo-repo --create-namespace
+
+# Or from the archive in this repository
+$helm install r runs/$stamp/charts/hip-groups-0.1.0.tgz --wait=ordered --kube-context $ctx -n demo-archive --create-namespace
+```
+
+The run does not use `helm package`. The tier binaries stop with `invalid chart apiVersion` for a chart v3, and for
+a chart v2 they write `Chart.yaml` again without the `depends-on` key.
+
 ## Repository layout
 
 | Path | Content |
@@ -184,7 +217,7 @@ foo        2026-10-05T18:36:44Z
 | `wiring/` | The test-only patches ([wiring/README.md](wiring/README.md)) |
 | `kind/`, `scripts/` | The kind cluster, the audit policy and the helper scripts |
 | `testgrid/` | The dashboard generator |
-| `runs/` | The evidence of each published run |
+| `runs/` | The evidence of each published run, with the charts of the run in `runs/<stamp>/charts/` |
 | `.github/workflows/pages.yml` | Builds the dashboard from `runs/` and publishes it on GitHub Pages |
 
 ## License

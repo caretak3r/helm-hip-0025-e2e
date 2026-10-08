@@ -20,6 +20,7 @@ from grade import (
     pr_summary,
     tests_for,
 )
+from paths import SITE_URL
 
 
 def _built_from(data: dict, tier: str) -> str:
@@ -46,6 +47,9 @@ def render(run: Path) -> Path:
       "Every ordering fact and every readiness fact below comes from the kube-apiserver audit log: one clock, "
       "microsecond timestamps. The requirement catalog is `requirements.yaml`.")
     w("")
+    if meta.get("charts"):
+        w("The run keeps the charts that the tests read as a Helm chart repository: see [Charts](#charts).")
+        w("")
     w("Upstream Helm cannot install chart-v3 releases yet. For this reason every tier also contains the test-only "
       "patches in `wiring/`. The patches connect the `helm` commands to the code of each PR. They do not decide "
       "the order or the readiness of resources.")
@@ -155,9 +159,40 @@ def render(run: Path) -> Path:
             res = "✓ pass" if pkg["passed"] else f"✗ {pkg['summary']}"
             w(f"| `{pkg['package']}` | {pkg['scope']} | [{res}]({tier}/{pkg['log']}) | {pkg['seconds']}s |")
     w("")
+    _charts(lines, run, meta.get("charts", []))
     md = run / "REPORT.md"
     md.write_text("\n".join(lines) + "\n")
     return md
+
+
+def _charts(lines: list[str], run: Path, charts: list[dict]) -> None:
+    if not charts:  # a run from before the chart archives
+        return
+    w = lines.append
+    example = next((c for c in charts if c["apiVersion"] == "v3"), charts[0])
+    w("## Charts")
+    w("")
+    w("[`charts/`](charts/index.yaml) is a Helm chart repository with one archive for each chart directory that the "
+      "tests read. An archive holds the files that helm loads from the chart directory, byte for byte.")
+    w("")
+    w("| Chart directory | Chart | Archive | sha256 |")
+    w("|---|---|---|---|")
+    for c in charts:
+        w(f"| `{c['source']}` | `{c['name']}` {c['version']}, apiVersion {c['apiVersion']} "
+          f"| [{c['archive']}](charts/{c['archive']}) | `{c['sha256'][:16]}` |")
+    w("")
+    w("To inspect or install a chart, use a `helm` binary of a tier (`make build TIERS=combined`):")
+    w("")
+    w("```bash")
+    w("export HELM_EXPERIMENTAL_CHART_V3=1")
+    w("helm=.bin/helm-combined")
+    w(f"$helm show all runs/{run.name}/charts/{example['archive']}")
+    w(f"$helm install r runs/{run.name}/charts/{example['archive']} --wait=ordered -n demo --create-namespace")
+    w("# or from the published chart repository")
+    w(f"$helm repo add hip0025-{run.name} {SITE_URL}{run.name}/charts")
+    w(f"$helm install r hip0025-{run.name}/{example['name']} --wait=ordered -n demo --create-namespace")
+    w("```")
+    w("")
 
 
 def _obs_lines(value) -> list[str]:

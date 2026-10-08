@@ -1,4 +1,5 @@
 {% extends "base.html.j2" %}
+{% import "macros.html.j2" as m %}
 {% block title %}Run {{ run.stamp }} · HIP-0025 black-box tests{% endblock %}
 {% block crumbs %} / run {{ run.stamp }}{% endblock %}
 {% block heading %}Run {{ run.stamp }}{% endblock %}
@@ -15,8 +16,8 @@
 </p>
 <nav class="toc">
   <a href="#verdicts">Verdict per PR</a> · <a href="#requirements">Requirements</a> · <a href="#tests">Tests</a> ·
-  <a href="#before-after">Before and after</a> · <a href="#builds">Builds</a> · <a href="#unit">Go unit tests</a> ·
-  <a href="#files">Files</a>
+  <a href="#before-after">Before and after</a> · <a href="#charts">Charts</a> · <a href="#builds">Builds</a> ·
+  <a href="#unit">Go unit tests</a> · <a href="#files">Files</a>
 </nav>
 
 <section id="verdicts">
@@ -111,7 +112,9 @@
   {% for p in run.before_after %}
   <article class="pair">
     <h3>{{ p.title }}</h3>
-    <p class="muted">Chart {% if run.harness.tree %}<a href="{{ run.harness.tree }}/charts/{{ p.chart }}"><code>charts/{{ p.chart }}</code></a>{% else %}<code>charts/{{ p.chart }}</code>{% endif %} · tier {{ p.tier_label }}</p>
+    {% set chart = run.charts.by_dir.get(p.chart) %}
+    {% set href = m.chart_href(chart, "") if chart else "" %}
+    <p class="muted">Chart {% if href %}<a href="{{ href }}"><code>charts/{{ p.chart }}</code></a>{% else %}<code>charts/{{ p.chart }}</code>{% endif %} · tier {{ p.tier_label }}</p>
     <p>{{ p.look_for }}</p>
     <div class="sides">
       {% for s in p.sides %}
@@ -134,6 +137,20 @@
     </div>
   </article>
   {% endfor %}
+</section>
+
+<section id="charts">
+  <h2>Charts</h2>
+  {% if run.charts.archived %}
+  <p class="hint">The tests read these charts. The run keeps each chart as an archive in a Helm chart repository,
+    <a href="charts/index.html">charts/</a>. Click a chart to see its files and the commands that inspect or install
+    it. To add the repository to a <code>helm</code> binary of a tier:</p>
+  <pre class="cmds">helm repo add {{ run.charts.repo_name }} {{ run.charts.repo_url }}</pre>
+  {% else %}
+  <p class="hint">The tests read these charts. This run did not keep chart archives, so the links go to the chart
+    directories in the harness commit.</p>
+  {% endif %}
+  {{ m.chart_table(run.charts.all, "", run.charts.archived) }}
 </section>
 
 <section id="builds">
@@ -208,6 +225,9 @@
     <li><a href="run.json">run.json</a>: the environment and the harness commit of the run</li>
     <li><a href="tiers.yaml">tiers.yaml</a>: the pinned commits and the wiring of each tier</li>
     <li><a href="requirements.yaml">requirements.yaml</a>: the requirement catalog that graded the run</li>
+    {% if run.charts.archived %}
+    <li><a href="charts/index.yaml">charts/index.yaml</a> and the chart archives: the charts that the tests read, as a Helm chart repository</li>
+    {% endif %}
     {% for tv in run.tiers %}
     <li>{{ tv.label }}: <a href="{{ tv.id }}/results.json">results.json</a>, <a href="{{ tv.id }}/pytest.log">pytest.log</a>, <a href="{{ tv.id }}/build.json">build.json</a>{% if tv.unit %}, <a href="{{ tv.id }}/unit.json">unit.json</a>{% endif %}</li>
     {% endfor %}

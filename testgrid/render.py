@@ -34,6 +34,16 @@ def _ticks(text: str) -> Markup:
     return Markup(TICKS.sub(r"<code>\1</code>", str(escape(text))))
 
 
+def _chart_links(text: str, hrefs: dict[str, str]) -> Markup:
+    """Escape a commands log, then link each charts/<dir> argument to the chart."""
+
+    def link(m: re.Match) -> str:
+        href = hrefs.get(m[2])
+        return f'{m[1]}<a href="{escape(href)}">charts/{m[2]}</a>' if href else m[0]
+
+    return Markup(collect.CHART_REF.sub(link, str(escape(text))))
+
+
 def _env() -> Environment:
     env = Environment(loader=FileSystemLoader(TEMPLATES), autoescape=True, trim_blocks=True, lstrip_blocks=True,
                       undefined=StrictUndefined, keep_trailing_newline=True)
@@ -41,6 +51,7 @@ def _env() -> Environment:
     env.filters["size"] = lambda n: f"{n / 1024:.1f} KB" if n >= 1024 else f"{n} B"
     env.filters["lines"] = _lines
     env.filters["ticks"] = _ticks
+    env.filters["chartlinks"] = _chart_links
     return env
 
 
@@ -111,15 +122,28 @@ def build(runs_dir: Path, out: Path) -> dict:
             files += _copy_files(run["dir"] / tv["id"], run_out / tv["id"])
         _write(env, "run.html.j2", run_out / "index.html", root="../", repo=repo, run=run)
         pages += 1
+        charts = run["charts"]
+        if charts["archived"]:  # the run's chart repository: index.yaml, the archives, one page per chart
+            files += _copy_files(run["dir"] / "charts", run_out / "charts")
+            _write(env, "charts.html.j2", run_out / "charts" / "index.html", root="../../", repo=repo, run=run)
+            pages += 1
+            for chart in charts["all"]:
+                if chart["page"]:
+                    _write(env, "chart.html.j2", run_out / chart["page"], root="../../../", repo=repo, run=run,
+                           chart=chart)
+                    pages += 1
         reqs = {row["id"]: row for row in run["req_rows"]}
         for tv, test in run["pages"]:
             src = run["dir"] / tv["id"] / collect.test_dir(test)
             dst = run_out / tv["id"] / collect.test_dir(test)
             files += _copy_files(src, dst)
+            used = [charts["by_dir"][name] for name in charts["uses"].get(tv["id"], {}).get(test["name"], [])]
+            hrefs = {c["dir"]: f"../../{c['page']}" if c["page"] else c["tree"] for c in used if c["page"] or c["tree"]}
             _write(env, "test.html.j2", dst / "index.html", root="../../../", repo=repo, run=run, tier=tv,
                    test=test, css=collect.OUTCOME_CSS.get(test["outcome"], "na"),
                    outcome=collect.grade.outcome_text(test), evidence=_evidence(src),
-                   reqs=[reqs[r] for r in test["reqs"] if r in reqs], others=_others(run, tv, test))
+                   reqs=[reqs[r] for r in test["reqs"] if r in reqs], others=_others(run, tv, test),
+                   charts=used, chart_hrefs=hrefs)
             pages += 1
     _write(env, "index.html.j2", out / "index.html", root="", repo=repo, runs=runs)
     return {"runs": len(runs), "pages": pages + 1, "files": files}

@@ -1,0 +1,62 @@
+{% extends "base.html.j2" %}
+{% block title %}{{ chart.source }} · run {{ run.stamp }} · HIP-0025 black-box tests{% endblock %}
+{% block crumbs %} / <a href="../../index.html">run {{ run.stamp }}</a> / <a href="../index.html">charts</a> / {{ chart.dir }}{% endblock %}
+{% block heading %}<code>{{ chart.source }}</code>{% endblock %}
+{% block main %}
+{% set v3 = chart.apiVersion == 'v3' %}
+<p class="lead">Chart <code>{{ chart.name }}</code> {{ chart.version }} · apiVersion {{ chart.apiVersion }} ·
+  archive <a href="../{{ chart.archive }}">{{ chart.archive }}</a> ({{ chart.bytes | size }}) ·
+  sha256 <code>{{ chart.sha256 }}</code></p>
+<p>{{ chart.description }}</p>
+{% if chart.tree %}<p class="muted">Source: <a href="{{ chart.tree }}">{{ chart.source }}</a> in the harness commit.</p>{% endif %}
+
+<section>
+  <h2>Tests that read this chart</h2>
+  {% if chart.used_by %}
+  <ul>
+    {% for name, rows in chart.used_by | groupby('test') %}
+    <li><code>{{ name }}</code>: {% for u in rows %}<a href="../../{{ u.link }}">{{ u.tier }}</a>{{ ' · ' if not loop.last }}{% endfor %}</li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="muted">No test of this run read the chart.</p>
+  {% endif %}
+</section>
+
+<section>
+  <h2>Inspect or install it</h2>
+  <p class="hint">{% if v3 %}Upstream Helm cannot install a chart v3 yet. {% endif %}Use a <code>helm</code> binary of
+    a tier: clone {% if repo %}<a href="{{ repo }}">the repository</a>{% else %}the repository{% endif %} and run
+    <code>make build TIERS=combined</code>. Some charts must fail; the tests above show the expected result.
+    <a href="../index.html">All charts of the run</a> are also a Helm chart repository.</p>
+  <pre class="cmds">
+{% if v3 %}
+export HELM_EXPERIMENTAL_CHART_V3=1
+{% endif %}
+helm=.bin/helm-combined
+chart={{ run.charts.repo_url }}/{{ chart.archive }}
+
+$helm show all $chart
+$helm pull $chart --untar
+$helm install r $chart {{ '--wait=ordered' if v3 else '--wait' }} -n demo --create-namespace</pre>
+</section>
+
+<section>
+  <h2>Files</h2>
+  <p class="hint">The {{ chart.files | length }} files in the archive: the files that helm loads from
+    <code>{{ chart.source }}</code>, byte for byte.</p>
+  <ul class="files">
+    {% for f in chart.files %}
+    <li><a href="#f{{ loop.index }}"><code>{{ f.path }}</code></a></li>
+    {% endfor %}
+  </ul>
+  {% for f in chart.files %}
+  <p class="filename" id="f{{ loop.index }}">{{ f.path }} <span class="muted">· {{ f.bytes | size }}</span></p>
+  {% if f.text is not none %}
+  <pre>{{ f.text }}</pre>
+  {% else %}
+  <p class="muted">A binary file.</p>
+  {% endif %}
+  {% endfor %}
+</section>
+{% endblock %}

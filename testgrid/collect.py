@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import re
 import sys
+import tarfile
 from collections import Counter
 from pathlib import Path
 
@@ -15,7 +16,9 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "e2e"))
+sys.path.insert(0, str(ROOT / "e2e" / "lib"))
 import grade  # noqa: E402
+from paths import SITE_URL  # noqa: E402
 
 PAIRS = Path(__file__).parent / "before_after.yaml"
 
@@ -39,6 +42,8 @@ MEANING_CSS = {"MET": "pass", "MET (extension)": "pass", "DEVIATION (documented)
 COMMAND = re.compile(r"^(\d\d:\d\d:\d\d\.\d{3}) \$ (.*)$")
 EXIT = re.compile(r"^\[exit (-?\d+), ([\d.]+)s\]$")
 SHA = re.compile(r"[0-9a-f]{40}")
+# A chart directory in a helm command: the tests pass charts/<dir>, relative to the repository root.
+CHART_REF = re.compile(r"(^|\s)charts/([\w.-]+)(?=\s|$)")
 
 
 def web(url: str) -> str:
@@ -71,6 +76,14 @@ def commands(log: Path, only_helm: bool = False) -> list[dict]:
     if only_helm:  # the binary under test: .bin/helm-<tier>
         out = [c for c in out if Path(c["cmd"].split(" ", 1)[0]).name.startswith("helm")]
     return out
+
+
+def chart_refs(log: Path) -> list[str]:
+    """The chart directories that the helm commands in a commands.log read, in order."""
+    refs: dict[str, None] = {}
+    for c in commands(log, only_helm=True):
+        refs.update((m[2], None) for m in CHART_REF.finditer(c["cmd"]))
+    return list(refs)
 
 
 def timeline(test: dict) -> dict | None:
@@ -203,6 +216,60 @@ def _before_after(run_dir: Path, tiers: list[dict]) -> list[dict]:
     return out
 
 
+def _archive_files(archive: Path) -> list[dict]:
+    """The files in a chart archive, in archive order, as text where they are UTF-8."""
+    files = []
+    with tarfile.open(archive) as tar:
+        for member in tar.getmembers():
+            if member.isfile():
+                data = tar.extractfile(member).read()
+                try:
+                    text = data.decode()
+                except UnicodeDecodeError:
+                    text = None
+                files.append({"path": member.name, "bytes": member.size, "text": text})
+    return files
+
+
+def _charts(run_dir: Path, meta: dict, harness: dict, tiers: list[dict]) -> dict:
+    """The charts that the tests of a run read, and the tests that read each chart.
+
+    A run keeps its charts as archives in runs/<stamp>/charts/ (run.json maps them). A run
+    from before the archives links to the chart directories in its harness commit."""
+    charts: dict[str, dict] = {}
+    for rec in meta.get("charts", []):
+        name = Path(rec["source"]).name
+        archive = run_dir / "charts" / rec["archive"]
+        files = _archive_files(archive)
+        chart_yaml = next(f["text"] for f in files if f["path"] == f"{rec['name']}/Chart.yaml")
+        charts[name] = {**rec, "page": f"charts/{name}/index.html", "bytes": archive.stat().st_size,
+                        "description": yaml.safe_load(chart_yaml).get("description", ""), "files": files}
+    archived = bool(charts)
+    uses: dict[str, dict[str, list[str]]] = {}
+    for tv in tiers:
+        for test in (tv["results"] or {}).get("tests", []):
+            if not test_dir(test):
+                continue
+            names = chart_refs(run_dir / tv["id"] / test_dir(test) / "commands.log")
+            uses.setdefault(tv["id"], {})[test["name"]] = names
+            for name in names:
+                chart = charts.setdefault(name, {"source": f"charts/{name}", "page": None})
+                chart.setdefault("used_by", []).append({"tier": tv["label"], "test": test["name"],
+                                                        "link": page(tv["id"], test)})
+    for name, chart in charts.items():
+        chart.setdefault("used_by", [])
+        chart["dir"] = name
+        chart["tree"] = f"{harness['tree']}/{chart['source']}" if harness["tree"] else None
+    return {
+        "archived": archived,
+        "all": [charts[name] for name in sorted(charts)],  # not "items": Jinja would find dict.items
+        "by_dir": charts,
+        "uses": uses,
+        "repo_name": f"hip0025-{run_dir.name}",
+        "repo_url": f"{SITE_URL}{run_dir.name}/charts" if archived else None,
+    }
+
+
 def load_run(run_dir: Path) -> dict:
     data = grade.load(run_dir)
     harness = _harness(data["meta"])
@@ -222,6 +289,7 @@ def load_run(run_dir: Path) -> dict:
         "req_rows": _req_rows(data, tiers),
         "test_groups": _test_groups(tiers),
         "before_after": _before_after(run_dir, tiers),
+        "charts": _charts(run_dir, data["meta"], harness, tiers),
         "pages": [(tv, t) for tv in tiers for t in (tv["results"] or {}).get("tests", []) if test_dir(t)],
     }
 

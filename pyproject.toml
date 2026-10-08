@@ -23,7 +23,7 @@ target-version = "py312"
 select = ["E", "F", "W", "I", "UP", "B"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["grade", "paths", "report", "timeline", "testgrid"]
+known-first-party = ["chartrepo", "grade", "paths", "report", "timeline", "testgrid"]
 
 [tool.ruff.lint.per-file-ignores]
 # Test docstrings are printed in the reports; keep each on one line.

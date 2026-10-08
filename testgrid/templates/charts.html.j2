@@ -1,0 +1,40 @@
+{% extends "base.html.j2" %}
+{% import "macros.html.j2" as m %}
+{% block title %}Charts · run {{ run.stamp }} · HIP-0025 black-box tests{% endblock %}
+{% block crumbs %} / <a href="../index.html">run {{ run.stamp }}</a> / charts{% endblock %}
+{% block heading %}Charts of run {{ run.stamp }}{% endblock %}
+{% block main %}
+{% set charts = run.charts %}
+{% set ex = charts.all | selectattr('page') | first %}
+<p class="lead">The tests of this run read these {{ charts.all | length }} charts. This folder is a Helm chart
+  repository: <a href="index.yaml">index.yaml</a> and one archive for each chart directory. An archive holds the
+  files that helm loads from the chart directory, byte for byte. Click a chart to see its files.</p>
+<p class="hint">The run did not use <code>helm package</code>: the tier binaries stop with
+  <code>invalid chart apiVersion</code> for a chart v3, and for a chart v2 they write <code>Chart.yaml</code> again
+  without the <code>depends-on</code> key.</p>
+
+<section>
+  <h2>Inspect or install the charts</h2>
+  <p class="hint">Upstream Helm cannot install a chart v3 yet. Use a <code>helm</code> binary of a tier: clone
+    {% if repo %}<a href="{{ repo }}">the repository</a>{% else %}the repository{% endif %} and run
+    <code>make build TIERS=combined</code>.</p>
+  <pre class="cmds">
+export HELM_EXPERIMENTAL_CHART_V3=1
+helm=.bin/helm-combined
+
+$helm repo add {{ charts.repo_name }} {{ charts.repo_url }}
+$helm search repo {{ charts.repo_name }}
+
+# Inspect a chart, or get its files
+$helm show all {{ charts.repo_name }}/{{ ex.name }}
+$helm pull {{ charts.repo_name }}/{{ ex.name }} --untar
+
+# Install it
+$helm install r {{ charts.repo_name }}/{{ ex.name }} {{ '--wait=ordered' if ex.apiVersion == 'v3' else '--wait' }} -n demo --create-namespace</pre>
+</section>
+
+<section>
+  <h2>Charts</h2>
+  {{ m.chart_table(charts.all, "../", true) }}
+</section>
+{% endblock %}

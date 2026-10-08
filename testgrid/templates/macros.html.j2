@@ -1,0 +1,30 @@
+{# Parts that several pages share. `up` is the path from the page to the folder of the run. #}
+
+{# The page of a chart that the run kept, or else the chart directory in the harness commit. #}
+{% macro chart_href(c, up) %}{% if c.page %}{{ up }}{{ c.page }}{% elif c.tree %}{{ c.tree }}{% endif %}{% endmacro %}
+
+{% macro chart_table(charts, up, archived, with_tests=true) %}
+<div class="scroll">
+<table class="data">
+  <thead><tr><th>Chart directory</th>{% if archived %}<th>Chart</th><th>Archive</th><th>sha256</th>{% endif %}{% if with_tests %}<th>Tests</th>{% endif %}</tr></thead>
+  <tbody>
+  {% for c in charts %}
+    {% set href = chart_href(c, up) %}
+    <tr>
+      <td class="mono">{% if href %}<a href="{{ href }}">{{ c.source }}</a>{% else %}{{ c.source }}{% endif %}</td>
+      {% if archived %}
+      {% if c.page %}
+      <td><code>{{ c.name }}</code> {{ c.version }} · apiVersion {{ c.apiVersion }}<span class="doc">{{ c.description }}</span></td>
+      <td class="mono"><a href="{{ up }}charts/{{ c.archive }}">{{ c.archive }}</a> · {{ c.bytes | size }}</td>
+      <td class="mono">{{ c.sha256[:16] }}</td>
+      {% else %}
+      <td colspan="3" class="muted">not in the chart archives of the run</td>
+      {% endif %}
+      {% endif %}
+      {% if with_tests %}<td>{{ c.used_by | map(attribute='test') | unique | list | length }}</td>{% endif %}
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endmacro %}

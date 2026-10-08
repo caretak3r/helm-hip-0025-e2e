@@ -38,3 +38,7 @@ export HELM_EXPERIMENTAL_CHART_V3=1
 .bin/helm-combined dag charts/hip-groups
 .bin/helm-combined install demo charts/hip-groups --wait=ordered --kube-context kind-hip0025-e2e -n demo --create-namespace
 ```
+
+Each run also keeps these charts as archives in `runs/<stamp>/charts/`, a Helm chart repository (see "Inspect or
+install the charts of a run" in the main README). The repository uses the chart names: the chart in
+`hip-subcharts` is `foo`, and the chart in `hip-subcharts-nested` is `parent-z`.

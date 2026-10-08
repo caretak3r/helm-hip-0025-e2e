@@ -1,4 +1,5 @@
 {% extends "base.html.j2" %}
+{% import "macros.html.j2" as m %}
 {% block title %}{{ test.name }} · {{ tier.label }} · run {{ run.stamp }}{% endblock %}
 {% block crumbs %} / <a href="../../index.html">run {{ run.stamp }}</a> / {{ tier.label }}{% endblock %}
 {% block heading %}<code>{{ test.name }}</code>{% endblock %}
@@ -45,11 +46,21 @@
   {% endfor %}
 </section>
 
+{% if charts %}
+<section>
+  <h2>Charts</h2>
+  <p class="hint">The charts that the <code>helm</code> commands below read.{% if run.charts.archived %} The run keeps
+    each chart as an archive. Click a chart to see its files and the commands that inspect or install it.{% else %}
+    This run did not keep chart archives, so the links go to the chart directories in the harness commit.{% endif %}</p>
+  {{ m.chart_table(charts, "../../", run.charts.archived, false) }}
+</section>
+{% endif %}
+
 <section>
   <h2>Commands</h2>
   <p class="hint">Every command that the test ran, in order, with the start time, the exit code and the output. The
     paths are relative to the root of the repository.</p>
-  <pre class="log">{{ evidence.log }}</pre>
+  <pre class="log">{{ evidence.log | chartlinks(chart_hrefs) }}</pre>
 </section>
 
 {% for name, text in evidence.inline.items() %}

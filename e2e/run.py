@@ -7,6 +7,7 @@
 
 Stages (tiers run in parallel where they are independent):
   sources  fetch the commits pinned in tiers.yaml from GitHub into .work/helm
+  charts   pack each chart in charts/ into runs/<stamp>/charts/, a Helm chart repository
   unit     each PR's own Go tests on the pure PR commit (no wiring), like CI on the PR
   build    PR commit + wiring patches -> .bin/helm-<tier> (skipped when the inputs did not change)
   e2e      pytest per tier against the kind cluster; evidence in runs/<stamp>/<tier>/
@@ -32,7 +33,8 @@ from pathlib import Path
 import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parent / "lib"))
-from paths import BIN, CLUSTER, CONTEXT, HARNESS_URL, ROOT, RUNS, WORK  # noqa: E402
+import chartrepo  # noqa: E402
+from paths import BIN, CHARTS, CLUSTER, CONTEXT, HARNESS_URL, ROOT, RUNS, WORK  # noqa: E402
 
 CFG = yaml.safe_load((ROOT / "tiers.yaml").read_text())
 TIERS = CFG["tiers"]
@@ -316,6 +318,9 @@ def run(tiers: list[str], args) -> Path:
     for name in ("tiers.yaml", "requirements.yaml"):  # grade the run against the catalog it ran with
         shutil.copy(ROOT / name, out / name)
     meta = run_meta(stamp, started, tiers, args)
+    # The archives hold the same bytes that the tests read from charts/; run.json maps them.
+    meta["charts"] = chartrepo.publish(CHARTS, out / "charts", created=started)
+    log(f"charts  {len(meta['charts'])} archives and index.yaml in {rel(out / 'charts')}")
 
     with cf.ThreadPoolExecutor(max_workers=8) as pool:
         unit_jobs = {pool.submit(unit, t, out / t): t for t in tiers if "commit" in TIERS[t] and not args.skip_unit}
