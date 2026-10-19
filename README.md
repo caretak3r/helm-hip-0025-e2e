@@ -20,13 +20,14 @@ The three pull requests split the umbrella pull request
 
 `make run` does these steps:
 
-1. It fetches the commits that `tiers.yaml` pins from github.com/caretak3r/helm and github.com/helm/helm.
-2. It runs the Go unit tests of each pull request on the pull request commit, without other changes.
-3. For each tier, it applies the patches in `wiring/` and builds a `helm` binary, `.bin/helm-<tier>`.
+1. It creates a new evidence directory and records the selected tiers before any fetch or cluster operation.
+2. It collects the full pytest suite without filters and saves the expected test IDs in `run.json`.
+3. It fetches the commits that `tiers.yaml` pins from github.com/caretak3r/helm and github.com/helm/helm.
 4. It creates a kind cluster with kube-apiserver audit logging (`scripts/cluster-up.sh`).
 5. It packs each chart in `charts/` into `runs/<stamp>/charts/`, a Helm chart repository.
-6. It runs the tests in `e2e/tests/` for all tiers at the same time. Each test uses its own namespace.
-7. It writes the evidence to `runs/<stamp>/` and grades the run against the HIP requirements in `requirements.yaml`.
+6. It runs each pull request's Go tests without wiring. In parallel, it builds the tier binaries with wiring.
+7. It runs the tests in `e2e/tests/` for all selected tiers. Each test uses its own namespace.
+8. It grades the evidence against `requirements.yaml` and writes `REPORT.md`, including incomplete runs.
 
 Each test runs the real `helm` command and then reads the result from the cluster. The order of the requests and
 the readiness of the objects come from the kube-apiserver audit log. Thus all timestamps in the evidence come from
@@ -63,7 +64,7 @@ The [dashboard](https://caretak3r.github.io/helm-hip-0025-e2e/) shows each run i
 ### Run 20261008-084220
 
 This run used the harness commit `768299181667`, a new kind cluster (Kubernetes v1.37.0) and new builds. The builds
-are byte-identical to the builds of run 20261005-184055. All tiers are green.
+are byte-identical to the builds of run 20261005-184055. The original report recorded all tiers as green.
 [Dashboard page](https://caretak3r.github.io/helm-hip-0025-e2e/20261008-084220/index.html),
 [REPORT.md](runs/20261008-084220/REPORT.md),
 [charts](https://caretak3r.github.io/helm-hip-0025-e2e/20261008-084220/charts/index.html).
@@ -74,6 +75,10 @@ are byte-identical to the builds of run 20261005-184055. All tiers are green.
 | PR2 | `453cda84c` | 8 graded: 7 met, 1 not implemented (R26) | 28 pass, 1 xfail (R26), 17 n/a | 5/5 packages pass |
 | PR3 | `b57469035` | 7 graded: 6 met, 1 extension (R37) | 19 pass, 27 n/a | 3/3 packages pass |
 | Combined | PR2 + PR3 | 30 graded: 27 met, 1 extension, 1 deviation, 1 not implemented | 45 pass, 1 xfail (R26) | — |
+
+These recorded outcomes remain unchanged. The current dashboard labels this run **LEGACY**, because it predates
+the full-suite collection, exit-code and phase records. This label describes the evidence format, not a newly
+observed feature failure. The historical files and original report remain unchanged.
 
 ### Verdicts
 
@@ -87,6 +92,44 @@ are byte-identical to the builds of run 20261005-184055. All tiers are green.
 
 A tier of one pull request is graded on the requirements that this pull request owns. The `combined` tier is graded
 on all requirements.
+
+### Run completeness
+
+The overall run status is separate from each requirement verdict:
+
+| Run status | Meaning |
+|---|---|
+| PASS | Every expected tier, test and required Go unit stage has complete, successful evidence. |
+| FAILED | A stage, pytest phase, worker or Go test failed, or an expected-failure contract was violated. |
+| INCOMPLETE | Required evidence is missing, inconsistent or unfinished. A skip cannot replace required test coverage. |
+| PARTIAL | A diagnostic run selected fewer tiers or tests, skipped Go tests, or ran without runner metadata. |
+| LEGACY | Recorded historical outcomes remain available, but the evidence format cannot prove full-run completeness. |
+
+Failures take precedence over missing evidence and partial selection. Only **PASS** returns exit code zero from
+the runner. A successful filtered run is **PARTIAL** and returns nonzero, not a full-suite pass.
+
+`run.json` keeps stage status and errors from the start. Fetch and kind failures therefore have a report even
+without cluster metadata. Each tier's `results.json` records collection errors, pytest's exit code, the expected,
+selected and executed test IDs, and setup/call/teardown outcomes. Counts include legitimate feature-based N/A
+records. The expected suite comes from a separate unfiltered collection, without `PYTEST_ADDOPTS` or configured
+pytest `addopts`. Diagnostic selection cannot redefine the full suite.
+Long failure messages wrap in the dashboard. Artifact links appear only for files that the run produced.
+Downloaded evidence keeps the original bytes.
+
+Full PASS also requires completed grading and report stages, a zero terminal exit, and the published report's
+recorded SHA-256. The runner prepares `REPORT.md.tmp` before publication. The dashboard does not copy this preview.
+Interrupted finalization cannot pass, even if metadata already records completion. The default report command
+does not bypass these checks or silently repair an interrupted publication.
+
+N/A requires a feature missing from that tier. XFAIL requires a strict marker and a `not-implemented` catalog
+entry, currently R26. Other skips and xfails do not establish required coverage. A teardown failure overrides
+a passing test body.
+
+Go records contain selected, started, completed and skipped test names, plus exit codes. A separate selected-package
+manifest must match the package records exactly, without duplicates. An unfiltered package with no tests is
+**compile only**, not a test pass. A named selection with no matches, or a required unit stage with no successfully
+completed tests, cannot pass. An entirely skipped package is allowed alongside a package with successful tests.
+Existing Go skips remain visible in the unit record.
 
 ### Differences from the HIP
 
@@ -132,6 +175,23 @@ make cluster-down   # delete the kind cluster
 The build is reproducible. The same commits and patches give the same source tree ID, the same commit IDs and
 the same `helm version` string. Compare the `tree` value in `.bin/helm-<tier>.json` with the value in
 `runs/<stamp>/<tier>/build.json`.
+
+### Check the evidence tools without Kubernetes
+
+Run these commands from the repository root:
+
+```bash
+uv run python -m pytest testgrid/tests -q
+make lint
+```
+
+These isolated regressions use temporary evidence directories, real pytest subprocesses and the Markdown/HTML
+consumers. They do not install charts or contact Kubernetes. No separate type-checker is configured.
+`make run` remains the full real-cluster check.
+
+For an interrupted or failed new run, read `runs/<stamp>/run.json` and `runs/<stamp>/REPORT.md`.
+The collection log is `runs/<stamp>/collection/pytest.log`. Tier logs remain under `runs/<stamp>/<tier>/`.
+Do not regenerate or backfill historical run evidence to add the new metadata.
 
 ### Try the feature by hand
 

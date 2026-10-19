@@ -212,7 +212,7 @@ def unit(tier: str, out: Path) -> dict:
     env = {f"HELM_{kind}_HOME": str(home / kind.lower()) for kind in ("CACHE", "CONFIG", "DATA")}
     changed = git("diff", "--name-only", base, head, "--", "*.go").splitlines()
     packages = sorted({str(Path(f).parent) for f in changed})
-    results = []
+    selection = []
     for pkg in packages:
         pkg_dir = path / pkg
         if not pkg_dir.is_dir() or not any(f.suffix == ".go" for f in pkg_dir.iterdir()):
@@ -223,22 +223,49 @@ def unit(tier: str, out: Path) -> dict:
             git("diff", base, head, "--", f"{pkg}/*_test.go"), re.M)))
         if not new_pkg and pkg in NOISY_PACKAGES and not names:
             continue
-        args = ["go", "test", "-count=1", f"./{pkg}/"]
+        selection.append((pkg, new_pkg, names))
+    results = []
+    for pkg, new_pkg, names in selection:
+        pattern = f"^({'|'.join(names)})$" if pkg in NOISY_PACKAGES and not new_pkg else "."
+        listing = sh("go", "test", "-list", pattern, f"./{pkg}/", cwd=path, env=env)
+        discovered = sorted(line for line in listing.stdout.splitlines()
+                            if re.fullmatch(r"(Test|Example|Fuzz)\w*", line))
+        selected = names if pattern != "." else discovered
+        args = ["go", "test", "-json", "-count=1", f"./{pkg}/"]
         scope = "all tests (package added by the PR)" if new_pkg else "all tests"
-        if pkg in NOISY_PACKAGES and not new_pkg:
-            args += ["-run", f"^({'|'.join(names)})$"]
+        if pattern != ".":
+            args += ["-run", pattern]
             scope = f"{len(names)} test(s) the PR added or changed"
         started = time.time()
         proc = sh(*args, cwd=path, env=env, check=False)
+        events = [json.loads(line) for line in proc.stdout.splitlines() if line.startswith("{")]
+        record = go_coverage(events, selected, proc.returncode, compile_only=pattern == "." and not discovered)
         log_file = out / f"unit-{pkg.replace('/', '_')}.log"
-        log_file.write_text(f"$ {' '.join(args)}\n" + proc.stdout + proc.stderr)
-        results.append({"package": pkg, "scope": scope, "passed": proc.returncode == 0,
+        log_file.write_text(f"$ go test -list {pattern} ./{pkg}/\n{listing.stdout}{listing.stderr}\n"
+                            f"$ {' '.join(args)}\n{proc.stdout}{proc.stderr}")
+        results.append({"package": pkg, "scope": scope, **record,
                         "seconds": round(time.time() - started, 1), "log": log_file.name,
-                        "summary": _go_summary(proc.stdout + proc.stderr)})
+                        "summary": _go_summary("".join(e.get("Output", "") for e in events) + proc.stderr)})
     info = {"tier": tier, "base": base, "head": head, "packages": results,
-            "passed": all(r["passed"] for r in results)}
+            "selected_packages": [pkg for pkg, _, _ in selection],
+            "passed": bool(results) and all(r["passed"] for r in results)
+                      and any(r["completed"] for r in results)}
     (out / "unit.json").write_text(json.dumps(info, indent=2))
     return info
+
+
+def go_coverage(events: list[dict], selected: list[str], exit_code: int, *, compile_only: bool = False) -> dict:
+    def names(action):
+        return sorted({e["Test"] for e in events if e.get("Action") == action
+                       and e.get("Test") and "/" not in e["Test"]})
+
+    executed, completed, skipped = names("run"), names("pass"), names("skip")
+    failed = [e.get("Test", e.get("Package", "?")) for e in events if e.get("Action") == "fail"]
+    passed = exit_code == 0 and not failed and set(selected) == set(executed) and (
+        compile_only or bool(selected)
+    ) and set(executed) == set(completed) | set(skipped)
+    return {"selected": selected, "executed": executed, "completed": completed, "skipped": skipped,
+            "failed": failed, "exit_code": exit_code, "compile_only": compile_only, "passed": passed}
 
 
 def _go_summary(text: str) -> str:
@@ -303,67 +330,144 @@ def e2e(tier: str, binary: str, out: Path, pytest_args: list[str]) -> int:
     return proc.returncode
 
 
+def collect_suite(out: Path) -> list[dict]:
+    dest = out / "collection"
+    dest.mkdir()
+    proc = subprocess.run(
+        [sys.executable, "-m", "pytest", "e2e/tests", "--collect-only", "-o", "addopts=", "--tier", next(iter(TIERS)),
+         "--helm", "not-used-during-collection", "--out", rel(dest), "-p", "no:cacheprovider", "-q"],
+        cwd=ROOT, env={**os.environ, "PYTEST_ADDOPTS": ""}, capture_output=True, text=True,
+    )
+    (dest / "pytest.log").write_text(proc.stdout + proc.stderr)
+    if proc.returncode:
+        raise RuntimeError(f"unfiltered pytest collection exited {proc.returncode}; see collection/pytest.log")
+    results = json.loads((dest / "results.json").read_text())
+    suite = results["coverage"]["expected"]
+    if results.get("errors") or not suite:
+        raise RuntimeError("unfiltered pytest collection failed or selected no tests; see collection/results.json")
+    return suite
+
+
 # ── orchestration ─────────────────────────────────────────────────────────
 
 
 def run(tiers: list[str], args) -> Path:
-    started = utc_now()
-    stamp = datetime.now(UTC).strftime("%Y%m%d-%H%M%S")
-    log(f"HIP-0025 e2e run {stamp}: tiers {', '.join(tiers)}")
-    fetch_sources()
-    ensure_cluster()
-    out = RUNS / stamp
-    for tier in tiers:
-        (out / tier).mkdir(parents=True, exist_ok=True)
-    for name in ("tiers.yaml", "requirements.yaml"):  # grade the run against the catalog it ran with
-        shutil.copy(ROOT / name, out / name)
-    meta = run_meta(stamp, started, tiers, args)
-    # The archives hold the same bytes that the tests read from charts/; run.json maps them.
-    meta["charts"] = chartrepo.publish(CHARTS, out / "charts", created=started)
-    log(f"charts  {len(meta['charts'])} archives and index.yaml in {rel(out / 'charts')}")
-
-    with cf.ThreadPoolExecutor(max_workers=8) as pool:
-        unit_jobs = {pool.submit(unit, t, out / t): t for t in tiers if "commit" in TIERS[t] and not args.skip_unit}
-        builds = {}
-        for tier, fut in {t: pool.submit(build, t, args.rebuild) for t in tiers}.items():
-            try:
-                builds[tier] = fut.result()
-                b = builds[tier]
-                log(f"build {tier:<9} {b['version']:<18} {'rebuilt' if b['rebuilt'] else 'cached '} "
-                    f"tree {b['tree'][:9]}")
-            except Exception as exc:  # a broken tier must not hide the others
-                builds[tier] = {"tier": tier, "error": str(exc)}
-                log(f"build {tier:<9} FAILED: {str(exc).splitlines()[0]}")
-        for tier, b in builds.items():
-            record = {k: v for k, v in b.items() if k != "inputs"}
-            (out / tier / "build.json").write_text(json.dumps(record, indent=2))
-
-        runnable = [t for t in tiers if "error" not in builds[t]]
-        e2e_jobs = {pool.submit(e2e, t, builds[t]["binary"], out / t, args.pytest): t for t in runnable}
-        for fut in cf.as_completed(e2e_jobs):
-            tier = e2e_jobs[fut]
-            res_file = out / tier / "results.json"
-            counts: dict[str, int] = {}
-            if res_file.exists():
-                for test in json.loads(res_file.read_text())["tests"]:
-                    counts[test["outcome"]] = counts.get(test["outcome"], 0) + 1
-            log(f"e2e   {tier:<9} " + (", ".join(f"{k} {v}" for k, v in sorted(counts.items())) or "no results"))
-        for fut in cf.as_completed(unit_jobs):
-            tier = unit_jobs[fut]
-            try:
-                u = fut.result()
-                log(f"unit  {tier:<9} {'pass' if u['passed'] else 'FAIL'} ({len(u['packages'])} package(s))")
-            except Exception as exc:
-                (out / tier / "unit.json").write_text(json.dumps({"tier": tier, "error": str(exc)}))
-                log(f"unit  {tier:<9} ERROR: {str(exc).splitlines()[0]}")
-
     import grade  # noqa: PLC0415
     import report  # noqa: PLC0415
 
+    started = utc_now()
+    stamp = datetime.now(UTC).strftime("%Y%m%d-%H%M%S-%f")
+    out = RUNS / stamp
+    out.mkdir(parents=True)  # never reuse or overwrite an earlier run
+    meta = {"evidence_version": 2, "stamp": stamp, "started_utc": started, "tiers": tiers,
+            "pytest_args": args.pytest, "pytest_addopts": os.environ.get("PYTEST_ADDOPTS", ""),
+            "skip_unit": args.skip_unit, "status": "running", "exit_code": 1, "stages": {}}
+
+    def persist():
+        temp = out / "run.json.tmp"
+        temp.write_text(json.dumps(meta, indent=2) + "\n")
+        temp.replace(out / "run.json")
+
+    def stage(name, status, **details):
+        meta["stages"][name] = {"status": status, "updated_utc": utc_now(), **details}
+        persist()
+
+    def execute(name, fn, *values, **kwargs):
+        stage(name, "running")
+        try:
+            value = fn(*values, **kwargs)
+        except BaseException as exc:
+            stage(name, "failed", error=f"{type(exc).__name__}: {exc}")
+            raise
+        stage(name, "passed")
+        return value
+
+    persist()
+    log(f"HIP-0025 e2e run {stamp}: tiers {', '.join(tiers)}")
+    try:
+        for name in ("tiers.yaml", "requirements.yaml"):
+            shutil.copy(ROOT / name, out / name)
+        for tier in tiers:
+            (out / tier).mkdir()
+        meta["suite"] = execute("collection", collect_suite, out)
+        persist()
+        execute("sources", fetch_sources)
+        execute("cluster", ensure_cluster)
+        meta.update(execute("metadata", run_meta, stamp, started, tiers, args))
+        meta["charts"] = execute("charts", chartrepo.publish, CHARTS, out / "charts", created=started)
+        persist()
+        with cf.ThreadPoolExecutor(max_workers=8) as pool:
+            unit_jobs = {}
+            build_jobs = {}
+            for tier in tiers:
+                if "commit" in TIERS[tier]:
+                    stage(f"unit:{tier}", "skipped" if args.skip_unit else "running")
+                    if not args.skip_unit:
+                        unit_jobs[pool.submit(unit, tier, out / tier)] = tier
+                stage(f"build:{tier}", "running")
+                build_jobs[pool.submit(build, tier, args.rebuild)] = tier
+            builds = {}
+            for fut in cf.as_completed(build_jobs):
+                tier = build_jobs[fut]
+                try:
+                    builds[tier] = fut.result()
+                    stage(f"build:{tier}", "passed")
+                except Exception as exc:
+                    builds[tier] = {"tier": tier, "error": str(exc)}
+                    stage(f"build:{tier}", "failed", error=str(exc))
+                record = {k: v for k, v in builds[tier].items() if k != "inputs"}
+                (out / tier / "build.json").write_text(json.dumps(record, indent=2))
+            e2e_jobs = {}
+            for tier, b in builds.items():
+                if "error" in b:
+                    stage(f"e2e:{tier}", "blocked", reason="build failed")
+                    continue
+                stage(f"e2e:{tier}", "running")
+                e2e_jobs[pool.submit(e2e, tier, b["binary"], out / tier, args.pytest)] = tier
+            for fut in cf.as_completed(e2e_jobs):
+                tier = e2e_jobs[fut]
+                try:
+                    code = fut.result()
+                    stage(f"e2e:{tier}", "passed" if code == 0 else "failed", exit_code=code)
+                    log(f"e2e   {tier:<9} exit {code}")
+                except Exception as exc:
+                    stage(f"e2e:{tier}", "failed", error=str(exc))
+            for fut in cf.as_completed(unit_jobs):
+                tier = unit_jobs[fut]
+                try:
+                    u = fut.result()
+                    stage(f"unit:{tier}", "passed" if u["passed"] else "failed")
+                    log(f"unit  {tier:<9} {'pass' if u['passed'] else 'FAIL'} ({len(u['packages'])} package(s))")
+                except Exception as exc:
+                    (out / tier / "unit.json").write_text(json.dumps({"tier": tier, "error": str(exc)}))
+                    stage(f"unit:{tier}", "failed", error=str(exc))
+        meta["status"] = "finalizing"
+    except BaseException as exc:
+        meta["status"] = "failed"
+        stage("runner", "failed", error=f"{type(exc).__name__}: {exc}")
     meta["finished_utc"] = utc_now()
-    meta["exit_code"] = 0 if grade.all_green(out) else 1
-    (out / "run.json").write_text(json.dumps(meta, indent=2) + "\n")
-    log(f"report  {rel(report.render(out))}")
+    persist()
+    try:
+        assessment = execute("grading", lambda: grade.assess(grade.load(out), final=False))
+        meta["exit_code"] = 0 if assessment["status"] == "PASS" else 1
+    except Exception:
+        meta["status"] = "failed"
+        meta["exit_code"] = 1
+    persist()
+    try:
+        preview = execute("report", report.render, out, final=False)
+        stage("report", "passed", sha256=sha256(preview))
+        if meta["status"] == "finalizing":
+            meta["status"] = "completed"
+        persist()
+        # External completeness also requires this published report. A termination
+        # after metadata publication but before this rename cannot grade PASS.
+        preview.replace(out / "REPORT.md")
+        log(f"report  {rel(out / 'REPORT.md')}")
+    except Exception as exc:
+        meta["status"] = "failed"
+        meta["exit_code"] = 1
+        stage("report", "failed", error=f"{type(exc).__name__}: {exc}")
     return out
 
 
@@ -380,6 +484,8 @@ def main() -> int:
     args = parser.parse_args(argv[: argv.index("--")] if "--" in argv else argv)
     args.pytest = extra  # everything after `--` goes to pytest, e.g. `-- -k subchart`
     tiers = [t.strip() for t in args.tiers.split(",") if t.strip()]
+    if not tiers or len(set(tiers)) != len(tiers):
+        parser.error("select at least one tier, without duplicates")
     unknown = [t for t in tiers if t not in TIERS]
     if unknown:
         parser.error(f"unknown tier(s): {', '.join(unknown)}")

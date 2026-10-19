@@ -118,7 +118,7 @@ def _tier(data: dict, tier: str, fork: str, harness: dict) -> dict:
     spec = data["cfg"]["tiers"][tier]
     build = data["builds"].get(tier, {})
     results = data["results"].get(tier)
-    tests = results["tests"] if results else []
+    tests = results.get("tests", []) if results else []
     counts = Counter(t["outcome"] for t in tests)
     summary = grade.pr_summary(data, tier)
     commits = build.get("commits") or _cfg_commits(data["cfg"], tier)
@@ -275,17 +275,25 @@ def load_run(run_dir: Path) -> dict:
     harness = _harness(data["meta"])
     fork = web(data["cfg"]["fork"]["url"])
     tiers = [_tier(data, t, fork, harness) for t in data["tiers"]]
+    assessment = grade.assess(data)
+    meta = {"started_utc": "not recorded", "finished_utc": "not recorded", "pytest_args": [], **data["meta"]}
+    for key, fields in (("cluster", ("name", "server_version", "node_image")), ("host", ("os", "arch")),
+                        ("tools", ("go", "kind", "kubectl", "docker", "python"))):
+        meta[key] = {**dict.fromkeys(fields, "not recorded"), **meta.get(key, {})}
     return {
         "stamp": run_dir.name,
         "dir": run_dir,
-        "meta": data["meta"],
+        "meta": meta,
         "data": data,
         "harness": harness,
         "fork": fork,
         "upstream": web(data["cfg"]["upstream"]["url"]),
         "base": data["cfg"]["upstream"]["base"],
         "tiers": tiers,
-        "green": grade.all_green(run_dir),
+        "green": assessment["status"] == "PASS",
+        "assessment": assessment,
+        "status_css": {"PASS": "pass", "FAILED": "fail", "INCOMPLETE": "fail",
+                       "PARTIAL": "untested", "LEGACY": "untested"}[assessment["status"]],
         "req_rows": _req_rows(data, tiers),
         "test_groups": _test_groups(tiers),
         "before_after": _before_after(run_dir, tiers),
@@ -295,8 +303,10 @@ def load_run(run_dir: Path) -> dict:
 
 
 def collect_runs(runs_dir: Path) -> list[dict]:
-    """Every run under runs_dir that has a run.json, newest first."""
-    dirs = sorted(d for d in runs_dir.iterdir() if (d / "run.json").is_file()) if runs_dir.is_dir() else []
+    """Runner records and manual pytest evidence, newest first."""
+    dirs = sorted(d for d in runs_dir.iterdir() if d.is_dir() and (
+        (d / "run.json").is_file() or any(d.glob("*/results.json"))
+    )) if runs_dir.is_dir() else []
     runs = [load_run(d) for d in dirs]
-    runs.sort(key=lambda r: (r["meta"].get("started_utc", ""), r["stamp"]), reverse=True)
+    runs.sort(key=lambda r: (r["data"]["meta"].get("started_utc", ""), r["stamp"]), reverse=True)
     return runs

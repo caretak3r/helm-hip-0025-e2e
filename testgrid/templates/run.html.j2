@@ -9,11 +9,29 @@
 <p class="banner">FIXTURE DATA. These results are sample data for the dashboard, not a real run.</p>
 {% endif %}
 <p class="lead">
-  <span class="badge {{ 'pass' if run.green else 'fail' }}">{{ 'all tiers green' if run.green else 'not all tiers green' }}</span>
+  <span class="badge {{ run.status_css }}">{{ run.assessment.status }}</span>
   Started {{ meta.started_utc }} · finished {{ meta.finished_utc }} · Kubernetes {{ meta.cluster.server_version }} on kind ·
   harness {% if run.harness.commit_url %}<a href="{{ run.harness.commit_url }}"><code>{{ run.harness.short }}</code></a>{% else %}<code>{{ run.harness.short }}</code>{% endif %}
   {% if run.harness.dirty %}<span class="badge fail">local changes</span>{% endif %}
 </p>
+<section id="coverage">
+  <h2>Run completeness</h2>
+  {% if run.assessment.issues %}
+  <ul>{% for issue in run.assessment.issues %}<li>{{ issue }}</li>{% endfor %}</ul>
+  {% endif %}
+  <table class="data">
+    <thead><tr><th>Tier</th><th>Expected tests</th><th>Selected tests</th><th>Executed/recorded tests</th></tr></thead>
+    <tbody>{% for c in run.assessment.coverage %}
+      <tr><td>{{ c.tier }}</td><td>{{ c.expected if c.expected is not none else 'not recorded' }}</td><td>{{ c.selected if c.selected is not none else 'not recorded' }}</td><td>{{ c.executed }}</td></tr>
+    {% endfor %}</tbody>
+  </table>
+  {% if meta.get('stages') %}
+  <h3>Stages</h3>
+  <ul>{% for name, stage in meta.stages.items() %}
+    <li><code>{{ name }}</code>: {{ stage.status }}{% if stage.get('error') %}<pre class="reason">{{ stage.error }}</pre>{% endif %}</li>
+  {% endfor %}</ul>
+  {% endif %}
+</section>
 <nav class="toc">
   <a href="#verdicts">Verdict per PR</a> · <a href="#requirements">Requirements</a> · <a href="#tests">Tests</a> ·
   <a href="#before-after">Before and after</a> · <a href="#charts">Charts</a> · <a href="#builds">Builds</a> ·
@@ -203,11 +221,17 @@
   <table class="data">
     <thead><tr><th>Package</th><th>Scope</th><th>Result</th><th>Time</th></tr></thead>
     <tbody>
-    {% for pkg in tv.unit.packages %}
+    {% for pkg in tv.unit.get('packages', []) %}
       <tr>
         <td class="mono">{{ pkg.package }}</td>
         <td>{{ pkg.scope }}</td>
-        <td><a href="{{ tv.id }}/{{ pkg.log }}"><span class="badge {{ 'pass' if pkg.passed else 'fail' }}">{{ '✓ pass' if pkg.passed else '✗ FAIL' }}</span></a>{% if not pkg.passed %} <code>{{ pkg.summary }}</code>{% endif %}</td>
+        <td>
+          {% set log_path = tv.id ~ '/' ~ pkg.log %}
+          {% if log_path in evidence_files %}<a href="{{ log_path }}">{% endif %}
+          <span class="badge {{ 'na' if pkg.get('compile_only') else 'pass' if pkg.passed else 'fail' }}">{{ 'compile only (no tests)' if pkg.get('compile_only') else '✓ pass' if pkg.passed else '✗ FAIL' }}</span>
+          {% if log_path in evidence_files %}</a>{% endif %}
+          {% if not pkg.passed %} <code>{{ pkg.summary }}</code>{% endif %}
+        </td>
         <td>{{ pkg.seconds | seconds }}</td>
       </tr>
     {% endfor %}
@@ -221,15 +245,27 @@
 <section id="files">
   <h2>Files</h2>
   <ul>
+    {% if 'REPORT.md' in evidence_files %}
     <li><a href="REPORT.md">REPORT.md</a>: the same verdicts as Markdown{% if run.harness.blob %} (<a href="{{ run.harness.url }}/blob/main/runs/{{ run.stamp }}/REPORT.md">rendered on GitHub</a>){% endif %}</li>
+    {% endif %}
+    {% if 'run.json' in evidence_files %}
     <li><a href="run.json">run.json</a>: the environment and the harness commit of the run</li>
+    {% endif %}
+    {% if 'tiers.yaml' in evidence_files %}
     <li><a href="tiers.yaml">tiers.yaml</a>: the pinned commits and the wiring of each tier</li>
+    {% endif %}
+    {% if 'requirements.yaml' in evidence_files %}
     <li><a href="requirements.yaml">requirements.yaml</a>: the requirement catalog that graded the run</li>
+    {% endif %}
     {% if run.charts.archived %}
     <li><a href="charts/index.yaml">charts/index.yaml</a> and the chart archives: the charts that the tests read, as a Helm chart repository</li>
     {% endif %}
     {% for tv in run.tiers %}
-    <li>{{ tv.label }}: <a href="{{ tv.id }}/results.json">results.json</a>, <a href="{{ tv.id }}/pytest.log">pytest.log</a>, <a href="{{ tv.id }}/build.json">build.json</a>{% if tv.unit %}, <a href="{{ tv.id }}/unit.json">unit.json</a>{% endif %}</li>
+    <li>{{ tv.label }}:
+      {% for name in ('results.json', 'pytest.log', 'build.json', 'unit.json') if (tv.id ~ '/' ~ name) in evidence_files %}
+      {% if not loop.first %}, {% endif %}<a href="{{ tv.id }}/{{ name }}">{{ name }}</a>
+      {% else %}<span class="muted">not recorded</span>{% endfor %}
+    </li>
     {% endfor %}
   </ul>
 </section>

@@ -42,6 +42,7 @@ footer { margin-top: 3rem; padding-top: 0.8rem; border-top: 1px solid var(--bord
 .banner { background: #fff3e0; border-left: 4px solid var(--xpass); padding: 0.5rem 0.8rem; font-weight: 700; }
 .intro { max-width: 62rem; }
 .intro ul { margin: 0.3rem 0 0.6rem; }
+#coverage { overflow-wrap: anywhere; }
 
 /* status colours: one class per verdict or outcome, used by badges and grid cells */
 .badge { display: inline-block; padding: 0.12rem 0.5rem; border-radius: 3px; font-size: 0.74rem; font-weight: 700;

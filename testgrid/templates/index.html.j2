@@ -33,7 +33,7 @@
 <section>
   <h2>Latest run: <a href="{{ latest.stamp }}/index.html">{{ latest.stamp }}</a></h2>
   <p class="lead">
-    <span class="badge {{ 'pass' if latest.green else 'fail' }}">{{ 'all tiers green' if latest.green else 'not all tiers green' }}</span>
+    <span class="badge {{ latest.status_css }}">{{ latest.assessment.status }}</span>
     Started {{ latest.meta.started_utc }} · Kubernetes {{ latest.meta.cluster.server_version }} on kind ·
     harness {% if latest.harness.commit_url %}<a href="{{ latest.harness.commit_url }}"><code>{{ latest.harness.short }}</code></a>{% else %}<code>{{ latest.harness.short }}</code>{% endif %}
     {% if latest.harness.dirty %}<span class="badge fail">local changes</span>{% endif %}
@@ -72,7 +72,7 @@
         <td><a href="{{ run.stamp }}/index.html"><code>{{ run.stamp }}</code></a></td>
         <td>{{ run.meta.started_utc }}</td>
         <td>{% if run.harness.commit_url %}<a href="{{ run.harness.commit_url }}"><code>{{ run.harness.short }}</code></a>{% else %}<code>{{ run.harness.short }}</code>{% endif %}{% if run.harness.dirty %} <span class="badge fail">local changes</span>{% endif %}</td>
-        <td><span class="badge {{ 'pass' if run.green else 'fail' }}">{{ 'green' if run.green else 'failures' }}</span></td>
+        <td><span class="badge {{ run.status_css }}">{{ run.assessment.status }}</span></td>
         {% for col in latest.tiers %}
         {% set found = run.tiers | selectattr('id', 'equalto', col.id) | list %}
         <td>{% if found %}{{ outcome_badges(found[0]) }}{% else %}<span class="muted">not run</span>{% endif %}</td>

@@ -49,18 +49,40 @@ def pytest_configure(config):
         raise pytest.UsageError(f"unknown tier {tier!r}; known: {', '.join(tiers)}")
     config._hip_tier = tier
     config._hip_features = set(tiers[tier]["features"])
-    config._hip_results = []
+    config._hip_results = {}
+    config._hip_expected = []
+    config._hip_selected = []
+    config._hip_errors = []
     Path(config.getoption("--out")).mkdir(parents=True, exist_ok=True)
 
 
+def _test_spec(item):
+    req = item.get_closest_marker("req")
+    needs = item.get_closest_marker("needs")
+    xfail = item.get_closest_marker("xfail")
+    return {"nodeid": item.nodeid, "reqs": list(req.args) if req else [],
+            "needs": list(needs.args) if needs else [],
+            "xfail_strict": bool(xfail and xfail.kwargs.get("strict", item.config.getini("xfail_strict")))}
+
+
+@pytest.hookimpl(hookwrapper=True, tryfirst=True)
 def pytest_collection_modifyitems(config, items):
-    have = config._hip_features
+    config._hip_expected = [_test_spec(item) for item in items]
     for item in items:
-        marker = item.get_closest_marker("needs")
-        need = set(marker.args) if marker else set()
-        missing = sorted(need - have)
+        missing = sorted(set(_test_spec(item)["needs"]) - config._hip_features)
         if missing:
             item.add_marker(pytest.mark.skip(reason=f"N/A: tier has no {', '.join(missing)}"))
+    yield
+    config._hip_selected = [item.nodeid for item in items]
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_make_collect_report(collector):
+    outcome = yield
+    rep = outcome.get_result()
+    if rep.failed:
+        collector.config._hip_errors.append({"phase": "collection", "nodeid": rep.nodeid,
+                                             "error": str(rep.longrepr)})
 
 
 # ── Results plugin ─────────────────────────────────────────────────────────
@@ -70,35 +92,33 @@ def pytest_collection_modifyitems(config, items):
 def pytest_runtest_makereport(item, call):
     outcome = yield
     rep = outcome.get_result()
-    if rep.when == "call" or (rep.when == "setup" and rep.outcome != "passed"):
-        req = item.get_closest_marker("req")
-        needs = item.get_closest_marker("needs")
+    config = item.config
+    record = config._hip_results.setdefault(item.nodeid, {
+        **_test_spec(item), "name": item.name, "doc": (item.function.__doc__ or "").strip(),
+        "outcome": "unknown", "reason": "", "duration": 0, "phases": {}, "observations": [], "evidence": "",
+    })
+    record["phases"][rep.when] = rep.outcome
+    record["duration"] = round(record["duration"] + rep.duration, 2)
+    if rep.when == "call" or rep.failed or (rep.when == "setup" and rep.skipped):
         status = rep.outcome
+        reason = ""
         if hasattr(rep, "wasxfail"):
             status = "xfailed" if rep.skipped else "xpassed"
-        reason = ""
-        if rep.skipped and not hasattr(rep, "wasxfail"):
+            reason = rep.wasxfail
+        elif rep.skipped:
             reason = rep.longrepr[2] if isinstance(rep.longrepr, tuple) else str(rep.longrepr)
             reason = reason.replace("Skipped: ", "")
-            if reason.startswith("N/A"):
+            if set(record["needs"]) - config._hip_features:
                 status = "n/a"
         elif rep.failed:
             reason = _short_failure(rep)
-        elif hasattr(rep, "wasxfail"):
-            reason = rep.wasxfail
-        ctx = getattr(item, "_hip_ctx", None)
-        item.config._hip_results.append({
-            "nodeid": item.nodeid,
-            "name": item.name,
-            "doc": (item.function.__doc__ or "").strip(),
-            "reqs": list(req.args) if req else [],
-            "needs": list(needs.args) if needs else [],
-            "outcome": status,
-            "reason": reason,
-            "duration": round(rep.duration, 2),
-            "observations": ctx.observations if ctx else [],
-            "evidence": str(ctx.dir.relative_to(Path(item.config.getoption("--out")).parent)) if ctx else "",
-        })
+            if rep.when != "call":
+                status = "error"
+        record.update(outcome=status, reason=reason)
+    ctx = getattr(item, "_hip_ctx", None)
+    if ctx:
+        record["observations"] = ctx.observations
+        record["evidence"] = str(ctx.dir.relative_to(Path(config.getoption("--out")).parent))
 
 
 def _short_failure(rep) -> str:
@@ -109,18 +129,20 @@ def _short_failure(rep) -> str:
     return message[:1200]
 
 
-def pytest_sessionfinish(session):
+def pytest_sessionfinish(session, exitstatus):
     config = session.config
     out = Path(config.getoption("--out"))
-    helm = config.getoption("--helm")
-    version = subprocess.run([helm, "version", "--short"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
+    # Do not execute Helm here: a missing binary must not erase collection or failure evidence.
     (out / "results.json").write_text(json.dumps({
         "tier": config._hip_tier,
         "features": sorted(config._hip_features),
-        "helm": helm,
-        "helm_version": version,
+        "helm": config.getoption("--helm"),
         "finished": datetime.now(UTC).isoformat(),
-        "tests": config._hip_results,
+        "exit_code": int(exitstatus),
+        "errors": config._hip_errors,
+        "coverage": {"expected": config._hip_expected, "selected": config._hip_selected,
+                     "executed": list(config._hip_results)},
+        "tests": list(config._hip_results.values()),
     }, indent=2))
 
 

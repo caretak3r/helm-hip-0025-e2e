@@ -12,6 +12,7 @@ from grade import (
     GLYPH,
     MEANINGS,
     XPASS,
+    assess,
     cell,
     evidence_tier,
     label,
@@ -26,13 +27,13 @@ from paths import SITE_URL
 def _built_from(data: dict, tier: str) -> str:
     b = data["builds"].get(tier, {})
     if "error" in b:
-        return f"build failed: {b['error'].splitlines()[0]}"
+        return f"build failed: {_one_line(b['error']) or 'unspecified error'}"
     commits = ", ".join(f"`{branch}` @ `{sha[:9]}`" for branch, sha in b.get("commits", {}).items())
     wiring = ", ".join(w["name"] for w in b.get("wiring", []))
     return f"{commits} · wiring {wiring} · tree `{b.get('tree', '?')[:9]}` · `{b.get('version', '?')}`"
 
 
-def render(run: Path) -> Path:
+def render(run: Path, *, final: bool = True) -> Path:
     data = load(run)
     tiers = data["tiers"]
     meta = data["meta"]
@@ -40,6 +41,19 @@ def render(run: Path) -> Path:
     lines: list[str] = []
     w = lines.append
     w(f"# HIP-0025 end-to-end report · {run.name}")
+    w("")
+    assessment = assess(data, final=final)
+    w(f"**Run status: {assessment['status']}**")
+    w("")
+    for issue in assessment["issues"]:
+        w(f"- {_one_line(issue)}")
+    w("")
+    w("| Tier | Expected tests | Selected tests | Executed/recorded tests |")
+    w("|---|---|---|---|")
+    for coverage in assessment["coverage"]:
+        counts = [str(coverage[k]) if coverage[k] is not None else "not recorded"
+                  for k in ("expected", "selected", "executed")]
+        w(f"| {label(data, coverage['tier'])} | {' | '.join(counts)} |")
     w("")
     w("Each tier is a `helm` binary built from the pull request commits in `tiers.yaml`. The tests install the "
       f"charts in `charts/` with this binary on the kind cluster `{cluster.get('name', '?')}` "
@@ -151,16 +165,18 @@ def render(run: Path) -> Path:
         if not unit or "error" in unit:
             continue
         w("")
-        w(f"**{data['cfg']['tiers'][tier]['title']}** · `{unit['base'][:9]}..{unit['head'][:9]}`")
+        w(f"**{data['cfg']['tiers'][tier]['title']}** · `{unit.get('base', '?')[:9]}..{unit.get('head', '?')[:9]}`")
         w("")
         w("| Package | Scope | Result | Time |")
         w("|---|---|---|---|")
-        for pkg in unit["packages"]:
-            res = "✓ pass" if pkg["passed"] else f"✗ {pkg['summary']}"
+        for pkg in unit.get("packages", []):
+            res = "compile only (no tests)" if pkg.get("compile_only") else (
+                "✓ pass" if pkg["passed"] else f"✗ {pkg['summary']}"
+            )
             w(f"| `{pkg['package']}` | {pkg['scope']} | [{res}]({tier}/{pkg['log']}) | {pkg['seconds']}s |")
     w("")
     _charts(lines, run, meta.get("charts", []))
-    md = run / "REPORT.md"
+    md = run / ("REPORT.md" if final else "REPORT.md.tmp")
     md.write_text("\n".join(lines) + "\n")
     return md
 

@@ -62,6 +62,8 @@ def _write(env: Environment, template: str, dest: Path, **context) -> None:
 
 def _copy_files(src: Path, dst: Path) -> int:
     """Copy the files (not the directories) of src into dst."""
+    if not src.is_dir():
+        return 0
     dst.mkdir(parents=True, exist_ok=True)
     count = 0
     for f in sorted(src.iterdir()):
@@ -73,7 +75,7 @@ def _copy_files(src: Path, dst: Path) -> int:
 
 def _evidence(src: Path) -> dict:
     files = []
-    for f in sorted(src.iterdir()):
+    for f in sorted(src.iterdir()) if src.is_dir() else []:
         if f.is_file():
             entry = {"name": f.name, "bytes": f.stat().st_size, "records": None}
             if f.suffix == ".jsonl":
@@ -118,9 +120,12 @@ def build(runs_dir: Path, out: Path) -> dict:
             if (run["dir"] / name).exists():
                 shutil.copyfile(run["dir"] / name, run_out / name)
                 files += 1
+        files += _copy_files(run["dir"] / "collection", run_out / "collection")
         for tv in run["tiers"]:
             files += _copy_files(run["dir"] / tv["id"], run_out / tv["id"])
-        _write(env, "run.html.j2", run_out / "index.html", root="../", repo=repo, run=run)
+        evidence_files = {p.relative_to(run_out).as_posix() for p in run_out.rglob("*") if p.is_file()}
+        _write(env, "run.html.j2", run_out / "index.html", root="../", repo=repo, run=run,
+               evidence_files=evidence_files)
         pages += 1
         charts = run["charts"]
         if charts["archived"]:  # the run's chart repository: index.yaml, the archives, one page per chart
