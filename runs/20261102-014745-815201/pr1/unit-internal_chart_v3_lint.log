@@ -1,0 +1,61 @@
+$ go test -list . ./internal/chart/v3/lint/
+TestBadChartV3
+TestInvalidYaml
+TestInvalidChartYamlV3
+TestBadValuesV3
+TestBadCrdFileV3
+TestGoodChart
+TestHelmCreateChart
+TestHelmCreateChart_CheckDeprecatedWarnings
+TestSubChartValuesChart
+TestMalformedTemplate
+ok  	helm.sh/helm/v4/internal/chart/v3/lint	0.322s
+
+$ go test -json -count=1 ./internal/chart/v3/lint/
+{"Time":"2026-11-01T20:48:56.539448-05:00","Action":"start","Package":"helm.sh/helm/v4/internal/chart/v3/lint"}
+{"Time":"2026-11-01T20:48:56.841627-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestBadChartV3"}
+{"Time":"2026-11-01T20:48:56.841703-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestBadChartV3","Output":"=== RUN   TestBadChartV3\n","OutputType":"frame"}
+{"Time":"2026-11-01T20:48:56.842688-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestBadChartV3","Output":"--- PASS: TestBadChartV3 (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-01T20:48:56.842697-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestBadChartV3","Elapsed":0}
+{"Time":"2026-11-01T20:48:56.842711-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestInvalidYaml"}
+{"Time":"2026-11-01T20:48:56.842712-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestInvalidYaml","Output":"=== RUN   TestInvalidYaml\n","OutputType":"frame"}
+{"Time":"2026-11-01T20:48:56.844237-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestInvalidYaml","Output":"--- PASS: TestInvalidYaml (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-01T20:48:56.844244-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestInvalidYaml","Elapsed":0}
+{"Time":"2026-11-01T20:48:56.844247-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestInvalidChartYamlV3"}
+{"Time":"2026-11-01T20:48:56.844249-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestInvalidChartYamlV3","Output":"=== RUN   TestInvalidChartYamlV3\n","OutputType":"frame"}
+{"Time":"2026-11-01T20:48:56.844679-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestInvalidChartYamlV3","Output":"    lint_test.go:104: [[WARNING] Chart.yaml: failed to strictly parse chart metadata file\n"}
+{"Time":"2026-11-01T20:48:56.844683-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestInvalidChartYamlV3","Output":"        \terror converting YAML to JSON: yaml: unmarshal errors:\n"}
+{"Time":"2026-11-01T20:48:56.844685-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestInvalidChartYamlV3","Output":"          line 3: key \"apiVersion\" already set in map [ERROR] Chart.yaml: apiVersion 'v1' is not valid. The value must be \"v3\" [WARNING] templates/: directory does not exist]\n"}
+{"Time":"2026-11-01T20:48:56.844699-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestInvalidChartYamlV3","Output":"--- PASS: TestInvalidChartYamlV3 (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-01T20:48:56.844708-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestInvalidChartYamlV3","Elapsed":0}
+{"Time":"2026-11-01T20:48:56.844711-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestBadValuesV3"}
+{"Time":"2026-11-01T20:48:56.844712-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestBadValuesV3","Output":"=== RUN   TestBadValuesV3\n","OutputType":"frame"}
+{"Time":"2026-11-01T20:48:56.845447-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestBadValuesV3","Output":"--- PASS: TestBadValuesV3 (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-01T20:48:56.845453-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestBadValuesV3","Elapsed":0}
+{"Time":"2026-11-01T20:48:56.845463-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestBadCrdFileV3"}
+{"Time":"2026-11-01T20:48:56.845465-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestBadCrdFileV3","Output":"=== RUN   TestBadCrdFileV3\n","OutputType":"frame"}
+{"Time":"2026-11-01T20:48:56.847308-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestBadCrdFileV3","Output":"--- PASS: TestBadCrdFileV3 (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-01T20:48:56.84733-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestBadCrdFileV3","Elapsed":0}
+{"Time":"2026-11-01T20:48:56.847371-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestGoodChart"}
+{"Time":"2026-11-01T20:48:56.847439-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestGoodChart","Output":"=== RUN   TestGoodChart\n","OutputType":"frame"}
+{"Time":"2026-11-01T20:48:56.849309-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestGoodChart","Output":"--- PASS: TestGoodChart (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-01T20:48:56.849321-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestGoodChart","Elapsed":0}
+{"Time":"2026-11-01T20:48:56.849328-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestHelmCreateChart"}
+{"Time":"2026-11-01T20:48:56.849329-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestHelmCreateChart","Output":"=== RUN   TestHelmCreateChart\n","OutputType":"frame"}
+{"Time":"2026-11-01T20:48:56.867057-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestHelmCreateChart","Output":"--- PASS: TestHelmCreateChart (0.02s)\n","OutputType":"frame"}
+{"Time":"2026-11-01T20:48:56.86708-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestHelmCreateChart","Elapsed":0.02}
+{"Time":"2026-11-01T20:48:56.867095-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestHelmCreateChart_CheckDeprecatedWarnings"}
+{"Time":"2026-11-01T20:48:56.867106-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestHelmCreateChart_CheckDeprecatedWarnings","Output":"=== RUN   TestHelmCreateChart_CheckDeprecatedWarnings\n","OutputType":"frame"}
+{"Time":"2026-11-01T20:48:56.894206-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestHelmCreateChart_CheckDeprecatedWarnings","Output":"--- PASS: TestHelmCreateChart_CheckDeprecatedWarnings (0.03s)\n","OutputType":"frame"}
+{"Time":"2026-11-01T20:48:56.894236-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestHelmCreateChart_CheckDeprecatedWarnings","Elapsed":0.03}
+{"Time":"2026-11-01T20:48:56.894248-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestSubChartValuesChart"}
+{"Time":"2026-11-01T20:48:56.89425-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestSubChartValuesChart","Output":"=== RUN   TestSubChartValuesChart\n","OutputType":"frame"}
+{"Time":"2026-11-01T20:48:56.896521-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestSubChartValuesChart","Output":"--- PASS: TestSubChartValuesChart (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-01T20:48:56.896546-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestSubChartValuesChart","Elapsed":0}
+{"Time":"2026-11-01T20:48:56.896549-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestMalformedTemplate"}
+{"Time":"2026-11-01T20:48:56.896551-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestMalformedTemplate","Output":"=== RUN   TestMalformedTemplate\n","OutputType":"frame"}
+{"Time":"2026-11-01T20:48:56.898134-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestMalformedTemplate","Output":"--- PASS: TestMalformedTemplate (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-01T20:48:56.89815-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestMalformedTemplate","Elapsed":0}
+{"Time":"2026-11-01T20:48:56.898153-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Output":"PASS\n","OutputType":"frame"}
+{"Time":"2026-11-01T20:48:56.899381-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Output":"ok  \thelm.sh/helm/v4/internal/chart/v3/lint\t0.360s\n"}
+{"Time":"2026-11-01T20:48:56.899396-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Elapsed":0.36}

@@ -1,0 +1,10 @@
+[
+  {
+    "label": "install",
+    "value": "exit 1 after 10.1s"
+  },
+  {
+    "label": "error",
+    "value": "context deadline exceeded"
+  }
+]

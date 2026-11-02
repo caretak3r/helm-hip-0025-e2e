@@ -1,0 +1,13 @@
+[
+  {
+    "label": "helm dag output",
+    "value": "Chart: foo\n  Subchart batches:\n    Batch 1: nginx, rabbitmq\n    Batch 2: bar\n  Unsequenced (deployed last): Deployment/foo\n  Chart: foo/charts/nginx\n    Subchart batches: (none)\n    Unsequenced (deployed last): Deployment/nginx\n  Chart: foo/charts/rabbitmq\n    Subchart batches: (none)\n    Unsequenced (deployed last): Deployment/rabbitmq\n  Chart: foo/charts/bar\n    Subchart batches: (none)\n    Unsequenced (deployed last): Deployment/bar\n"
+  },
+  {
+    "label": "subchart batches printed for foo",
+    "value": [
+      "nginx, rabbitmq",
+      "bar"
+    ]
+  }
+]

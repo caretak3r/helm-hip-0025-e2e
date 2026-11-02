@@ -1,0 +1,25 @@
+01:53:39.631 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-independent-subcharts-deploy-together --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+01:53:39.670 $ kubectl --context kind-hip0025-e2e create namespace e2e-combined-independent-subcharts-deploy-together
+[exit 0, 0.0s]
+namespace/e2e-combined-independent-subcharts-deploy-together created
+
+
+01:53:39.706 $ .bin/helm-combined install r charts/hip-subcharts --namespace e2e-combined-independent-subcharts-deploy-together --wait=ordered --timeout 3m --kube-context kind-hip0025-e2e
+[exit 0, 9.8s]
+NAME: r
+LAST DEPLOYED: Sun Nov  1 20:53:39 2026
+NAMESPACE: e2e-combined-independent-subcharts-deploy-together
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+
+
+01:53:50.570 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-independent-subcharts-deploy-together --wait=false
+[exit 0, 0.1s]
+namespace "e2e-combined-independent-subcharts-deploy-together" deleted
+
+

@@ -1,0 +1,552 @@
+{
+  "tier": "pr1",
+  "features": [
+    "ordered",
+    "subcharts"
+  ],
+  "helm": "not-used-during-collection",
+  "finished": "2026-11-02T01:47:45.945557+00:00",
+  "exit_code": 0,
+  "errors": [],
+  "coverage": {
+    "expected": [
+      {
+        "nodeid": "e2e/tests/test_combined.py::test_custom_readiness_gates_sequencing",
+        "reqs": [
+          "R36"
+        ],
+        "needs": [
+          "ordered",
+          "groups",
+          "readiness"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_upgrade_follows_install_order_and_waits_leaf",
+        "reqs": [
+          "R08",
+          "R35"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_uninstall_reverse_order_for_ordered_install",
+        "reqs": [
+          "R09"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_uninstall_after_plain_install_is_not_sequenced",
+        "reqs": [
+          "R09",
+          "R02"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_rollback_follows_target_revision_order",
+        "reqs": [
+          "R10"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_failure_stops_install_dependent_never_applied",
+        "reqs": [
+          "R11"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_rollback_on_failure_cleans_up",
+        "reqs": [
+          "R11"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_readiness_timeout_per_batch_cap",
+        "reqs": [
+          "R12"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_readiness_timeout_exceeds_timeout_rejected",
+        "reqs": [
+          "R12"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_default_readiness_timeout_one_minute",
+        "reqs": [
+          "R12"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_hooks_not_sequenced_run_by_weight",
+        "reqs": [
+          "R13"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr1_subcharts.py::test_plain_wait_applies_everything_at_once",
+        "reqs": [
+          "R01"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr1_subcharts.py::test_independent_subcharts_deploy_together",
+        "reqs": [
+          "R15"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr1_subcharts.py::test_subcharts_dag_order_and_gating",
+        "reqs": [
+          "R05",
+          "R04",
+          "R03"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr1_subcharts.py::test_release_record_has_plan_when_sequenced",
+        "reqs": [
+          "R02"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr1_subcharts.py::test_subchart_alias_dependency",
+        "reqs": [
+          "R03"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr1_subcharts.py::test_nested_subcharts_three_levels",
+        "reqs": [
+          "R05"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr1_subcharts.py::test_subchart_cycle_detected",
+        "reqs": [
+          "R06"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr1_subcharts.py::test_helm_dag_prints_subchart_order",
+        "reqs": [
+          "R07"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr2_groups.py::test_groups_follow_the_hip_example",
+        "reqs": [
+          "R20",
+          "R21"
+        ],
+        "needs": [
+          "ordered",
+          "groups"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr2_groups.py::test_unsequenced_resources_deploy_last_and_warn",
+        "reqs": [
+          "R22"
+        ],
+        "needs": [
+          "ordered",
+          "groups"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr2_groups.py::test_group_sandboxing_parent_and_subchart_use_same_names",
+        "reqs": [
+          "R23"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts",
+          "groups"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr2_groups.py::test_group_cycle_detected_and_rejected",
+        "reqs": [
+          "R24"
+        ],
+        "needs": [
+          "ordered",
+          "groups"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr2_groups.py::test_hip_dependency_key_is_removed_before_apply",
+        "reqs": [
+          "R25"
+        ],
+        "needs": [
+          "ordered",
+          "groups"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr2_groups.py::test_template_prints_delimiters_for_groups",
+        "reqs": [
+          "R26"
+        ],
+        "needs": [
+          "groups"
+        ],
+        "xfail_strict": true
+      },
+      {
+        "nodeid": "e2e/tests/test_pr2_groups.py::test_upgrade_follows_group_order",
+        "reqs": [
+          "R08"
+        ],
+        "needs": [
+          "ordered",
+          "groups"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr2_groups.py::test_uninstall_runs_in_reverse_order",
+        "reqs": [
+          "R09"
+        ],
+        "needs": [
+          "ordered",
+          "groups"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr3_readiness.py::test_deployment_without_annotations_uses_kstatus",
+        "reqs": [
+          "R30"
+        ],
+        "needs": [
+          "readiness"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr3_readiness.py::test_success_expressions_mark_ready",
+        "reqs": [
+          "R31"
+        ],
+        "needs": [
+          "readiness"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr3_readiness.py::test_failure_takes_precedence_over_success",
+        "reqs": [
+          "R32"
+        ],
+        "needs": [
+          "readiness"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr3_readiness.py::test_failure_expression_alone_fails_install",
+        "reqs": [
+          "R32"
+        ],
+        "needs": [
+          "readiness"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr3_readiness.py::test_failed_probe_plus_pending_waits_for_timeout",
+        "reqs": [
+          "R32"
+        ],
+        "needs": [
+          "readiness"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr3_readiness.py::test_only_success_annotation_falls_back_to_kstatus_and_warns",
+        "reqs": [
+          "R33"
+        ],
+        "needs": [
+          "readiness"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr3_readiness.py::test_only_success_annotation_fails_helm_lint",
+        "reqs": [
+          "R33"
+        ],
+        "needs": [
+          "readiness"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[==-5-10-10-count-equality number]",
+        "reqs": [
+          "R34"
+        ],
+        "needs": [
+          "readiness"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[!=-5-10-5-count-inequality number]",
+        "reqs": [
+          "R34"
+        ],
+        "needs": [
+          "readiness"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[<-10-4-5-count-less than]",
+        "reqs": [
+          "R34"
+        ],
+        "needs": [
+          "readiness"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[<=-10-5-5-count-less or equal]",
+        "reqs": [
+          "R34"
+        ],
+        "needs": [
+          "readiness"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[>-5-11-10-count-greater than]",
+        "reqs": [
+          "R34"
+        ],
+        "needs": [
+          "readiness"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[>=-5-10-10-count-greater or equal]",
+        "reqs": [
+          "R34"
+        ],
+        "needs": [
+          "readiness"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[==-Pending-Ready-Ready-phase-equality string]",
+        "reqs": [
+          "R34"
+        ],
+        "needs": [
+          "readiness"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[==-false-true-true-ready-equality boolean]",
+        "reqs": [
+          "R34"
+        ],
+        "needs": [
+          "readiness"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr3_readiness.py::test_custom_readiness_applies_to_plain_wait",
+        "reqs": [
+          "R37"
+        ],
+        "needs": [
+          "readiness"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_v2_compat.py::test_v2_chart_with_plain_wait_applies_in_one_burst",
+        "reqs": [
+          "R14"
+        ],
+        "needs": [],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_v2_compat.py::test_v2_chart_with_ordered_wait_fails",
+        "reqs": [
+          "R14"
+        ],
+        "needs": [],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_v2_compat.py::test_v2_chart_upgrade_rollback_uninstall_succeed",
+        "reqs": [
+          "R14"
+        ],
+        "needs": [],
+        "xfail_strict": false
+      }
+    ],
+    "selected": [
+      "e2e/tests/test_combined.py::test_custom_readiness_gates_sequencing",
+      "e2e/tests/test_pr1_lifecycle.py::test_upgrade_follows_install_order_and_waits_leaf",
+      "e2e/tests/test_pr1_lifecycle.py::test_uninstall_reverse_order_for_ordered_install",
+      "e2e/tests/test_pr1_lifecycle.py::test_uninstall_after_plain_install_is_not_sequenced",
+      "e2e/tests/test_pr1_lifecycle.py::test_rollback_follows_target_revision_order",
+      "e2e/tests/test_pr1_lifecycle.py::test_failure_stops_install_dependent_never_applied",
+      "e2e/tests/test_pr1_lifecycle.py::test_rollback_on_failure_cleans_up",
+      "e2e/tests/test_pr1_lifecycle.py::test_readiness_timeout_per_batch_cap",
+      "e2e/tests/test_pr1_lifecycle.py::test_readiness_timeout_exceeds_timeout_rejected",
+      "e2e/tests/test_pr1_lifecycle.py::test_default_readiness_timeout_one_minute",
+      "e2e/tests/test_pr1_lifecycle.py::test_hooks_not_sequenced_run_by_weight",
+      "e2e/tests/test_pr1_subcharts.py::test_plain_wait_applies_everything_at_once",
+      "e2e/tests/test_pr1_subcharts.py::test_independent_subcharts_deploy_together",
+      "e2e/tests/test_pr1_subcharts.py::test_subcharts_dag_order_and_gating",
+      "e2e/tests/test_pr1_subcharts.py::test_release_record_has_plan_when_sequenced",
+      "e2e/tests/test_pr1_subcharts.py::test_subchart_alias_dependency",
+      "e2e/tests/test_pr1_subcharts.py::test_nested_subcharts_three_levels",
+      "e2e/tests/test_pr1_subcharts.py::test_subchart_cycle_detected",
+      "e2e/tests/test_pr1_subcharts.py::test_helm_dag_prints_subchart_order",
+      "e2e/tests/test_pr2_groups.py::test_groups_follow_the_hip_example",
+      "e2e/tests/test_pr2_groups.py::test_unsequenced_resources_deploy_last_and_warn",
+      "e2e/tests/test_pr2_groups.py::test_group_sandboxing_parent_and_subchart_use_same_names",
+      "e2e/tests/test_pr2_groups.py::test_group_cycle_detected_and_rejected",
+      "e2e/tests/test_pr2_groups.py::test_hip_dependency_key_is_removed_before_apply",
+      "e2e/tests/test_pr2_groups.py::test_template_prints_delimiters_for_groups",
+      "e2e/tests/test_pr2_groups.py::test_upgrade_follows_group_order",
+      "e2e/tests/test_pr2_groups.py::test_uninstall_runs_in_reverse_order",
+      "e2e/tests/test_pr3_readiness.py::test_deployment_without_annotations_uses_kstatus",
+      "e2e/tests/test_pr3_readiness.py::test_success_expressions_mark_ready",
+      "e2e/tests/test_pr3_readiness.py::test_failure_takes_precedence_over_success",
+      "e2e/tests/test_pr3_readiness.py::test_failure_expression_alone_fails_install",
+      "e2e/tests/test_pr3_readiness.py::test_failed_probe_plus_pending_waits_for_timeout",
+      "e2e/tests/test_pr3_readiness.py::test_only_success_annotation_falls_back_to_kstatus_and_warns",
+      "e2e/tests/test_pr3_readiness.py::test_only_success_annotation_fails_helm_lint",
+      "e2e/tests/test_pr3_readiness.py::test_readiness_operators[==-5-10-10-count-equality number]",
+      "e2e/tests/test_pr3_readiness.py::test_readiness_operators[!=-5-10-5-count-inequality number]",
+      "e2e/tests/test_pr3_readiness.py::test_readiness_operators[<-10-4-5-count-less than]",
+      "e2e/tests/test_pr3_readiness.py::test_readiness_operators[<=-10-5-5-count-less or equal]",
+      "e2e/tests/test_pr3_readiness.py::test_readiness_operators[>-5-11-10-count-greater than]",
+      "e2e/tests/test_pr3_readiness.py::test_readiness_operators[>=-5-10-10-count-greater or equal]",
+      "e2e/tests/test_pr3_readiness.py::test_readiness_operators[==-Pending-Ready-Ready-phase-equality string]",
+      "e2e/tests/test_pr3_readiness.py::test_readiness_operators[==-false-true-true-ready-equality boolean]",
+      "e2e/tests/test_pr3_readiness.py::test_custom_readiness_applies_to_plain_wait",
+      "e2e/tests/test_v2_compat.py::test_v2_chart_with_plain_wait_applies_in_one_burst",
+      "e2e/tests/test_v2_compat.py::test_v2_chart_with_ordered_wait_fails",
+      "e2e/tests/test_v2_compat.py::test_v2_chart_upgrade_rollback_uninstall_succeed"
+    ],
+    "executed": []
+  },
+  "tests": []
+}

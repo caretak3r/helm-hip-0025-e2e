@@ -1,0 +1,45 @@
+[
+  {
+    "label": "upgrade timeline",
+    "value": [
+      "01:55:38.976  apply  Deployment/db",
+      "01:55:38.980  apply  Deployment/queue",
+      "01:55:42.869  ready  Deployment/db",
+      "01:55:42.873  ready  Deployment/queue",
+      "01:55:43.010  apply  Deployment/app",
+      "01:55:46.879  ready  Deployment/app"
+    ]
+  },
+  {
+    "label": "db patch-marker",
+    "value": "v2"
+  },
+  {
+    "label": "queue patch-marker",
+    "value": "v2"
+  },
+  {
+    "label": "app patch-marker",
+    "value": "v2"
+  },
+  {
+    "label": "db patched",
+    "value": "01:55:38.976"
+  },
+  {
+    "label": "queue patched",
+    "value": "01:55:38.980"
+  },
+  {
+    "label": "app patched",
+    "value": "01:55:43.010"
+  },
+  {
+    "label": "db ready after patch",
+    "value": "01:55:42.869"
+  },
+  {
+    "label": "queue ready after patch",
+    "value": "01:55:42.873"
+  }
+]

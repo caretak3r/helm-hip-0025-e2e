@@ -1,0 +1,60 @@
+01:53:20.983 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-hooks-not-sequenced-run-by-weight --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+01:53:21.023 $ kubectl --context kind-hip0025-e2e create namespace e2e-combined-hooks-not-sequenced-run-by-weight
+[exit 0, 0.0s]
+namespace/e2e-combined-hooks-not-sequenced-run-by-weight created
+
+
+01:53:21.061 $ .bin/helm-combined install r charts/hip-lifecycle-hooks --namespace e2e-combined-hooks-not-sequenced-run-by-weight --wait=ordered --timeout 3m --kube-context kind-hip0025-e2e
+[exit 0, 12.4s]
+NAME: r
+LAST DEPLOYED: Sun Nov  1 20:53:21 2026
+NAMESPACE: e2e-combined-hooks-not-sequenced-run-by-weight
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+
+
+01:53:34.469 $ kubectl --context kind-hip0025-e2e get secret -n e2e-combined-hooks-not-sequenced-run-by-weight -l owner=helm,name=r -o json
+[exit 0, 0.1s]
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "v1",
+            "data": {
+                "release": "SDRzSUFBQUFBQUFDLyt4WVczUGFPdGYrS3hwOXR6YnhBV2ppbVgxUmFFTkpLVGwxUTZBd0hkbGV3VXBsU1o4bGs1QU0vLzBkeWVCQWsreEp1dnZPdkJjbG1RRmI2NnpIejFyV0ErWWtCeHpoQWp1WThtdUJvd2Q4VFF1bHY2Y2dtVmhCaWlNY2VFSGI5WDNYODc4R1h0UUtvOEJ2K1A0N0x3eGNyeFY1SG5Zd0kyOVdTVUVsQlpXYUNvNGozT2RLRThaUUluTEpRQU4yc05KRWx3cEh1TGE3ZG5DU2tVS2JLSFBRSkNXYW1OK2JKRElxWFVhdklWa2xETnhNaUI4S08zZ0poYXA4ZUEyLzhkUnoxMWhFdDFSbnlLb2duUkdOVkNaS2xpSXVOSW9CS2ZqL0VuZ0NxWU1rSzlYak5WSmxiRU15bm9pa285clpNclNlSlBBVWVFSkI0ZWhiSGFrdDhiT3hGU0NGb2xvVUt5dkdJRG80cUJ3Y2JKV0FrNWlaS3V1aWhMVlRHMVdRQ0o2KzFXcXR0V2QyRzdweWpaMXZtNERuNi9uYXdVd2tQM0RFUzhZY3JDR1hqT2o5N09xYkI3YWdqUlhKbVNtRzNTMDh1UFIwTnorK0phTXBTL2hReGtHejNlK2RaR2x2S0FiaDVLNmJheG5uNSszK1I3bWNMS1NlWGwxazA5NnhOL2txUHZlN25YSXk5dGtwN1lnNE9Db0dWeWtqNDFTa1hWK1RjY3RQVnA3ZnBlOFhrM0dyak1PTExPMnhaY3kvdE0yOWZyY2pwdU03UGVCRE1RaXlaUnlvZHY5VFp6Vzk5R1hNaDk1a2ZLZGVrTk5wTUpMVElQTk82WHM2K1BvM2ZVbHUyaHVwNmRVRkcxeDFsbkdQM2NCWHNaamtvendPVDloZ1hNbE13aE0ydWJvd2VYOU93ZzZiM051OHZPbll2NDE3eDk3VTV2bCswZjgwdkoyT3Q3R2I2eE9XaEJkWndpL080K0JPVHNJZjdmN0hGa3Z6MGFxVzZRMlhNYi9JeUxqRkVyNmoyMzIvR0Z6dTEyNTNyZC90eUhoOHpLY21YajY2aC9ISkVqNkl1OEhObCtBbnVaczQ4UFZrM1BweFNqdHhudzlGbjk0dSt0Uy9zZC81cUVtdXpoZGZ1aWRwbDNwNmNDNnpwTWZHMDZ1VGV6SStLazlwaDA2dUxtNUk5eWo0Y2k0TFV0bjVIQWY5ei9GNDVFM0daczgrMnJqai9GaWJlRWp2YUVsV2ZqZ2RNMDQrbmV2aHVWajBlOGRsbkI5NVZSMWI5NmNMWWVNanZaR0tMMXYzcEh0a2N6eWxuZHNrLzl0ZzR6N3RIYXY0L2ZOeU5ZNCtpRVgvNXMvK3ZtcC9GMy85aFIyY2kxVFRITGFjN3gyNVFmTnJFRVorTXdvUEcySHJYWEI0Mkc3NXJ0YzB0TCtlTzNoSldBbXE3alRteDRLSm1EQWNQYXdkVEhPeU1PYjRndks3eUc4RTcxekNKT1ZnZVl5a3F3L0F5QXBINFZ0a25TMDcvckt6dFlOVmtrRk90dFJYWFQybTczbWU2WGVtNVhsZVpQK24yTEZzcTdZNkx4WExTamU4NE5CcmVXRXozQmJMd1RuaDlCcE1rYkRydWpQK2YraFNsRVVDRVhxbTJlMDFpb05IRnE3NnA2WGhHWDlzVWhFaVVxcURwVC9qUHloUEkvVEJ5dVhBOVl4djIyczA0d2daWG8rUU5UdmpTa0ppN3hZZ0dVMklpcEJ2TGhVd1NMUW83QnBDT2RGSk5pQXhNQldoQnlMbHhzRGFMRzlqMjhydU9qTWY5b0llUXJWMzg5RlE1SlFUMDhoN0JVbmdEQW9xMGt1NzB5cEMzbFl1RVZ3VHlxRlF0U3BDN2lhdFc0Z2ZieUprRVJHaEo0QjRJbk5XTW5ZbUdFMVdFZXBmRDRVK0swRFoyajBLR2doUkRrcWRGU0tHYUhjSm9VeHIyUU1kb1FkSmRCYWhBd2RKVWVnSUhYcnJmVW5LcWFhRVdTelcyWVg3TW5JL2QzL0daL3oxa0ttZWp0K1BtY3J1dndGTlplRVhVTE9qK0FjMmI0SU5kckJraEJ1dXJFZEozOEVNbHNDcVFjOTRmbkhnVGtHYVZjL0IyK0c0WTdiVnpvajFKT2w4MnpMeWZPNWdTQmViRWZLNkVQbk9nS3pGNDJCcmhzOS9jdjN6bkx5SnczK2RWajBIMTJwekI4ZDE0QS9WbThmWm03MDcyRHdvT01JbHI5OGFzTEZjRkJTSzdiUzk1Zm5LRmVVcDNOa0t2akxiNXg5YzIyMFhoU2psM25pTy8zdnVxaTE2WmFXZVZQeGZsTXAzWHIzRnY2Vld2OE9mL1hPd1ZkbjFhVzY0dDBBWG1YWnp5a3ZsdG5CZG1oTVI0My8wL2NMTDE4NGdzY3ZtRnVBN2RINGk0bWQ1L0ptWXpDTGhYR2hMcEZ1S3pJRGxEWlZaNXhHU0JiaTBlck4vdXJ5eEY2RVpkbHN6L0l4QUNndzB1SEpEbHpGY2k2TEswMDBLc0g1M1dzdFA3V0dQOGd0UTJvQnlZMmtJU3loZVJmUEcyVE04SDVkcUZRdkQ5R0Y3ZHprUmVVNU1JYi9Oc01wbTJESEpKZFUzM0ZHTnZCbWVXNGFGSlhDTEtieFRKRHpmSEtVVXBhVmZHelNrMzRsKzRVd2xhRFdiUVZpZnFXeFBUMTdVYURhQ1E4OS81OWNhTWlQS2dPNnlUQktBdERwa3FUWUdSMjdMUEp6RzRIZTdCOVVwQm41dUgvQjg1eVJpRnkzL1c5ajlyYWo5QTlwZkFXMnowZlJiemNQMjYwSDdydEZzdDRMWFFmWk5pSjA3ZXdPT0taNlNKREhHSVFBM0VYbE1PYVFWT2wwdXRGdjNKYmNvdVJ1dk5taXdoMytTcmI3bm9ETmhzSzRVd2V2L0RBQWJJSThPWHhVQUFBPT0="
+            },
+            "kind": "Secret",
+            "metadata": {
+                "creationTimestamp": "2026-11-02T01:53:21Z",
+                "labels": {
+                    "modifiedAt": "1793584413",
+                    "name": "r",
+                    "owner": "helm",
+                    "status": "deployed",
+                    "version": "1"
+                },
+                "name": "sh.helm.release.v1.r.v1",
+                "namespace": "e2e-combined-hooks-not-sequenced-run-by-weight",
+                "resourceVersion": "5312",
+                "uid": "3a1aa409-ed28-48c4-9511-d17c10c33700"
+            },
+            "type": "helm.sh/release.v2"
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}
+
+
+01:53:34.521 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-hooks-not-sequenced-run-by-weight --wait=false
+[exit 0, 0.0s]
+namespace "e2e-combined-hooks-not-sequenced-run-by-weight" deleted
+
+

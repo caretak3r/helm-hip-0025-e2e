@@ -1,0 +1,65 @@
+01:49:51.354 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-uninstall-after-plain-install-is-not-sequenced --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+01:49:51.394 $ kubectl --context kind-hip0025-e2e create namespace e2e-combined-uninstall-after-plain-install-is-not-sequenced
+[exit 0, 0.0s]
+namespace/e2e-combined-uninstall-after-plain-install-is-not-sequenced created
+
+
+01:49:51.430 $ .bin/helm-combined install r charts/hip-lifecycle --namespace e2e-combined-uninstall-after-plain-install-is-not-sequenced --wait --timeout 3m --kube-context kind-hip0025-e2e
+[exit 0, 3.5s]
+NAME: r
+LAST DEPLOYED: Sun Nov  1 20:49:51 2026
+NAMESPACE: e2e-combined-uninstall-after-plain-install-is-not-sequenced
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+
+
+01:49:54.974 $ kubectl --context kind-hip0025-e2e get secret -n e2e-combined-uninstall-after-plain-install-is-not-sequenced -l owner=helm,name=r -o json
+[exit 0, 0.0s]
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "v1",
+            "data": {
+                "release": "SDRzSUFBQUFBQUFDLyt4WTczUGFPaGI5Vnp6YUw3c3ptUGhIVElwbjNnY2d4VGcvYUNBcEJwZE9SNUtGclVTU1hVdUdrQTcvKzQ1TWNVaWI3cnkzM2U3N1VvWk1iSEhQMGJsWEIxMlpMMEJBVG9BUFN0QUNWS3h5NEg4QksxcEs5U2toQmN1M0pBRStjQ3luWTlxMmFkbDNqdVdmZG4zUGJwK2VlVjdYTlMzUHR5elFBZ3orWlVoQ0pDNXBvV2d1Z0E5Q0lSVmt6TUE1THhoUkJMU0FWRkJWRXZpZzRkMjFBTTVncWJSS1RoUk1vSUw2K21zU0dTMU1SbGNFYnpIVEJHdFN5ajI3MWJiYjM4OTVBMHNpbExHaEtqTWsrVndSZ1VsaXlBclZrMGdER3VheXNpeVhHS2k1S3ZhWVZWNGF6VlNHSWxKSjQ1OVZrWll3SVMyakVuU2ZUc3NvYzhZUXhBLy9BaTBBQ3pwckpLMWRQU0pFcnFDV0kzVWVHV0c4TGJPVGhCUkVKTkxNeFVtakJ2amd3eEtnSmZpb3k3Q1BJQUpUSW9IL29Ta0JmRFh0a2hTNXBDb3Z0OEFISzhxSWYzS3laejNSQUNJZ1luclpWRm1SWGFzaFEzK1ZESDFMMWdMUHFRRC9BNERnNCs3anJnVllqaCtBTHlyR1drQVJYakNvWHViUkRKNTgydVRsQTh0aDBsWUYwMHRZcnprZ3JsVGg0TTNuY0RTV3lNVUs4MWtXang3U2FURGJvS0Ryb1doV0pZTStSMjZZb29EeE9CcDdDK2VSaGFNcHcrNzA2UjN0NVhIQTdwTkJqMkxlWFNlRE1MMFk5Q2ppUXhYZmhta29VbnA1Mi90OHRlMnAxZHk2ck9jTHBpem1ySXB2ZXpTK3UyQlhJbGxqcmlSeWhnOVgvTEdJK2V5ZVJHT3A4VmR6dXp2Z3d3MmN4UXlMY1lHYzAwNFlERGQ0ZEwxTzd0OWVRb2RWOFhuK1VtK3ZVUEY4bXNYQjBGcmM1WmZob0Y4dElwdTlvLzB6c3UxVmUyMzk3bXFTcDJFd3JCRHZXb3Y1dEVDTzkvUXV6ZE53MEVzeG56bUgrSDFlWHJTSUh1MTRmbDNGenVONndZZnlTbHl3aFBiZmhLT2hqZHdwQzBkMmR5REdtemk2N2d4b3piRkJBYnRmeks4NzRmbGJyZU1wamg3WndwMnU4YjNXMVV2RHdNNlNZSnpmQlVNYVI0OVBlczdGdkwvNVR1dmMwbmdyanV3TkNvWldmTmZnV1JJTUh4YnphWGJRSGc3NmNoRmRNRFM2N29RamxlRlJULzgvQ3dkZVhRZXRjelZwWWpQRXZYVVNEQzBZZFN2ODlKVjMvOWsybmk4TzJDMXl1dFlWaXpNMG1qRzg5UVFLdW5RUmJTcGRxM0MwU2ZGOHRrNkM5K2xlYXk4TlI4KzEyTjlQR2VaMmdmaCtycWw3a1MyYzJTU2VYeFRJbWQ3RjBYaU5lTzJwVFlNSnhtc2twaG1NUEliRkVkZWdsMTdkTnV2cXhsRjRwRnZqbUZwRUNmdlJHc0xJem1MblNPczN1UGVqbVVURC9scXZIN25MMDlzb2ZvZmM2UVR6MlZNY2VkYXhqcnBPMGZDaDF1aU9KNWgzYWJNK1IzOXdOTFh3MjRRbDUzbEszSDZXQkdrbkhMeVI0YWkveG1MU0NjL1R6Zk82Tk53RjRzeUMwVkJPZzVsY3pObFJuVjdQYmY4ZFptL2o2REVqQjUrLzVOeThVdlBIZ1ZCblY3ZDlodmhrLzcxTC8vZ0R0QURQRTBVNU9YUWpxMnM2cDNlTzYxdTJiM2ZiVHNkeGJPZk1zazNyVkRla1hldVZ6V2UvMjdlM2tML2NlbElZZWZkb05IdjRNMXZCWlRBdEZ1NGtEY1hGR3JrVEdnNU8wNUI3R1lyZTAzQndzVm5NTHhnU0UzcTVUL25IMGgzZjYvcFd0MjE1VHFmamRKK2xmMnlCTldRVnFadEkzUkZUbGlQSTlGVkoxc0FIdG00YWxNTlVjNHFVaWtmZmJqdG5KbVFGRmFUZTFXR3lQU2NNYm9Idjdsb0EvVTlZc01ZMkhXRUZtU1M3MXMvVFNwd1JEZzhOWkgvM1hETEwwcFhSN3p2TDh1dDNERnAxcTVJSHpJKzhvZTF4Mm5ZOHQrTjZwMmRlNHczQW9hQXJJaFh3Z1dtYVMvRVA0emF2U2t4ODQ4V3BvMm1ySjg4bTJoOWZhaE10eGZNWndEZGdVY2lUdGIwVUQxUWt2bkZleDNFaTFGSWNUamYrVWhpR3RxWGZuRXRNcU1lT1RnNTFqR0dVWk8wYlMyQXZ3VkxJZ3VCNnVDUUZveGhLMzdEMXJTU01ZSldYWHlFY0tweGRRVVNZOUkwdnNDaU9aOW5wbUVNV0I4Q3hMUDFpL3dsc0dLL3AvRmFydm0vMDZwY2lKYWVpeGdRbHhPU0dsRFJQYmduT1JTSjl3enJFNFZ3b1NBVXBqNW5OcjlYYUVQUThhQmkxdTN6ak8zTjlGM05UTVhhVE00cTN2aEd1eHJtNktZbXNsK1E1VU51UkNpTGxUWmtqNGg5L1pCaVpVa1ZBbEc5OEthREtmT09rWlJSNXFYempqYlY3R1VrRlZSU3kydGROZHU3TG1PSmw3dlpTTE1XZjhSLzZoZjVEL3hmL29aL3hIL3J0djcvSmY2LzJ6cCt4M1o3bVYxcHVQOE4vWWJjajRHK3IvUktySFQrQTJxMzZmQ1lMaUhYZkpnNHhjYzRSRlNReG13ZHVFNjRVS2MyQ1FTck13eGlWcHNpVjJUemkxNC9pQmR0KzRrUmx1ZjY1UWtvSWR2OGVBQUFxL3VFTkVRQUE="
+            },
+            "kind": "Secret",
+            "metadata": {
+                "creationTimestamp": "2026-11-02T01:49:51Z",
+                "labels": {
+                    "modifiedAt": "1793584194",
+                    "name": "r",
+                    "owner": "helm",
+                    "status": "deployed",
+                    "version": "1"
+                },
+                "name": "sh.helm.release.v1.r.v1",
+                "namespace": "e2e-combined-uninstall-after-plain-install-is-not-sequenced",
+                "resourceVersion": "2244",
+                "uid": "9da8dc27-d3d1-44b2-a718-d40fdda36704"
+            },
+            "type": "helm.sh/release.v2"
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}
+
+
+01:49:55.013 $ .bin/helm-combined uninstall r --namespace e2e-combined-uninstall-after-plain-install-is-not-sequenced --kube-context kind-hip0025-e2e
+[exit 0, 0.2s]
+release "r" uninstalled
+
+
+01:49:56.187 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-uninstall-after-plain-install-is-not-sequenced --wait=false
+[exit 0, 0.0s]
+namespace "e2e-combined-uninstall-after-plain-install-is-not-sequenced" deleted
+
+

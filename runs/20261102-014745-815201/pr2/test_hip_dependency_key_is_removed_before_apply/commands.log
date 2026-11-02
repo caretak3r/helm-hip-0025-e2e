@@ -1,0 +1,171 @@
+01:55:16.070 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr2-hip-dependency-key-is-removed-before-apply --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+01:55:16.110 $ kubectl --context kind-hip0025-e2e create namespace e2e-pr2-hip-dependency-key-is-removed-before-apply
+[exit 0, 0.0s]
+namespace/e2e-pr2-hip-dependency-key-is-removed-before-apply created
+
+
+01:55:16.152 $ sh -c kubectl --context kind-hip0025-e2e create configmap key-probe -n e2e-pr2-hip-dependency-key-is-removed-before-apply --dry-run=client -o yaml | kubectl --context kind-hip0025-e2e annotate -f - 'helm.sh/depends-on/resource-groups=[]' --local -o yaml | kubectl --context kind-hip0025-e2e apply --dry-run=server -f -
+[exit 1, 0.1s]
+The ConfigMap "key-probe" is invalid: metadata.annotations: Invalid value: "helm.sh/depends-on/resource-groups": a valid label key must consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character (e.g. 'MyName',  or 'my.name',  or '123-abc', regex used for validation is '([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]') with an optional DNS subdomain prefix and '/' (e.g. 'example.com/MyName')
+
+
+01:55:16.234 $ .bin/helm-pr2 install r charts/hip-groups --namespace e2e-pr2-hip-dependency-key-is-removed-before-apply --wait=ordered --timeout 3m --kube-context kind-hip0025-e2e
+[exit 0, 7.6s]
+NAME: r
+LAST DEPLOYED: Sun Nov  1 20:55:16 2026
+NAMESPACE: e2e-pr2-hip-dependency-key-is-removed-before-apply
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+level=WARN msg="sequencing: group \"orphan\" depends-on non-existent group \"no-such-group\"; moving group to unsequenced batch" chart=hip-groups
+level=WARN msg="sequencing: resource-group \"lonely\" is isolated (no depends-on edges and no dependents); deploying it in the unsequenced batch after sequenced groups" chart=hip-groups
+
+
+01:55:24.853 $ kubectl --context kind-hip0025-e2e get Deployment my-app -n e2e-pr2-hip-dependency-key-is-removed-before-apply -o json
+[exit 0, 0.1s]
+{
+    "apiVersion": "apps/v1",
+    "kind": "Deployment",
+    "metadata": {
+        "annotations": {
+            "deployment.kubernetes.io/revision": "1",
+            "helm.sh/resource-group": "app",
+            "meta.helm.sh/release-name": "r",
+            "meta.helm.sh/release-namespace": "e2e-pr2-hip-dependency-key-is-removed-before-apply"
+        },
+        "creationTimestamp": "2026-11-02T01:55:19Z",
+        "generation": 1,
+        "labels": {
+            "app.kubernetes.io/managed-by": "Helm"
+        },
+        "name": "my-app",
+        "namespace": "e2e-pr2-hip-dependency-key-is-removed-before-apply",
+        "resourceVersion": "9362",
+        "uid": "5473b727-310f-4eb5-8fbd-d00d37069779"
+    },
+    "spec": {
+        "progressDeadlineSeconds": 600,
+        "replicas": 1,
+        "revisionHistoryLimit": 10,
+        "selector": {
+            "matchLabels": {
+                "app": "my-app"
+            }
+        },
+        "strategy": {
+            "rollingUpdate": {
+                "maxSurge": "25%",
+                "maxUnavailable": "25%"
+            },
+            "type": "RollingUpdate"
+        },
+        "template": {
+            "metadata": {
+                "labels": {
+                    "app": "my-app"
+                }
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "image": "nginx:1.27-alpine",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "web",
+                        "readinessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/",
+                                "port": 80,
+                                "scheme": "HTTP"
+                            },
+                            "initialDelaySeconds": 3,
+                            "periodSeconds": 1,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 1
+                        },
+                        "resources": {},
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File"
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "terminationGracePeriodSeconds": 0
+            }
+        }
+    },
+    "status": {
+        "availableReplicas": 1,
+        "conditions": [
+            {
+                "lastTransitionTime": "2026-11-02T01:55:23Z",
+                "lastUpdateTime": "2026-11-02T01:55:23Z",
+                "message": "Deployment has minimum availability.",
+                "reason": "MinimumReplicasAvailable",
+                "status": "True",
+                "type": "Available"
+            },
+            {
+                "lastTransitionTime": "2026-11-02T01:55:19Z",
+                "lastUpdateTime": "2026-11-02T01:55:23Z",
+                "message": "ReplicaSet \"my-app-7ffb5c449f\" has successfully progressed.",
+                "reason": "NewReplicaSetAvailable",
+                "status": "True",
+                "type": "Progressing"
+            }
+        ],
+        "observedGeneration": 1,
+        "readyReplicas": 1,
+        "replicas": 1,
+        "terminatingReplicas": 0,
+        "updatedReplicas": 1
+    }
+}
+
+
+01:55:24.909 $ kubectl --context kind-hip0025-e2e get secret -n e2e-pr2-hip-dependency-key-is-removed-before-apply -l owner=helm,name=r -o json
+[exit 0, 0.0s]
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "v1",
+            "data": {
+                "release": "SDRzSUFBQUFBQUFDLyt4WmUzUGlPcGIvS2lyUEh6TlRDMmsvUWhLOE5YK0EweGlUaE81QTR0ZWw2NVlzQzF0QmxuMHRHWEM2K3J0dnlRWkNIdE56MDkyN3RWTTE1R243dlBVNzUraklYeFVHTTZ5WVNxbDBGTUtXdVdKK1ZaYWs1T0wzR0JjMHIzR3NtSXF1Nm1kZFRldXEycDJ1bXIyZXFaMmQ2UDF6NDBMcnFqMVRWWldPUXVHN1dXTE1VVWtLUVhLbW1JckR1SUNVQXBSbkJjVUNLeDJGQ3lncXJwaktRZTYzam9KU1dBcHBaWVlGaktHQTh2K2RFeWtwdWttWlZ3VlhPc29hbDd3VnJaNW9KNjhWanAzUFhWWFZlMkNoM09Hc29GQmdnTGRRYXVjTEJmeE55bzRneHgzd1I0VXJETHFMU2xVTkRHQlIvQjBVdE9KQXBCaUl0TVFZVkl6alB5ck1FSTRCZ2h4TC9iQWc3c0dFdFNGdHB6bGFLU2FyS08wb1lxZVRLK1p2QndjT056Lzh2c25MRmMxaGZDSUtLbTF2UEZXd3dZVmpYZnpoaktjOE1wQkFtWnVHNDFVeXM5MU5aUGQ3a2VkVzhXV2VYTm16SWpCdUU0ZE4xcEZ4U3h6ck5uR3lYaHA1OThTeEpxY09HWkRRbUt4amZ5Q3ZXWE50dXh0VU84bVZ2UzJRY1p0Y2s5UHFhcjVLcnNoRmN1MXJmWXVKOCt2NWNCVjZZUkZsOTRtVDNkZmh2R2RFeHFTTTdINGFXazVMbDQwMjBBMHBZdE1pMGsvUEhIdTBRZU9iZGZ6dzhRcnF0QW92OCtmMkRnb1Irck0wdEVkcWNKZGZPZGF3Q2p5TmZpTERjMXdQcWlnYmlYQSs3Qzl2ODhTeFIxV1U5ZFhBbnhXUjNudjhsT1NKWXcyU0ppN2p1SWp0SkxuTzRqb3kzSTB6MXZvV0dTU09OY3hEYnl1dTJUUy9OaVlVNlgwTlpWTjY3YlYwZXoxSDlPZTRWcFBRNjYxZTNvdDFxa0pyVUxXeDJ0bGtEUkpvdXp5YTl4NmgxVitGL3BCRzJlengydXRYYitsRGo3bTBONG50L2hYUys1VmpuU1pMYTdpTnZiNTY4SFB2aysxV29TWHZGWS9JZGg4YWY4Y1RpdXh0RWVpangwOWtzSlgySWQzbG9UZFZJOE01MjlrckFuLzJBRDl1MHlCemVhTlRIMjNRWmF2N3VzVkNzdlJiLzJMYkZjamVwckY5ZitCL3ZpYUR4cWJJSHBIUTJ6N0ttQVgrY1BOcWpYeTFwUjFQTjZGM3M1TWxyMmNVWlZvUlpTTVZldjFxWmt6U1FIZHZRMzlTUlByc0x2U21heG16VDJTd09mRFkwM1hFWmluMGVoU3hJMW5XSUxtZUh6QmloSjV6c0svbG95THc0Z04rVU5aZngxYlBDN3l0RnZvM0ZmUzBOTlR2azRPdEwvanV4eTZQUnNOMVpOTUhmSmNuY3kvOEZCbXpXNVM1ajZIWFU0L3RjS3hoSFhxalZXT2pNYjFGV1orRVIvSGEvOER4VEVVZll4bzM4Uittc1oyY09kWUZkOGJETldLM1o4NWxzdG12KzVIc0lzcW9DcjBSbjlrdUQzeDZGS2UzZld2ckFmMFlldHNVSDJIcFNPYm1qWmh2ZDdsTm8reTJ6ZUhrSC85UU9rcVd4NEprZUYvUDFYNVhQNy9URFZNM1RQWGlSRHZyR3hmNm1XWjAxVk5aMHI5MTNpaGtiVDArcVdGMlZNYWNldWpNM1lHNHVSelUwL21BdUUvd1MwSS9UU04veUVQL2hud2l3MVhnejlJZ0d6Mkc4MkVxelVPK1MyUHZQb0gyU0Evbnd5cXFoeUwyWjFyZ2JSS1psakp0UTYvM2dGdjZLNmNleXBUa2tiR1NLY2RDZjVhSHZuUGVsQ1ZyYUFRZVZWRTl6Q0xEU1lLc3IwTHJOSEh0bERyMmpDS1pmclpiQmNZcWlXejZHRnZEQWtsNTNyWUlNcmNPL0JtTnhxc0VlcWRKYktmVUlqZEpaQXcza1RFdHBDK1JNVm1GdnBQRTlrWHozUG1ZVHU2dG9ScjZxZXBZQ1duMTlPdlFkbXZIcHBVempuUG9UWE5uTEcxY0pZRS9vVTVUam1jMHRJYXJTSGNmSGJ1M2pnZjVnMk9Qc2pCekgySnI3eDhWRXA3T2VFcGxqS0pzV2tRWklsZnoweXVaOHREclBVUmpkeFhPQnlTOG05QnJGcTlSSm5pa2oxWU9HZVNoVFI5aWEwQmFTRG5KeEJxUU5xMmR4TWxtNU5xZlVzVENJdENiRnNKUTF0ZVExVHhMWTN0RUFuOUtIYkpxMHVwNnJnb0pLZWxUb0crMTBINjdYZnlMTnJXTlBWY0w1OW9HWmYySDBKOCtSb2J6WERjYmFhSHYvbXE5QXMrMUZJMEhML3djYmRxL000ckdOOFN4VWc3OXFmcGs1NnRZRk03NGU2bDBlcWZyWnU5VWJvMU9lNFp4Ym1qOWkrK2wwdEV1NDNVKzNVUDdYbUtzRHIzN3hLRnVoWFJYMmxVRnVydHlSazl0U0xaNDJUcEMvK2FzeGZoMmpUMTNKZkVVTnpoMDlkQ2Y5STV3SkxHM2k4UHBWZUFQQ3pkemE2VFRkZlNRSjhkdC9WYnZWMkZHMlowMzJsaVpSbU43MU9SdjA3YnNKcjVuanIxZFI4YVV2aXlSVGoza2dUY3RVUzN6dHJlTzdiWlZvRTNSeXBBdFI5cDlseWRSZGlFQ3IxZEZob3czWFVkczJyZUlLcTV2aXhUWjFBdjl5YVBrL1VTRytzMXRVVUt2dC9wRWhwZVIzc3VnRjA4RGYzQVZlYTRhZUpML1k5TmFHcXhMMmNaa0ErMVI5Y0sraDBNOUdOOGtrWDZhQlBOOVRJWXF0RWVxWTgvV29YK1R5TzJKWTd1bkxUYlUvM0xHY1lxeW5zeEZ1YlY1N3R2anJsWFlLWTFzdFVKNnNwWnRKakxjT3REdnhXNkxkaVpyQkxMVE5FcCtiTHN4MFRpUk1VT0crd0F0YldmM0pKNjhGVnVQUGlLNW5yVzJseTB4MEZ2ZTV1SjZydjZhOWM5Y2p1ZXYxcjlBZXAvTG1uckEyMld6MWtub3paaU1yYXl6c2s1SGh2c0xZN3V6NS9aMUxLQS9YVWYyU0EyOTJ4Mzk4RSszeHZQekMvWFFHYjkwbERXa2xkenRmMVZJQmhQSnlCTEN0cVoyb3A5M0lTMElrek5QaVdGY1gySUthOFUwdm5VVWpsS2N3ZjNRMEY0OXFWWlZWWTVZY3NwU1ZiUDVEcFdPc2lRVTh6M1B2eW84ZXErbm54cm5oOEtqWkpDUkplWkNNWlZ1dDd0Z2Z3SHp2Q29STnNIVGZQWGhuMWNseVhCM21Jd1d5djNUY3pERHZCRWxCNnhtVGpMQmZyWURjQ2x3Q2ZBYWx6VjQ0bWpVblN6WTB6UmxnclcyWUN2Q1loTllPVnVTNUFZV0M3WWZCODBGQTBDV1RoUFFQT2NZSEgzK0FpaEVLdzRnWTdtQWNnN2tDOVl3Z2EvU0hCT3d2SHYwOE51Q0xkaVB4ZUJIN00zTElvWHNtYjB4TGpDTE9jZ1pnRzBzZ0VpaEFIR09PV0M1QUhoTHVEak1waHRZTXNJU0tmTElqVVlGQUNtbTJRbFBQNVM3UldqZDJLdDlUclBUMjgzWkMzSnVnci8rdGxCWTN1VVZTdHQ3QytYTFgxL0VNU09jRTVaMFd6bVlvZnIvT0pZMFo1ald6MkpKZUM0MTdEQWwxeHJnT01FY0VBYnlFdVRWVDhheFZma2lFSHVsTGRHZkRzTFJybG5TZnYrc3dnVDdzd29BV2J3N3JramhHa3NYczBwVWtJS25oWkEwVW1hYmVFRGtDUllwTHY5YkhteUFEU1NDZzJWZWdpZ1g2VW1UeUVlc1ZJS05jQkJqU2lKY1FpRmpUSmc4Q1pFaTg2TElPUkVZNUdXTVN5QnkrVUFhRHdUZUN2QzNoWEtYN2g4U0JqWXBRYWtrcVFFc2NTTWN4d2RvUzRGd3VjUkk3RXpOTUJQN3lpQVhSL243aTdvQWk0Si9lQUxJNVlIclRZVEVVWmZqY2swUWZ0OHk3Mk85WUx6QXFDRXVjVUVKZ3R3RW1yemttR0lrOG5JbktJTUNwZGN3d3BTYjRDc3NpbVBkM3lUTmZ0MzNETWZHeWcvOUhqTUFCenZrUitBeUk2enh4QzRod3A5eFNmSjRqbEhPWW00Q2RVK0hjaVlnWWJqa0IxWUF1cnZZYkhDME9DcEVUY015d2F0KzlZcm1jMFhwNTV3U1ZKdkFXVTV6OGJuRXZGbUFKMExaNFFqRG5IOHU4d2lieDQ4QVNJVW9iQ3hNOExXQUlqWEJodzRvOGxLWTRFTDk5cHlTTUNJSXBFMnJQSGhuUEtjcG52dXUvVkQyL1RqQ21rVHNGbVdPTU9kNStUNllOY3cvZzdFWDJuOEFhRzlKK0EvYS9yK2lMYXU3c0NqZUI3SWR3NS9yK3d2bHQ4VmlvYlRBWEN5VWp2eDFxSWFMaGZKbG9md01ZRnNIZmdDblI0ei9nZWU3NEtsMGxJSkNKb2VTdytzU3JhTlF2TWEwZlRFaE5iOThzeExqUXQ1VTVWUVR5WFhjdmNSb1hzMTgvZzVEUjVGSVZremw4Q1NDWlVsd3FaaWlyUERUNk5IS0l5ekdXOFUwT3ErdGVEdDltbU9USGRmcE83aStkUFlXSGIyTDJTTmIrUVZtZlRrNnoybnk1NThKZlpmVnJkai9wYWozZmpaK3NDaVVYeUZiU3FjWUx1Mjloa2J5TzEwL0dpcitwUC9xOTIxOGRSWjNCRDN0eDFuMTk3SytHWHJsMzl5bjVxdnpyQ1JKejNnQmtYUVA2M0pYb25lbHVLZmhwTHZDZFpmd2JvbXpmSTNqYm9TWGVZbGxaNkIxOHpxMm9QWHZHUlpwTGdIQk9WUysvYzhBekdWNzUvNGVBQUE9"
+            },
+            "kind": "Secret",
+            "metadata": {
+                "creationTimestamp": "2026-11-02T01:55:16Z",
+                "labels": {
+                    "modifiedAt": "1793584523",
+                    "name": "r",
+                    "owner": "helm",
+                    "status": "deployed",
+                    "version": "1"
+                },
+                "name": "sh.helm.release.v1.r.v1",
+                "namespace": "e2e-pr2-hip-dependency-key-is-removed-before-apply",
+                "resourceVersion": "9366",
+                "uid": "00820e91-3e6a-4cbc-bf0b-49a60ff7203b"
+            },
+            "type": "helm.sh/release.v2"
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}
+
+
+01:55:24.955 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr2-hip-dependency-key-is-removed-before-apply --wait=false
+[exit 0, 0.0s]
+namespace "e2e-pr2-hip-dependency-key-is-removed-before-apply" deleted
+
+

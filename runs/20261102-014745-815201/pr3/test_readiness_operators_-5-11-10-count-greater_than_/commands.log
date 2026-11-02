@@ -1,0 +1,30 @@
+01:50:10.962 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr3-readiness-operators-5-11-10-count-greater-than --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+01:50:11.003 $ kubectl --context kind-hip0025-e2e create namespace e2e-pr3-readiness-operators-5-11-10-count-greater-than
+[exit 0, 0.0s]
+namespace/e2e-pr3-readiness-operators-5-11-10-count-greater-than created
+
+
+01:50:14.044 $ kubectl --context kind-hip0025-e2e patch Probe probe -n e2e-pr3-readiness-operators-5-11-10-count-greater-than --subresource=status --type=merge -p {"status": {"count": 11}}
+[exit 0, 0.1s]
+probe.readiness.hip0025.example/probe patched
+
+
+01:50:11.040 $ .bin/helm-pr3 install r charts/hip-readiness-basic -f runs/20261102-014745-815201/pr3/test_readiness_operators_-5-11-10-count-greater_than_/values.yaml --namespace e2e-pr3-readiness-operators-5-11-10-count-greater-than --wait --timeout 2m --kube-context kind-hip0025-e2e
+[exit 0, 3.1s]
+NAME: r
+LAST DEPLOYED: Sun Nov  1 20:50:11 2026
+NAMESPACE: e2e-pr3-readiness-operators-5-11-10-count-greater-than
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+
+
+01:50:15.118 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr3-readiness-operators-5-11-10-count-greater-than --wait=false
+[exit 0, 0.0s]
+namespace "e2e-pr3-readiness-operators-5-11-10-count-greater-than" deleted
+
+

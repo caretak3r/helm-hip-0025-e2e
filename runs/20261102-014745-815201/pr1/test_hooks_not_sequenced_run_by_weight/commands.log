@@ -1,0 +1,60 @@
+01:53:15.085 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr1-hooks-not-sequenced-run-by-weight --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+01:53:15.124 $ kubectl --context kind-hip0025-e2e create namespace e2e-pr1-hooks-not-sequenced-run-by-weight
+[exit 0, 0.0s]
+namespace/e2e-pr1-hooks-not-sequenced-run-by-weight created
+
+
+01:53:15.159 $ .bin/helm-pr1 install r charts/hip-lifecycle-hooks --namespace e2e-pr1-hooks-not-sequenced-run-by-weight --wait=ordered --timeout 3m --kube-context kind-hip0025-e2e
+[exit 0, 12.3s]
+NAME: r
+LAST DEPLOYED: Sun Nov  1 20:53:15 2026
+NAMESPACE: e2e-pr1-hooks-not-sequenced-run-by-weight
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+
+
+01:53:28.461 $ kubectl --context kind-hip0025-e2e get secret -n e2e-pr1-hooks-not-sequenced-run-by-weight -l owner=helm,name=r -o json
+[exit 0, 0.0s]
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "v1",
+            "data": {
+                "release": "SDRzSUFBQUFBQUFDLyt4WVczUGF1aGIrS3hxZFY1djRFcFBnbWYwUWFFTkpLYmx1SENoTVI3WVZyRVNXZEN5WmhHVDQ3MmNrWTRjMHlSN1MzWWZ6VUlZWnNMWHUrdnl0SlQ5QmhuSU1RMWhBQ3hKMncySDRCRzlJSWRXUEZBdktWemlGSWZRY3IyMjdydTI0VjU0VEJuN29CaTNQN2V4N251MEVvZU5BQzFMMFlaVVV5NlFnUWhIT1lBZ0hUQ3BFS1VoNExpaFdHRnBRS3FSS0NVUFkyRjFiTU1sUW9YU1VPVllvUlFycC81c2tNaUpzU201d3Nrb290alBPN3lTMDRCSVhzdkxodE56V2E4ODliUkhjRTVVQm93SlVoaFNRR1M5cENoaFhJTVpBNHYrV21DVTR0WUNncFh5K0JyS01UVWphRXhKazNEaGIrc2FUd0N6RkxDRll3dkI3RTZrcDhadXhGVmh3U1JRdlZrYU00bkJ2cjNLd1Z5dGhobUtxcTZ5S0VxK3R4cWpFQ1dmcFI2MDJXaS9NMXFGTFc5djV2Z2w0dnA2dkxVaDVjZ2REVmxKcVFZVnpRWkY2bVYxemM4OFV0TFZDT2RYRk1Mc0ZoNWVPNnVYSDkyZzhwUWtiaWRqYmJ3LzZKMW5hSC9HaFAzbm81VXJFK1hsNzhGa3NKd3VocHRjWDJiUi83RXl1K05kQnIxdE9JcGVla2k2UHZVNHh2RTRwaWxLZTlseUZvc0JOVm83YkkwZUxTUlNVc1grUnBYMjZqTm0zdHI0MzZIWDVOSHBRUXpiaVF5OWJ4cDVzRDc1MFY5TkxWOFJzNUV5aUIvbU9uRXE5c1poNm1YTktqc2p3Nm0veW50eTBQNWJUNndzNnZPNHU0ejY5eFZkOE1jbkhlZXlmMEdGVXlVejhFenE1dnRCNWYwMzhMcDA4bXJ5Y2FlVGV4LzFqWjJyeVBGb012b3p1cDFFZHU3NCtvWWwva1NYczRqejJIc1RFdjJzUFBnYzB6Y2VyUnFZL1dzYnNJa05SUUJPMnBkczdXZ3d2WDladWUyM1E2NG80T21aVEhTOGJQK0xvWklrLzhZZmg3VGZ2SjduYjJIUFZKQXJ1VGtrM0hyQVJINUQ3eFlDNHQrWTNIKytqNi9QRnQ5NUoyaU9PR3A2TExPblRhSHA5OG9paVRubEt1bVJ5ZlhHTGVoM3YyN2tvVUdYbmErd052c2JSMkpsRWVzOCttN2pqL0ZqcGVGQy9zMFFyMTU5R2xLRXY1MnAwemhlRC9uRVo1eDJucW1Qd2VMcmdKajdVSDh2NE1uaEV2WTdKOFpSMDc1UDhiNDJOeDdSL0xPT2p0K1VhSEgzaWk4SHRuLzNkYVg4WGYvMEZMWmp6VkpFYzE1enZkR3h2LzhyelEzYy85QTliZm5EZ0hSNjJBOWQyOWpYdHIrY1dYQ0phWXRsMEd2MW5RWG1NS0F5ZjFoWWtPVnBvYzJ4QjJFUG90cndERzFGQkdEWThodExWSjB6UkNvYitSMlN0bWgxLzJkbmFnakxKY0k1cTZxdXVudE4zSEVmM085M3lIQ2MwM3ltMEROdktXdWU5WWhucGx1TWRPb0hqNy90MXNTeVlJMFp1c0M0U3RHMTd4djRETG5sWkpEZ0VielM3RjQxaTc1bUZxLzVwYUhqR25wdFVDSkFRY20vcHp0Z2RZV2tJUGhtNUhETTFZM1Y3RFdjTUFNM3JJVEJtWjB3S25KaTdCUmFVSkVpR3dOV1hFbE9jS0Y2WU5RQnlwSkpzaUdKTVpRaWVrQkFiQTJ1OVhNZFd5MjQ3MHgvNmpoNEFqWGY5VWJqSUNVTzZrZmNMbE9BelhCQ2VYcHFkbGlGd2FybUVNNFVJdzRWc1ZBR3dOMm5kNC9qNUpnQUdFU0Y0QlloWE1tY2xwV2Vja21RVmdzSE5pS3V6QWt0VHUyZEJEU0hDc0pSbkJZOXh1TDBFUUthVTZHTVZnaWVCVkJhQ1BRc0lYcWdRSERycmw1S0VFVVVRTlZoc3N2TmZ5b2lYdWJzek5tTzdRNlo2T240L1ppcTcvd1kwbFlWZlFNMlc0aC9ZZkFnMjBJS0NJcWE1c2hrbFhRdFN2TVMwR3ZTMDUzY0g3aFFMdmVwWXNCNk91M3Biell6WVRKTFc5NXFSNTNNTDRuU3hHU0Z2Q3A1dkRjaUtQdysyZXZqOEo5Yy96OG1iT056ZHRKbzV1RkdiV3pCdUFuK3FUaDVuSC9adVFmMmd3QkNXckRrMVFHMjVLQWd1Nm1tNzV2bktGV0VwZmpBVjNESGJ0eC9jVGNWMkRQeFZBZjVGNUs2MWM4WGZEMTJmTll6Qzl0bEMzN0R2TVZsa3lzNEpLNlVkd0NiUUV4N0RmL1Q4enNsa3E4dHVVNTNaL1MydU8rSHhteVQzUmt4NkVUSEdsV0dabWo4eVRQT1d6SXp6RUlnQzI2UTY5cjVlM3RnTHdRemF3UXkrSVpCaWZVNjJ4WVpMWW56RGl5cFBPeW13OGJ2RnV6OXg1d3MrTExCVUdpSWJTeU84eE1WT0hLaWR2VUdDY1NsWE1kYzA2TGUzbHhPZTUwZ1g4dnNNeW13R0xaMWNVdjNpQjZLQU00TnpRejk0aVpsQkZOd3FFcHh2M2pNVXBlRW1FelJPZnlEMXpnc0h2OTBKL0U3endxRit0ZkN1eG1GclB6Z00zSGFqSVRJa05lZ3V5eVRCT0szZVFGUWJBME03MEkrS052akQ3RUYxeElkdjdRT2NieDNUdDlIeS80WGQzNHJhUDZEOUZkQWV0b0xPUVhDd08yZzl0N1YvNExnSHdXNmcvUkJtNTlhTC9xL0xKd1ZLdEhIc1lWc1ViZ1ZObTNGbE55M0NMa3BteDZzTkZNeHJNVUZYUDNLc01xNkJMaVdDNi84TkFIa242Rng1RkFBQQ=="
+            },
+            "kind": "Secret",
+            "metadata": {
+                "creationTimestamp": "2026-11-02T01:53:15Z",
+                "labels": {
+                    "modifiedAt": "1793584407",
+                    "name": "r",
+                    "owner": "helm",
+                    "status": "deployed",
+                    "version": "1"
+                },
+                "name": "sh.helm.release.v1.r.v1",
+                "namespace": "e2e-pr1-hooks-not-sequenced-run-by-weight",
+                "resourceVersion": "5078",
+                "uid": "23885eb2-f433-495d-b541-06d78c08e5c6"
+            },
+            "type": "helm.sh/release.v2"
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}
+
+
+01:53:28.512 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr1-hooks-not-sequenced-run-by-weight --wait=false
+[exit 0, 0.0s]
+namespace "e2e-pr1-hooks-not-sequenced-run-by-weight" deleted
+
+

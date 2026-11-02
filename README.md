@@ -61,6 +61,22 @@ The [dashboard](https://caretak3r.github.io/helm-hip-0025-e2e/) shows each run i
 
 `runs/<stamp>/REPORT.md` contains the same verdicts as Markdown.
 
+### Run 20261102-014745-815201
+
+This run fetched the rebased pull request commits from GitHub after the push. It used the harness commit
+`d6465d96fc89`, a new kind cluster (Kubernetes v1.37.0) and new builds. The run status is PASS. The results and
+the builds are the same as in run 20261102-005819-128778.
+[Dashboard page](https://caretak3r.github.io/helm-hip-0025-e2e/20261102-014745-815201/index.html),
+[REPORT.md](runs/20261102-014745-815201/REPORT.md),
+[charts](https://caretak3r.github.io/helm-hip-0025-e2e/20261102-014745-815201/charts/index.html).
+
+| Tier | Commit | HIP requirements | Tests | Go unit tests |
+|---|---|---|---|---|
+| PR1 | `588ef3bf8` | 16 graded: 15 met, 1 deviation (R35) | 21 pass, 25 n/a | 10/10 packages pass, 1 compile only |
+| PR2 | `5960aa3ee` | 8 graded: 7 met, 1 not implemented (R26) | 28 pass, 1 xfail (R26), 17 n/a | 4/4 packages pass, 1 compile only |
+| PR3 | `176b059b0` | 7 graded: 6 met, 1 extension (R37) | 19 pass, 27 n/a | 3/3 packages pass |
+| Combined | PR2 + PR3 | 30 graded: 27 met, 1 extension, 1 deviation, 1 not implemented | 45 pass, 1 xfail (R26) | — |
+
 ### Run 20261102-005819-128778
 
 This run tests the three pull requests after their rebase onto the upstream commit `bc232c531`. It used the harness

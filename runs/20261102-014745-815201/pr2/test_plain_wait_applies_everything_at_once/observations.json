@@ -1,0 +1,19 @@
+[
+  {
+    "label": "apiserver timeline",
+    "value": [
+      "01:53:28.842  apply  Deployment/foo",
+      "01:53:28.842  apply  Deployment/bar",
+      "01:53:28.842  apply  Deployment/rabbitmq",
+      "01:53:28.842  apply  Deployment/nginx",
+      "01:53:32.423  ready  Deployment/foo",
+      "01:53:32.443  ready  Deployment/bar",
+      "01:53:32.447  ready  Deployment/rabbitmq",
+      "01:53:32.451  ready  Deployment/nginx"
+    ]
+  },
+  {
+    "label": "apply burst duration (seconds)",
+    "value": 4.1e-05
+  }
+]

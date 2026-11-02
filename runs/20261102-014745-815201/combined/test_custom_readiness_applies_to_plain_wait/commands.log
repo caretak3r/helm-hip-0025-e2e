@@ -1,0 +1,30 @@
+01:57:20.988 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-custom-readiness-applies-to-plain-wait --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+01:57:21.032 $ kubectl --context kind-hip0025-e2e create namespace e2e-combined-custom-readiness-applies-to-plain-wait
+[exit 0, 0.0s]
+namespace/e2e-combined-custom-readiness-applies-to-plain-wait created
+
+
+01:57:25.075 $ kubectl --context kind-hip0025-e2e patch Probe probe -n e2e-combined-custom-readiness-applies-to-plain-wait --subresource=status --type=merge -p {"status": {"phase": "Ready"}}
+[exit 0, 0.1s]
+probe.readiness.hip0025.example/probe patched
+
+
+01:57:21.070 $ .bin/helm-combined install r charts/hip-readiness-basic -f runs/20261102-014745-815201/combined/test_custom_readiness_applies_to_plain_wait/values.yaml --namespace e2e-combined-custom-readiness-applies-to-plain-wait --wait --timeout 2m --kube-context kind-hip0025-e2e
+[exit 0, 4.1s]
+NAME: r
+LAST DEPLOYED: Sun Nov  1 20:57:21 2026
+NAMESPACE: e2e-combined-custom-readiness-applies-to-plain-wait
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+
+
+01:57:26.163 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-custom-readiness-applies-to-plain-wait --wait=false
+[exit 0, 0.0s]
+namespace "e2e-combined-custom-readiness-applies-to-plain-wait" deleted
+
+
