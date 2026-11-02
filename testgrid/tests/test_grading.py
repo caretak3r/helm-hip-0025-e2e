@@ -24,6 +24,9 @@ report = importlib.import_module("report")
 runner = importlib.import_module("run")
 
 ROOT = Path(__file__).resolve().parents[2]
+# The live catalog has no not-implemented requirement, so the fixture marks this one as
+# not-implemented in its own copy. The strict-xfail rules of the grader stay under test.
+STRICT_XFAIL = "R24"
 
 
 def save(path, value):
@@ -50,10 +53,15 @@ def evidence(tmp_path):
     for name in ("tiers.yaml", "requirements.yaml"):
         shutil.copy(ROOT / name, run / name)
     cfg = yaml.safe_load((run / "tiers.yaml").read_text())
-    reqs = yaml.safe_load((run / "requirements.yaml").read_text())["requirements"]
+    catalog = yaml.safe_load((run / "requirements.yaml").read_text())
+    for req in catalog["requirements"]:
+        if req["id"] == STRICT_XFAIL:
+            req["status"] = "not-implemented"
+    (run / "requirements.yaml").write_text(yaml.safe_dump(catalog, sort_keys=False))
+    reqs = catalog["requirements"]
     suite = [{"nodeid": f"e2e/tests/test_contract.py::test_{r['id']}", "reqs": [r["id"]],
               "needs": cfg["tiers"].get(r["owner"], {}).get("features", []),
-              "xfail_strict": r["id"] == "R26"} for r in reqs]
+              "xfail_strict": r["status"] == "not-implemented"} for r in reqs]
     stages = {s: {"status": "passed"} for s in (
         "collection", "sources", "cluster", "metadata", "charts", "grading", "report",
     )}
@@ -104,10 +112,10 @@ def assert_consumers(run, expected):
     return data
 
 
-def test_complete_run_with_na_and_strict_r26(evidence):
+def test_complete_run_with_na_and_strict_xfail(evidence):
     data = assert_consumers(evidence, "PASS")["data"]
-    assert grade.cell(data, "pr1", "R26") == grade.NA
-    assert grade.cell(data, "combined", "R26") == grade.XFAIL
+    assert grade.cell(data, "pr1", STRICT_XFAIL) == grade.NA
+    assert grade.cell(data, "combined", STRICT_XFAIL) == grade.XFAIL
 
 
 @pytest.mark.parametrize("mutation, status", [
@@ -148,7 +156,7 @@ def test_incomplete_and_failed_evidence(evidence, mutation, status):
     elif mutation == "missing_phases":
         change(result, lambda d: d["tests"][0].pop("phases"))
     elif mutation == "loose_xfail":
-        change(result, lambda d: next(t for t in d["tests"] if "R26" in t["reqs"]).update(xfail_strict=False))
+        change(result, lambda d: next(t for t in d["tests"] if STRICT_XFAIL in t["reqs"]).update(xfail_strict=False))
     elif mutation == "worker":
         change(evidence / "run.json", lambda d: d["stages"]["e2e:pr1"].update(
             status="failed", error="pytest worker exploded"))
@@ -243,6 +251,7 @@ def test_dashboard_links_only_to_recorded_evidence(evidence, stage):
 def test_runner_persists_worker_and_early_failures(evidence, monkeypatch, stage_name, exit_code):
     meta = json.loads((evidence / "run.json").read_text())
     monkeypatch.setattr(runner, "RUNS", evidence.parent)
+    monkeypatch.setattr(runner, "ROOT", evidence)  # snapshot the fixture's catalog, not the live one
     monkeypatch.setattr(runner, "rel", str)
     monkeypatch.setattr(runner, "collect_suite", lambda out: meta["suite"])
     monkeypatch.setattr(runner, "fetch_sources", lambda: None)

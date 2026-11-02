@@ -6,7 +6,7 @@ repository root:
     uv run pytest e2e/tests --tier pr1 --helm .bin/helm-pr1 --out runs/<stamp>/pr1
 
 Markers
-    @pytest.mark.req("R05", ...)      HIP-0025 requirement(s) the test proves
+    @pytest.mark.req("R06", ...)      HIP-0025 requirement(s) the test proves
     @pytest.mark.needs("subcharts")   features the tier must ship (tiers.yaml);
                                       otherwise the test is reported N/A
 """

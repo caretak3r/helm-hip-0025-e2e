@@ -18,7 +18,7 @@ def _timeline_rows(tl, names):
     return rows
 
 
-@pytest.mark.req("R08", "R35")
+@pytest.mark.req("R09", "R15")
 @pytest.mark.needs("ordered", "subcharts")
 def test_upgrade_follows_install_order_and_waits_leaf(e2e, order):
     """Upgrade patches a -> b -> parent, each after the previous is ready again; helm finishes after the leaf is ready."""
@@ -41,14 +41,14 @@ def test_upgrade_follows_install_order_and_waits_leaf(e2e, order):
         (finished, "helm writes release record: deployed"),
     ])
 
-    # R08: the upgrade applies in install order, gated on readiness.
+    # R09: the upgrade applies in install order, gated on readiness.
     order.before("subchart-a ready", a_ready, "subchart-b patched", b_patch)
     order.before("subchart-b ready", b_ready, "parent patched", p_patch)
-    # R35 (deviation): the leaf (parent, nothing depends on it) is still waited on.
+    # R15 (deviation): the leaf (parent, nothing depends on it) is still waited on.
     order.before("parent ready", p_ready, "helm finished", finished)
 
 
-@pytest.mark.req("R09")
+@pytest.mark.req("R10")
 @pytest.mark.needs("ordered", "subcharts")
 def test_uninstall_reverse_order_for_ordered_install(e2e, order):
     """Uninstall of a sequenced release deletes in exact reverse: parent -> b -> a, each after the previous is gone."""
@@ -65,7 +65,7 @@ def test_uninstall_reverse_order_for_ordered_install(e2e, order):
     order.before("subchart-b deleted", b_del, "subchart-a deleted", a_del)
 
 
-@pytest.mark.req("R09", "R02")
+@pytest.mark.req("R10", "R02")
 @pytest.mark.needs("ordered", "subcharts")
 def test_uninstall_after_plain_install_is_not_sequenced(e2e):
     """A release installed all at once (plain --wait, no stored plan) is uninstalled all at once."""
@@ -86,7 +86,7 @@ def test_uninstall_after_plain_install_is_not_sequenced(e2e):
     assert spread < 1.0, f"deletes spread over {spread:.1f}s: uninstall was sequenced although the install was not"
 
 
-@pytest.mark.req("R10")
+@pytest.mark.req("R11")
 @pytest.mark.needs("ordered", "subcharts")
 def test_rollback_follows_target_revision_order(e2e, order):
     """Rollback to a sequenced revision re-applies it in its order, then removes the extras in reverse (d before c)."""
@@ -123,7 +123,7 @@ def test_rollback_follows_target_revision_order(e2e, order):
     assert rev3_batches == rev1_batches, "the rollback revision must carry the target revision's plan"
 
 
-@pytest.mark.req("R11")
+@pytest.mark.req("R12")
 @pytest.mark.needs("ordered", "subcharts")
 def test_failure_stops_install_dependent_never_applied(e2e):
     """A dependency that never becomes ready fails the install; its dependent is never applied; the release is failed."""
@@ -143,7 +143,7 @@ def test_failure_stops_install_dependent_never_applied(e2e):
     assert "STATUS: failed" in status.out
 
 
-@pytest.mark.req("R11")
+@pytest.mark.req("R12")
 @pytest.mark.needs("ordered", "subcharts")
 def test_rollback_on_failure_cleans_up(e2e):
     """--rollback-on-failure: the install fails, then Helm deletes what it applied and leaves no release."""
@@ -163,7 +163,7 @@ def test_rollback_on_failure_cleans_up(e2e):
     assert releases == [] and e2e.release_record() is None, "no release record may remain"
 
 
-@pytest.mark.req("R12")
+@pytest.mark.req("R13")
 @pytest.mark.needs("ordered", "subcharts")
 def test_readiness_timeout_per_batch_cap(e2e):
     """--readiness-timeout 10s under --timeout 2m fails the never-ready batch after ~10s, not 1m or 2m."""
@@ -175,7 +175,7 @@ def test_readiness_timeout_per_batch_cap(e2e):
     assert "broken" in run.err, "the error must name the resource that was not ready"
 
 
-@pytest.mark.req("R12")
+@pytest.mark.req("R13")
 @pytest.mark.needs("ordered", "subcharts")
 def test_readiness_timeout_exceeds_timeout_rejected(e2e):
     """--readiness-timeout 3m --timeout 2m: rejected immediately, nothing applied."""
@@ -192,7 +192,7 @@ def test_readiness_timeout_exceeds_timeout_rejected(e2e):
     assert len(applies) == 0, "nothing should be applied when validation fails"
 
 
-@pytest.mark.req("R12")
+@pytest.mark.req("R13")
 @pytest.mark.needs("ordered", "subcharts")
 def test_default_readiness_timeout_one_minute(e2e):
     """No --readiness-timeout, --timeout 3m: fails after ~60s (default 1m readiness timeout)."""
@@ -206,7 +206,7 @@ def test_default_readiness_timeout_one_minute(e2e):
     assert 55 <= elapsed <= 100, f"should fail around 60s with default readiness timeout, got {elapsed}s"
 
 
-@pytest.mark.req("R13")
+@pytest.mark.req("R14")
 @pytest.mark.needs("ordered", "subcharts")
 def test_hooks_not_sequenced_run_by_weight(e2e, order):
     """Hooks run before chart resources in hook-weight order, outside the plan, despite sequencing annotations."""

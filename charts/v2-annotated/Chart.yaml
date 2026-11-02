@@ -1,6 +1,6 @@
 apiVersion: v2
 name: v2-annotated
-description: R14 v2 chart with group annotations - must work with plain --wait, reject --wait=ordered
+description: R16 v2 chart with group annotations - must work with plain --wait, reject --wait=ordered
 version: 0.1.0
 dependencies:
   - name: sub

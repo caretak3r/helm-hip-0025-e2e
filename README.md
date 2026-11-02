@@ -72,10 +72,10 @@ the builds are the same as in run 20261102-005819-128778.
 
 | Tier | Commit | HIP requirements | Tests | Go unit tests |
 |---|---|---|---|---|
-| PR1 | `588ef3bf8` | 16 graded: 15 met, 1 deviation (R35) | 21 pass, 25 n/a | 10/10 packages pass, 1 compile only |
-| PR2 | `5960aa3ee` | 8 graded: 7 met, 1 not implemented (R26) | 28 pass, 1 xfail (R26), 17 n/a | 4/4 packages pass, 1 compile only |
-| PR3 | `176b059b0` | 7 graded: 6 met, 1 extension (R37) | 19 pass, 27 n/a | 3/3 packages pass |
-| Combined | PR2 + PR3 | 30 graded: 27 met, 1 extension, 1 deviation, 1 not implemented | 45 pass, 1 xfail (R26) | — |
+| PR1 | `588ef3bf8` | 16 graded: 15 met, 1 deviation (R15) | 21 pass, 25 n/a | 10/10 packages pass, 1 compile only |
+| PR2 | `5960aa3ee` | 8 graded: 7 met, 1 not implemented (R24) | 28 pass, 1 xfail (R24), 17 n/a | 4/4 packages pass, 1 compile only |
+| PR3 | `176b059b0` | 7 graded: 6 met, 1 extension (R31) | 19 pass, 27 n/a | 3/3 packages pass |
+| Combined | PR2 + PR3 | 30 graded: 27 met, 1 extension, 1 deviation, 1 not implemented | 45 pass, 1 xfail (R24) | — |
 
 ### Run 20261102-005819-128778
 
@@ -88,10 +88,10 @@ the requirement verdicts and the Go unit tests give the same results as run 2026
 
 | Tier | Commit | HIP requirements | Tests | Go unit tests |
 |---|---|---|---|---|
-| PR1 | `588ef3bf8` | 16 graded: 15 met, 1 deviation (R35) | 21 pass, 25 n/a | 10/10 packages pass, 1 compile only |
-| PR2 | `5960aa3ee` | 8 graded: 7 met, 1 not implemented (R26) | 28 pass, 1 xfail (R26), 17 n/a | 4/4 packages pass, 1 compile only |
-| PR3 | `176b059b0` | 7 graded: 6 met, 1 extension (R37) | 19 pass, 27 n/a | 3/3 packages pass |
-| Combined | PR2 + PR3 | 30 graded: 27 met, 1 extension, 1 deviation, 1 not implemented | 45 pass, 1 xfail (R26) | — |
+| PR1 | `588ef3bf8` | 16 graded: 15 met, 1 deviation (R15) | 21 pass, 25 n/a | 10/10 packages pass, 1 compile only |
+| PR2 | `5960aa3ee` | 8 graded: 7 met, 1 not implemented (R24) | 28 pass, 1 xfail (R24), 17 n/a | 4/4 packages pass, 1 compile only |
+| PR3 | `176b059b0` | 7 graded: 6 met, 1 extension (R31) | 19 pass, 27 n/a | 3/3 packages pass |
+| Combined | PR2 + PR3 | 30 graded: 27 met, 1 extension, 1 deviation, 1 not implemented | 45 pass, 1 xfail (R24) | — |
 
 The builds of this run use the macOS 26.5 SDK, because the linker of Command Line Tools 27.2 cannot read the macOS
 27.2 SDK.
@@ -106,10 +106,10 @@ are byte-identical to the builds of run 20261005-184055. The original report rec
 
 | Tier | Commit | HIP requirements | Tests | Go unit tests |
 |---|---|---|---|---|
-| PR1 | `c7c762a4c` | 16 graded: 15 met, 1 deviation (R35) | 21 pass, 25 n/a | 11/11 packages pass |
-| PR2 | `453cda84c` | 8 graded: 7 met, 1 not implemented (R26) | 28 pass, 1 xfail (R26), 17 n/a | 5/5 packages pass |
-| PR3 | `b57469035` | 7 graded: 6 met, 1 extension (R37) | 19 pass, 27 n/a | 3/3 packages pass |
-| Combined | PR2 + PR3 | 30 graded: 27 met, 1 extension, 1 deviation, 1 not implemented | 45 pass, 1 xfail (R26) | — |
+| PR1 | `c7c762a4c` | 16 graded: 15 met, 1 deviation (R15) | 21 pass, 25 n/a | 11/11 packages pass |
+| PR2 | `453cda84c` | 8 graded: 7 met, 1 not implemented (R24) | 28 pass, 1 xfail (R24), 17 n/a | 5/5 packages pass |
+| PR3 | `b57469035` | 7 graded: 6 met, 1 extension (R31) | 19 pass, 27 n/a | 3/3 packages pass |
+| Combined | PR2 + PR3 | 30 graded: 27 met, 1 extension, 1 deviation, 1 not implemented | 45 pass, 1 xfail (R24) | — |
 
 These recorded outcomes remain unchanged. The current dashboard labels this run **LEGACY**, because it predates
 the full-suite collection, exit-code and phase records. This label describes the evidence format, not a newly
@@ -157,7 +157,7 @@ Interrupted finalization cannot pass, even if metadata already records completio
 does not bypass these checks or silently repair an interrupted publication.
 
 N/A requires a feature missing from that tier. XFAIL requires a strict marker and a `not-implemented` catalog
-entry, currently R26. Other skips and xfails do not establish required coverage. A teardown failure overrides
+entry, currently R24. Other skips and xfails do not establish required coverage. A teardown failure overrides
 a passing test body.
 
 Go records contain selected, started, completed and skipped test names, plus exit codes. A separate selected-package
@@ -166,16 +166,43 @@ manifest must match the package records exactly, without duplicates. An unfilter
 completed tests, cannot pass. An entirely skipped package is allowed alongside a package with successful tests.
 Existing Go skips remain visible in the unit record.
 
+
+### Requirement renumbering on 2026-11-02
+
+The requirement IDs were renumbered on 2026-11-02 to insert two new requirements (R23 and R30) and to order all IDs ascending R01–R32. Historical runs before this date use the old IDs. This table maps old to new:
+
+| Old | New | Old | New | Old | New | Old | New |
+|-----|-----|-----|-----|-----|-----|-----|-----|
+| R01 | R01 | R05 | R06 | R13 | R14 | R21 | R18 |
+| R02 | R02 | R06 | R07 | R14 | R16 | R22 | R19 |
+| R03 | R03 | R07 | R08 | R15 | R05 | R23 | R20 |
+| R04 | R04 | R08 | R09 | R20 | R17 | R24 | R21 |
+| — | — | R09 | R10 | — | — | R25 | R22 |
+| — | — | R10 | R11 | — | — | — | **R23** |
+| — | — | R11 | R12 | — | — | R26 | R24 |
+| — | — | R12 | R13 | — | — | — | — |
+| — | — | — | — | — | — | R30 | R25 |
+| R35 | R15 | — | — | — | — | R31 | R26 |
+| — | — | — | — | — | — | R32 | R27 |
+| — | — | — | — | — | — | R33 | R28 |
+| — | — | — | — | — | — | R34 | R29 |
+| — | — | — | — | — | — | — | **R30** |
+| — | — | — | — | — | — | R37 | R31 |
+| — | — | — | — | — | — | R36 | R32 |
+
+New requirements: R23 (a resource belongs to one resource group only), R30 (comparison values are scalars; object comparisons are rejected).
+
 ### Differences from the HIP
 
 `requirements.yaml` quotes the HIP for each requirement. These entries are not plain "implemented":
 
 | Req | Status | Description |
 |---|---|---|
-| R35 | deviation | Helm also waits for resources that nothing depends on. Thus a successful install means that every sequenced resource became ready. |
-| R26 | not implemented | `helm template` does not print `## START`/`## END` resource-group delimiters. This is deferred to a follow-up pull request. `helm dag` prints the order. |
-| R37 | extension | Custom readiness also applies to a plain `--wait`, not only to `--wait=ordered`. |
-| R25 | implemented | The annotation key `helm.sh/depends-on/resource-groups` is used as the HIP spells it. The API server rejects a key with two `/` characters, so Helm removes the key before it applies an object. |
+| R15 | deviation | Helm also waits for resources that nothing depends on. Thus a successful install means that every sequenced resource became ready. |
+| R24 | implemented | `helm template` prints deploy order with `## START`/`## END` resource-group delimiters. The HIP example (line 241) uses `## END resource-group:` with `##`. The chart-v3 template path is test wiring patch 0004; upstream `helm template` rejects chart v3. |
+| R30 | implemented | Comparison values are scalars. Object comparisons are rejected at lint and evaluation time with the exact text "object comparisons are not supported". |
+| R31 | extension | Custom readiness also applies to a plain `--wait`, not only to `--wait=ordered`. |
+| R22 | implemented | The annotation key `helm.sh/depends-on/resource-groups` is used as the HIP spells it. The API server rejects a key with two `/` characters, so Helm removes the key before it applies an object. |
 
 ## Run the tests yourself
 

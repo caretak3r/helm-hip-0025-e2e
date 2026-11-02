@@ -42,7 +42,7 @@ def test_plain_wait_applies_everything_at_once(e2e, order):
         "plain --wait should not gate: bar applied before nginx/rabbitmq ready"
 
 
-@pytest.mark.req("R15")
+@pytest.mark.req("R05")
 @pytest.mark.needs("ordered", "subcharts")
 def test_independent_subcharts_deploy_together(e2e, order):
     """nginx and rabbitmq (no mutual dependency) applied together before either is ready."""
@@ -53,13 +53,13 @@ def test_independent_subcharts_deploy_together(e2e, order):
     nginx_apply, nginx_ready = tl.applied("Deployment", "nginx"), tl.ready("Deployment", "nginx")
     rabbitmq_apply, rabbitmq_ready = tl.applied("Deployment", "rabbitmq"), tl.ready("Deployment", "rabbitmq")
 
-    # R15: nginx and rabbitmq have no dependency between them, so both should be
+    # R05: nginx and rabbitmq have no dependency between them, so both should be
     # applied before either is ready (parallel deployment)
     order.before("last sibling applied", max(nginx_apply, rabbitmq_apply),
                  "first sibling ready", min(nginx_ready, rabbitmq_ready))
 
 
-@pytest.mark.req("R05", "R04", "R03")
+@pytest.mark.req("R06", "R04", "R03")
 @pytest.mark.needs("ordered", "subcharts")
 def test_subcharts_dag_order_and_gating(e2e, order):
     """bar waits for nginx+rabbitmq ready; foo waits for bar ready."""
@@ -72,7 +72,7 @@ def test_subcharts_dag_order_and_gating(e2e, order):
     bar_apply, bar_ready = tl.applied("Deployment", "bar"), tl.ready("Deployment", "bar")
     foo_apply = tl.applied("Deployment", "foo")
 
-    # R03/R05: bar applied after BOTH nginx and rabbitmq are ready
+    # R03/R06: bar applied after BOTH nginx and rabbitmq are ready
     order.before("nginx ready", nginx_ready, "bar applied", bar_apply)
     order.before("rabbitmq ready", rabbitmq_ready, "bar applied", bar_apply)
 
@@ -133,7 +133,7 @@ def test_subchart_alias_dependency(e2e, order):
     order.before("alpha ready", alpha_ready, "parent applied", parent_apply)
 
 
-@pytest.mark.req("R05")
+@pytest.mark.req("R06")
 @pytest.mark.needs("ordered", "subcharts")
 def test_nested_subcharts_three_levels(e2e, order):
     """grandchild-a → child-b → parent-z; each level applied after the level below is ready."""
@@ -159,7 +159,7 @@ def test_nested_subcharts_three_levels(e2e, order):
     order.before("child-b ready", child_ready, "parent-z applied", parent_apply)
 
 
-@pytest.mark.req("R06")
+@pytest.mark.req("R07")
 @pytest.mark.needs("ordered", "subcharts")
 def test_subchart_cycle_detected(e2e):
     """Cycle (a→b, b→a) fails helm install and helm lint; no objects applied."""
@@ -192,7 +192,7 @@ def test_subchart_cycle_detected(e2e):
         f"lint should mention cycle: {lint_output}"
 
 
-@pytest.mark.req("R07")
+@pytest.mark.req("R08")
 @pytest.mark.needs("ordered", "subcharts")
 def test_helm_dag_prints_subchart_order(e2e):
     """helm dag prints nginx and rabbitmq before bar."""

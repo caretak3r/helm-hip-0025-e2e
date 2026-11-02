@@ -1,11 +1,11 @@
-"""Combined tier · custom readiness gates sequencing (HIP-0025 R36)."""
+"""Combined tier · custom readiness gates sequencing (HIP-0025 R32)."""
 
 import pytest
 
 CHART = "hip-readiness-gate"
 
 
-@pytest.mark.req("R36")
+@pytest.mark.req("R32")
 @pytest.mark.needs("ordered", "groups", "readiness")
 def test_custom_readiness_gates_sequencing(e2e, order):
     """A Probe gated only by custom readiness holds back the group that depends on it."""

@@ -1,11 +1,11 @@
-"""R14 · Charts v2 backwards compatibility."""
+"""R16 · Charts v2 backwards compatibility."""
 
 import pytest
 
 from timeline import fmt_ts
 
 
-@pytest.mark.req("R14")
+@pytest.mark.req("R16")
 def test_v2_chart_with_plain_wait_applies_in_one_burst(e2e):
     """V2 chart with group annotations: plain --wait applies all at once (max-min < 1s), no sequencing, no plan in release."""
     run = e2e.install("v2-annotated", "--wait", "--timeout", "3m")
@@ -36,7 +36,7 @@ def test_v2_chart_with_plain_wait_applies_in_one_burst(e2e):
     assert "plan" not in rec, "v2 chart with plain --wait must not create a sequencing plan"
 
 
-@pytest.mark.req("R14")
+@pytest.mark.req("R16")
 def test_v2_chart_with_ordered_wait_fails(e2e):
     """V2 chart: --wait=ordered exits non-zero and creates no release."""
     run = e2e.install("v2-annotated", "--wait=ordered", "--timeout", "3m", check=False)
@@ -61,7 +61,7 @@ def test_v2_chart_with_ordered_wait_fails(e2e):
     assert len(releases) == 0, "no release should be created when install fails"
 
 
-@pytest.mark.req("R14")
+@pytest.mark.req("R16")
 def test_v2_chart_upgrade_rollback_uninstall_succeed(e2e):
     """V2 chart: upgrade, rollback, and uninstall all succeed with plain --wait."""
     # Initial install

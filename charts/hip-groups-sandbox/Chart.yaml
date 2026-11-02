@@ -1,6 +1,6 @@
 apiVersion: v3
 name: hip-groups-sandbox
-description: R23 sandbox - parent and subchart both define groups with opposite edges
+description: R20 sandbox - parent and subchart both define groups with opposite edges
 version: 0.1.0
 dependencies:
   - name: sub
