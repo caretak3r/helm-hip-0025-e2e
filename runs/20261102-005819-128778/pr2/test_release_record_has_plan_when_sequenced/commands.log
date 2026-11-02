@@ -1,0 +1,111 @@
+01:03:55.357 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr2-release-record-has-plan-when-sequenced --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+01:03:55.394 $ kubectl --context kind-hip0025-e2e create namespace e2e-pr2-release-record-has-plan-when-sequenced
+[exit 0, 0.0s]
+namespace/e2e-pr2-release-record-has-plan-when-sequenced created
+
+
+01:03:55.428 $ .bin/helm-pr2 install plain charts/hip-subcharts --namespace e2e-pr2-release-record-has-plan-when-sequenced --wait --timeout 3m --kube-context kind-hip0025-e2e
+[exit 0, 3.0s]
+NAME: plain
+LAST DEPLOYED: Sun Nov  1 20:03:55 2026
+NAMESPACE: e2e-pr2-release-record-has-plan-when-sequenced
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+
+
+01:03:58.411 $ kubectl --context kind-hip0025-e2e get secret -n e2e-pr2-release-record-has-plan-when-sequenced -l owner=helm,name=plain -o json
+[exit 0, 0.1s]
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "v1",
+            "data": {
+                "release": "SDRzSUFBQUFBQUFDLyt4WVhYUGF1aGI5S3g3ZGwzdG43T0NQUW9ObnpnT1FZcHlrYVNBcEJwZE9SNUtGclVRZnJpVytrdUcvMzdFcERwemtuSHRiem1NWk1vTmtyYlhYM2w2V2R2d01CT1FFK0NCbmtBcGdBaXJtRXZqUFlFNExwYjhsSkdkeVF4TGdBOWQyVzVialdMWno3OXErN2ZuTjV0bTdWcnZwbkZ0MjA3ZHRZQUlHZnhxU0VJVUxtbXNxQmZCQktKU0dqQmxZOHB3UlRZQUpsSVo2b1lBUGF0NnRDWEFHQzEycTVFVERCR3BZL3Y2UnlGeEtZSUlsS2RTTzB6NXp6bDVIR29TM2xtMjdUYU5YVWhrSnlZbElpTUNVS0lPc1lSbmUrTGRJcVZpYkJVU0lhdjdkc0dZTDIvYUlnV0JSLzU1TCtSOWdBcGpUY1IxeDZaVXpRa2dOeTJpcUZKY1J4czlVMXRnRlVwWVVEYlZBVlI1bGNsOW1BTUZpQnN3WjJJZWJnYTlscW9mS2dQK2xUclBTOW1haUJjbWxvbG9XbTdJYWxCRy8wZGdGYXV4QlJFREV5bHVraXdYWm1qWHBQdmJQOGg3Zy9vb2F3ZUpuV1hlUUkwSVR2QlFRK0YvcUt0UUN2bTYvYmszQUpINEV2bGd3WmdKTmVNNmdQcTVlUGRuNHRwTEZJNU13T2RNNUsyMVN1UWtRVCttd2QvNDlITndvNUdHTitUaUxCNC9wS0JpdlVOQnVvbWk4U0hwZGpyd3d4ZDZZVHQwc3cyTDA5SWwyWkJ5d2g2VFhvWmkzbDBrdlRDOTdIWXA0WDhkM1lScUtsRjdkZGI1ZmJ6cDZQckd2cWpqQmlNV2NMZUs3RG8zdkw5bTFTSmFZYTRYYy91TTFqNWRvRTZiWEU2ZmQ0LzBWSE1jTWk1c2N1ZTlhWWRCZjRjSEhaZkx3NFFxNmJCRmZ5R045blZ6SGsxRVdCMzE3ZWkrdndsNTNNWTBjOW9sMjM1Tk5aN0hUMUczUGgva1REc1lQbjFLWmhvTkxob04xUG5YN1pTN3JIdTJrMkIyck9McXhrUmUyeW5IWTYrcnBaUFFBUDZ5ektSOHIvQ1JUNHZaWCtFS214RlBwTlc5bUtQcWN6a3ZOdEpNbXdWampZSjBsd2VjYWY2eXJuT3VrS09qVE9Gby9sZnFtays3cWxjNkp2VnM3dUZuRjBjY2ZYT1Y0eERCM2NzVDdOb3phaTVGM21VM2Q4VENlWE9iSUhkM0gwYzBTOGVyZXJHcE1jTE5FWXBUQnFNbXdPT0RxZGRMcnU3cE9YaHlGdGI0ZGp1bHBsTlExM04zalpqU04xazQ4K2JpQWtaUEY3dWUwMXZvbjNPZkJXS0YrZDRrQzlrRHVaWG9YeForUU54cGlQbjZLbzZaOXFDUHNkVGR4MUgrc05IbzNROHpiTkQ2bzEvNFBEa1kyL3BDd3BLcC9OMHVDdEJYMnpsVTQ2QzZ4R0xiQ2kzUTFIOHIwR05mTkVXYzJqUHBxRkl6VmRNSU82dlIyYnJ0bmdIMklvM1ZHS3QrODRseTlVZk4xVCtqMzEzZGRodmh3NStQMGp6K0FDYmhNTk9Wa2YwN1liY3Q5ZCsrNmZyUHRlOTVaeTMzdmVXM0hkU3o3WFhsVWJNMDNIdDY1bEdjYnlJK2YyeFJHelFjMEdELyszZk4wRll6eXFUZE1RM0c1Uk42UWhyMWhHdTU4UzhQZUpVZnVPYjNhNWZqL2FHM2JMYWRsMTFxL21tQUoyWUpVVzMrNWpmblBJR1VTUVFiODU2MEpLSWRwdlluN3pwbjczb0lzcDRKVUd5Sk1OaGVFd1Ezd3ZmK3h0cG83aGJ6ZU4wL2grTk5ZNFl4d3VOOStkNk9YK3RsMldhYnllMi9iZnZXTmdWbnQvR3FQK1p0cXUrL083SlpqbjdmUEhiZDJCdUJRMERsUkd2akFzcXlaK0pkeEp4Y0ZKbjU1UGg4Y0o0MFg2eUJZVk5hWmlaZXoyemRnbnF2RzBwbUpSeW9TMzdpb2VnNU9oSjZKZmF2aHo0UmhsRTcweTBaZ0psUk9jRFZYa0p4UkRKVnZPT1ZRRVVhd2xrVjF6VEE0MURpN2hvZ3c1UnZQTU04citMYTh1QmUxWDNrWXFQeXdOMUdHVVVjdVA1b1VuSXFxNFFnS2lNa3RLYWhNN2dpV0lsRytZZS9YWVNrMHBJSVVxb1lhaHZVam9SVkJMNU9HVWJuQU4xNlo0TldhMndWanQ1SlJ2UEdOY0g0ajlXMUJWRlcxbDRXbFRhZ2dTdDBXRWhILzhKSmhaRnJuQWRHKzhaeERuZmxHd3pSeVdXamZPTGUzeHl1cG9KcENWdm10enM0N1hwTWY1KzdNeEV6OHRTK3E5QTZjVVkxUDlrYkZjb283S29KZjhNY0w3cmREL2lHSDdIZkpBNVBzcDA3MlNkM3VuMkNWUGNjdnVPVUkrdHN3cHhybWRXdHlpamZtVXA1aWk3bVV2K0NJUGVxM0dYN0tESWYvM0RwbTFhcXFIT0t5aVNFdXNmTEN0UXJDQ0ZURUtnaVdSV0psVUZrNWc4SmFaVVJZaW54ZkVJRkpVcjFOeU5ubUd5YzZrK1ZyRktVZzJQNTNBQk9BY01PcEVRQUE="
+            },
+            "kind": "Secret",
+            "metadata": {
+                "creationTimestamp": "2026-11-02T01:03:55Z",
+                "labels": {
+                    "modifiedAt": "1793581438",
+                    "name": "plain",
+                    "owner": "helm",
+                    "status": "deployed",
+                    "version": "1"
+                },
+                "name": "sh.helm.release.v1.plain.v1",
+                "namespace": "e2e-pr2-release-record-has-plan-when-sequenced",
+                "resourceVersion": "6563",
+                "uid": "e0b6663a-5909-44f5-bd66-d4c62a976443"
+            },
+            "type": "helm.sh/release.v2"
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}
+
+
+01:03:58.479 $ .bin/helm-pr2 uninstall plain --namespace e2e-pr2-release-record-has-plan-when-sequenced --kube-context kind-hip0025-e2e
+[exit 0, 0.2s]
+release "plain" uninstalled
+
+
+01:03:58.714 $ .bin/helm-pr2 install ordered charts/hip-subcharts --namespace e2e-pr2-release-record-has-plan-when-sequenced --wait=ordered --timeout 3m --kube-context kind-hip0025-e2e
+[exit 0, 9.8s]
+NAME: ordered
+LAST DEPLOYED: Sun Nov  1 20:03:58 2026
+NAMESPACE: e2e-pr2-release-record-has-plan-when-sequenced
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+
+
+01:04:08.471 $ kubectl --context kind-hip0025-e2e get secret -n e2e-pr2-release-record-has-plan-when-sequenced -l owner=helm,name=ordered -o json
+[exit 0, 0.0s]
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "v1",
+            "data": {
+                "release": "SDRzSUFBQUFBQUFDLyt4WVcxUGJ1aGIrS3g2ZGwzTm1iUENsQWVLWi9aQ0V4akd3S1FrMEptNllqaXdydGtDV1hFdTVsY2wvUHlPYm1LUUV1aUg3c1NITVJMTFc1ZnY4ZVZsTGo0REJEQU1YOENMR0JZNkJEZ2liY09BK2dna3BoUHdlNDV6eUpZNkJDMnpUUGpJc3l6Q3RHOXQwVGNkdG5Cd2NueHczcmFaaE5selRCRHFnOE4wbU1SYW9JTGtrbkFFWCtFeElTS21HZUpaVExESFFnWkJRVGdWd1FlMTNwUU9Vd2tLcUxETXNZUXdsVkwrZm9FdzRCenFZNFVKVVBzMEQ2K0JscEo1L1paaW0zZEE2eXBVVzR4eXpHRE5Fc05Ed0FxcncybjlaUXRoQ0wyQVVFWm45MEl6eDFEUWRyRVd3cUg5UE9QOGYwQUhNeWJDT09IUFVER05jUWhWTnFPUlNUTE1Ea1I1V2dZVEIyYUdZUmlVT0JlN2JHRVN3R0FOOUROYmh4dUJPUWQzTURMamZhcGhsYmp1QkZqam5na2hlTEJVYmhHTDM4TEFLZExnMndneEdWTjBpV1V6eFNxK2RybU8vMSsrRzNXdXVJMWk4MTJ0bHN1VlFCODhFQXZkYnpVS2R3TjNxYnFVRHl0RURjTm1VVWgxSW5PVVV5bTMyNnNuRDczTmVQRkFPNHdPWlV5V1RVazBBTzBMNm5aTWZmdTlTUkE2U0tCdW1ZZThoR1hqRGVlUTFHMUV3bk1hZGRoWTVmb0tjSVJuWmFZclk0T2NYMHVLaFIrL2pUb3VnckRtTE8zNXkxbW1SS092SzhOcFBmSmFROCt2V2o0dGxTMDV1emZNeWpqZWdZVWFuNFhXTGhEZG45SUxGTTVSSkVkbmRoNHNzbkVWTFA3bTR0WnFkckR1SHc1QWlkcGxIOXFjajMrdk9VZS92V1h6LytSemFkQnFlOHUzOFdya01id2RwNkhYTjBRMC85enZ0NlNpdzZCZlNQc2JMMXJUS3FkMmM5UE9meUJ2ZWYwbDQ0dmZPS1BJVytjanVLaXlMRG1rbHlCNktNTGcwSThjL1VtTy8wNWFqMjhFOS9MeElSOWxRb0o4OHdYWjNqazU1Z2gyUlhHU05OQXErSmhPVk0ya2xzVGVVeUZ1a3NmZTF0dC9PUzgyMWtzanJrakJZL0ZUNWpXN2I4eGQ1M3ByVjJ0N2xQQXorZnZLbHhnT0tNaXVQc3E0SmcrWjA0SnlsSTN2WUQyL1A4c2dlM0lUQjVTekt5bnN6cjIyOHkxbkVCaWtNR2hTeERWK2RWbkp4WGZQa2hJRmY1MWZaVVRrSzRwckQ2aDQzZ2xHd3NNTGJ2NmN3c05MUS9wclV1ZjVpOTdVM0ZGRzNQWXM4ZW85dmVISWRoRjhpWjlCSDJmQm5HRFRNelR6OFRuc1pCdDJITWtmbnNvK3lKZ2szK0ZyL3c5N0FSSjlqR3BmOHQ5UFlTNDc4em9ud2UrMFpZdjBqL3pTWlQvbzgyYlpyNTFGR1RSaDB4Y0FiaXRFdDNlQnBON2JxR2FDZncyQ1I0bEkzTDN6T2QzQys2REI1ZkhIZHBsSFdyM1NjL1BVWDBFSEdZMGt5dkg1UG1FM0QvblJqMjI2ajZUck93WkY5N0RoTnk3WU04NU42VmF6MEhRL3ZoUE9ESmN5Mm45c0VCbzM3cURkOGVPdDVPdmNHK2NqcEp6NDdtMFZPbi9pZGZ1Slh1aVYrNXl5TDdCTnlYbUg4SjdrMnpTUHJ5S3h6dmRQQkROSXBMa3UvS21QdUkwZ29qeUFGN3VOS0J5U0RTVjNFWGV2QVBqWWd6UW5EWlVHRThmSVVVN2dFcnZPYnRlWGNQczdydXJtUGoxL0dBcVU0Zyt2eVc0MmUrVE5OUlpQNjNwaW1XMzVEb0plVlg2eHQzbURiL25SZ0hsbm1TZlBFc210bGdBd3lNc0ZDQWhjWWhqRm0vOUd1K2JSQTJGWHY1NDNYeWVHemRDSllsTklacytkM3Q2dkJQQmVITTJ2TUhnaUxYZTIwM0hOa21Na3hXMjgxM0RIVE5LVkVWMjBFeGt6a0dKVnpCYzRwUVZDNG1xV0dBbE9NSkMvS2E1cVdRWW5TQ3hoaEtsenRFZVo1YWI1U0Y5ZEpyVmR1QmxJZnV0TkswK3JJNmlOeGtSRldiamk4QWlKOGhRdkM0MnVNT0l1RnE1bnJkWWd6Q1FuRGhhaE5OYzE0QWpUSDBmT2twcFVxY0xVWEluaXg1bXBLNlJXbkJDMWR6WjljY25sVllGR3k5cnhReVlRd0xNUlZ3U1BzYmw3U3RGVEszTVBTMVI1ektGTlhPOVMxbkJmUzFVN00xZlpLd29na2tKWjZxOUU1MjJ2eWJleldtSTNaNjdvbzRXMG9veHp2clkzU3l6N3FLQjE4UUIvUGRuOFU4aThwWkYwbE4wU3ludHBiSi9WMmZ3K3BySDE4UUMxYnBuOEVzNjlnWG01Tjl0SEdoUE45WkRIaC9BT0tXRnY5RWNPN3hBQjBrRlBJMUVhcWJuSXRIVkE4dzdScVBWWGsrbndpeHJrYW1UcFlId08wMVEwc3U5UmRiYTMrcmR4SDN0M3BBTWZKVXpNN0tYaTJjUlFnK1ZPZnZkTHJheHVkK2ZQbE94M2tzTUJNbmxiTjlKZXlsNjdhN1kxT1d0L00rZGNqaENjQTF1NVZHMkhmWGxnRnJkZmM2U0NxZVhpc3pubXVmcHVERHRUakJGd3daUUwvbUdLR3lxT3NDQllGd1FWd0o1QUsvTHhMckh3VEZ1TkZhZndLeUoxYmdwSzhwT0RUZk9zOEFmeHIzbGNsNzY4QTMwSHI3N0JYcHlZN2s3UDFOKzdjYSsrNmR4THcwUmh2MHJBdG1qMFlNUFhka3R6Uko3d1Q5L3M4NzBTN1ZTVStETkhaU21SSDYvdytYUC9BWGZtbmIxVkI1VlRrRUNuUDJNWkdYdGhHZ1NtR0Foc0ZScnlJalJRS1F4VlFZNTVpWm15aWhIbE9sOTh6TEZPdUtCQUNndFgvQndBaWJzYVd1UllBQUE9PQ=="
+            },
+            "kind": "Secret",
+            "metadata": {
+                "creationTimestamp": "2026-11-02T01:03:58Z",
+                "labels": {
+                    "modifiedAt": "1793581448",
+                    "name": "ordered",
+                    "owner": "helm",
+                    "status": "deployed",
+                    "version": "1"
+                },
+                "name": "sh.helm.release.v1.ordered.v1",
+                "namespace": "e2e-pr2-release-record-has-plan-when-sequenced",
+                "resourceVersion": "7149",
+                "uid": "6c1c2a01-1772-41e8-a600-b969516d6f5e"
+            },
+            "type": "helm.sh/release.v2"
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}
+
+
+01:04:08.517 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr2-release-record-has-plan-when-sequenced --wait=false
+[exit 0, 0.0s]
+namespace "e2e-pr2-release-record-has-plan-when-sequenced" deleted
+
+

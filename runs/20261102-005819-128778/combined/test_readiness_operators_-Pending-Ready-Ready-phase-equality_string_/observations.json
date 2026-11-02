@@ -1,0 +1,26 @@
+[
+  {
+    "label": "equality string operator",
+    "value": "=="
+  },
+  {
+    "label": "phase changes",
+    "value": [
+      [
+        "01:07:12.585",
+        "Ready"
+      ]
+    ]
+  },
+  {
+    "label": "install completed",
+    "value": true
+  },
+  {
+    "label": "apiserver timeline",
+    "value": [
+      "01:07:12.585  status Probe/probe phase=Ready (test patch)",
+      "01:07:12.590  helm writes release record: deployed"
+    ]
+  }
+]

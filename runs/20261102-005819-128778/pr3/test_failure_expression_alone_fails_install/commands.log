@@ -1,0 +1,24 @@
+00:59:16.971 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr3-failure-expression-alone-fails-install --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+00:59:17.009 $ kubectl --context kind-hip0025-e2e create namespace e2e-pr3-failure-expression-alone-fails-install
+[exit 0, 0.0s]
+namespace/e2e-pr3-failure-expression-alone-fails-install created
+
+
+00:59:19.054 $ kubectl --context kind-hip0025-e2e patch Probe probe -n e2e-pr3-failure-expression-alone-fails-install --subresource=status --type=merge -p {"status": {"phase": "Failed"}}
+[exit 0, 0.1s]
+probe.readiness.hip0025.example/probe patched
+
+
+00:59:17.044 $ .bin/helm-pr3 install r charts/hip-readiness-basic -f runs/20261102-005819-128778/pr3/test_failure_expression_alone_fails_install/values.yaml --namespace e2e-pr3-failure-expression-alone-fails-install --wait --timeout 1m --kube-context kind-hip0025-e2e
+[exit 1, 2.1s]
+Error: INSTALLATION FAILED: resource Probe/e2e-pr3-failure-expression-alone-fails-install/probe not ready. status: Failed, message: custom readiness failure condition met
+
+
+00:59:19.115 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr3-failure-expression-alone-fails-install --wait=false
+[exit 0, 0.0s]
+namespace "e2e-pr3-failure-expression-alone-fails-install" deleted
+
+

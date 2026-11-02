@@ -1,0 +1,30 @@
+00:59:04.332 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-custom-readiness-gates-sequencing --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.1s]
+
+
+00:59:04.383 $ kubectl --context kind-hip0025-e2e create namespace e2e-combined-custom-readiness-gates-sequencing
+[exit 0, 0.0s]
+namespace/e2e-combined-custom-readiness-gates-sequencing created
+
+
+00:59:09.441 $ kubectl --context kind-hip0025-e2e patch Probe gate -n e2e-combined-custom-readiness-gates-sequencing --subresource=status --type=merge -p {"status": {"phase": "Ready"}}
+[exit 0, 0.1s]
+probe.readiness.hip0025.example/gate patched
+
+
+00:59:04.431 $ .bin/helm-combined install r charts/hip-readiness-gate --namespace e2e-combined-custom-readiness-gates-sequencing --wait=ordered --timeout 3m --kube-context kind-hip0025-e2e
+[exit 0, 8.1s]
+NAME: r
+LAST DEPLOYED: Sun Nov  1 19:59:04 2026
+NAMESPACE: e2e-combined-custom-readiness-gates-sequencing
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+
+
+00:59:13.527 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-custom-readiness-gates-sequencing --wait=false
+[exit 0, 0.0s]
+namespace "e2e-combined-custom-readiness-gates-sequencing" deleted
+
+

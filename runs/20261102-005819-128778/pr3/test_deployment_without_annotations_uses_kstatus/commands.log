@@ -1,0 +1,25 @@
+00:59:04.332 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr3-deployment-without-annotations-uses-kstatus --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+00:59:04.381 $ kubectl --context kind-hip0025-e2e create namespace e2e-pr3-deployment-without-annotations-uses-kstatus
+[exit 0, 0.0s]
+namespace/e2e-pr3-deployment-without-annotations-uses-kstatus created
+
+
+00:59:04.429 $ .bin/helm-pr3 install r charts/hip-readiness-basic --namespace e2e-pr3-deployment-without-annotations-uses-kstatus --set deployment.enabled=true --wait --timeout 2m --kube-context kind-hip0025-e2e
+[exit 0, 4.1s]
+NAME: r
+LAST DEPLOYED: Sun Nov  1 19:59:04 2026
+NAMESPACE: e2e-pr3-deployment-without-annotations-uses-kstatus
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+
+
+00:59:09.553 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr3-deployment-without-annotations-uses-kstatus --wait=false
+[exit 0, 0.1s]
+namespace "e2e-pr3-deployment-without-annotations-uses-kstatus" deleted
+
+

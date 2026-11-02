@@ -1,0 +1,18 @@
+[
+  {
+    "label": "install exit code",
+    "value": 1
+  },
+  {
+    "label": "stderr",
+    "value": "Error: INSTALLATION FAILED: --wait=ordered requires chart apiVersion v3 (chart \"v2-annotated\" has apiVersion v2)\n"
+  },
+  {
+    "label": "error type",
+    "value": "v2-rejected"
+  },
+  {
+    "label": "releases in namespace",
+    "value": []
+  }
+]

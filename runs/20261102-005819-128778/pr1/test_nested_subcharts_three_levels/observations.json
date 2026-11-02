@@ -1,0 +1,12 @@
+[
+  {
+    "label": "apiserver timeline",
+    "value": [
+      "01:04:19.760  apply  Deployment/grandchild-a",
+      "01:04:23.421  ready  Deployment/grandchild-a",
+      "01:04:23.457  apply  Deployment/child-b",
+      "01:04:26.440  ready  Deployment/child-b",
+      "01:04:26.485  apply  Deployment/parent-z"
+    ]
+  }
+]

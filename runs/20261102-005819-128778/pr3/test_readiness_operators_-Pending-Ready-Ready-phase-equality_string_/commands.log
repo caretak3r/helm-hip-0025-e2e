@@ -1,0 +1,30 @@
+01:00:19.186 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr3-readiness-operators-pending-ready-ready-phase-equality --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+01:00:19.225 $ kubectl --context kind-hip0025-e2e create namespace e2e-pr3-readiness-operators-pending-ready-ready-phase-equality
+[exit 0, 0.0s]
+namespace/e2e-pr3-readiness-operators-pending-ready-ready-phase-equality created
+
+
+01:00:22.266 $ kubectl --context kind-hip0025-e2e patch Probe probe -n e2e-pr3-readiness-operators-pending-ready-ready-phase-equality --subresource=status --type=merge -p {"status": {"phase": "Ready"}}
+[exit 0, 0.0s]
+probe.readiness.hip0025.example/probe patched
+
+
+01:00:19.260 $ .bin/helm-pr3 install r charts/hip-readiness-basic -f runs/20261102-005819-128778/pr3/test_readiness_operators_-Pending-Ready-Ready-phase-equality_string_/values.yaml --namespace e2e-pr3-readiness-operators-pending-ready-ready-phase-equality --wait --timeout 2m --kube-context kind-hip0025-e2e
+[exit 0, 3.1s]
+NAME: r
+LAST DEPLOYED: Sun Nov  1 20:00:19 2026
+NAMESPACE: e2e-pr3-readiness-operators-pending-ready-ready-phase-equality
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+
+
+01:00:23.316 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr3-readiness-operators-pending-ready-ready-phase-equality --wait=false
+[exit 0, 0.0s]
+namespace "e2e-pr3-readiness-operators-pending-ready-ready-phase-equality" deleted
+
+

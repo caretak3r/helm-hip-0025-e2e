@@ -1,0 +1,10 @@
+[
+  {
+    "label": "lint exit code",
+    "value": 1
+  },
+  {
+    "label": "lint output",
+    "value": "==> Linting charts/hip-readiness-basic\n[INFO] Chart.yaml: icon is recommended\n[ERROR] hip-readiness-basic/templates/probe.yaml: resource \"Probe/probe\" has only one of \"helm.sh/readiness-success\" / \"helm.sh/readiness-failure\" annotations; both must be present or absent together\n\nError: 1 chart(s) linted, 1 chart(s) failed\n"
+  }
+]

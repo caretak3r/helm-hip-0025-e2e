@@ -1,0 +1,26 @@
+[
+  {
+    "label": "equality number operator",
+    "value": "=="
+  },
+  {
+    "label": "count changes",
+    "value": [
+      [
+        "01:06:47.249",
+        10
+      ]
+    ]
+  },
+  {
+    "label": "install completed",
+    "value": true
+  },
+  {
+    "label": "apiserver timeline",
+    "value": [
+      "01:06:47.249  status Probe/probe count=10 (test patch)",
+      "01:06:47.252  helm writes release record: deployed"
+    ]
+  }
+]

@@ -1,0 +1,30 @@
+01:05:44.989 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-uninstall-runs-in-reverse-order --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+01:05:45.030 $ kubectl --context kind-hip0025-e2e create namespace e2e-combined-uninstall-runs-in-reverse-order
+[exit 0, 0.0s]
+namespace/e2e-combined-uninstall-runs-in-reverse-order created
+
+
+01:05:45.070 $ .bin/helm-combined install r charts/hip-groups-upgrade --namespace e2e-combined-uninstall-runs-in-reverse-order --wait=ordered --timeout 3m --kube-context kind-hip0025-e2e
+[exit 0, 7.7s]
+NAME: r
+LAST DEPLOYED: Sun Nov  1 20:05:45 2026
+NAMESPACE: e2e-combined-uninstall-runs-in-reverse-order
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+
+
+01:05:52.733 $ .bin/helm-combined uninstall r --namespace e2e-combined-uninstall-runs-in-reverse-order --wait=ordered --timeout 3m --kube-context kind-hip0025-e2e
+[exit 0, 0.3s]
+release "r" uninstalled
+
+
+01:05:54.036 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-uninstall-runs-in-reverse-order --wait=false
+[exit 0, 0.1s]
+namespace "e2e-combined-uninstall-runs-in-reverse-order" deleted
+
+

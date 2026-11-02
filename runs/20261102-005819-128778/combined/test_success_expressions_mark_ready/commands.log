@@ -1,0 +1,30 @@
+01:05:58.866 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-success-expressions-mark-ready --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+01:05:58.905 $ kubectl --context kind-hip0025-e2e create namespace e2e-combined-success-expressions-mark-ready
+[exit 0, 0.0s]
+namespace/e2e-combined-success-expressions-mark-ready created
+
+
+01:06:02.945 $ kubectl --context kind-hip0025-e2e patch Probe probe -n e2e-combined-success-expressions-mark-ready --subresource=status --type=merge -p {"status": {"count": 3}}
+[exit 0, 0.1s]
+probe.readiness.hip0025.example/probe patched
+
+
+01:05:58.940 $ .bin/helm-combined install r charts/hip-readiness-basic -f runs/20261102-005819-128778/combined/test_success_expressions_mark_ready/values.yaml --namespace e2e-combined-success-expressions-mark-ready --wait --timeout 2m --kube-context kind-hip0025-e2e
+[exit 0, 4.1s]
+NAME: r
+LAST DEPLOYED: Sun Nov  1 20:05:58 2026
+NAMESPACE: e2e-combined-success-expressions-mark-ready
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+
+
+01:06:04.040 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-success-expressions-mark-ready --wait=false
+[exit 0, 0.1s]
+namespace "e2e-combined-success-expressions-mark-ready" deleted
+
+

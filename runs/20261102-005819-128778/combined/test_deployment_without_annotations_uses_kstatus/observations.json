@@ -1,0 +1,10 @@
+[
+  {
+    "label": "Deployment ready time",
+    "value": "01:05:57.742"
+  },
+  {
+    "label": "install succeeded with kstatus",
+    "value": true
+  }
+]

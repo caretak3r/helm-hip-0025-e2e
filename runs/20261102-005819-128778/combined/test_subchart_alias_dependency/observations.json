@@ -1,0 +1,11 @@
+[
+  {
+    "label": "apiserver timeline",
+    "value": [
+      "01:04:17.677  apply  Deployment/zeta",
+      "01:04:21.415  ready  Deployment/zeta",
+      "01:04:21.456  apply  Deployment/alpha",
+      "01:04:24.472  apply  Deployment/parent"
+    ]
+  }
+]

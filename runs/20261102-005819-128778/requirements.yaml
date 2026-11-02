@@ -1,0 +1,322 @@
+# HIP-0025 requirement catalog: the spec the e2e report is graded against.
+# Source: https://github.com/helm/community/blob/05eab5bba990d4f5556f90bfc001662d1a76f9a5/hips/hip-0025.md
+# The `hip` quotes keep the words of the HIP. Markdown formatting (links, bold,
+# list markers, curly quotes) is removed, and `[...]` marks text that is left out.
+#
+# owner:  the PR expected to deliver the requirement (pr1 | pr2 | pr3 | all | combined)
+# status: implemented     - tests assert the HIP text
+#         deviation       - implemented differently on purpose; tests assert the
+#                           implemented contract and `note` says why
+#         not-implemented - no PR delivers it; tests are strict xfail, so they
+#                           flip to a failure the day someone implements it
+#         extension       - not in the HIP; contract added by a PR
+
+requirements:
+  # ── Sequencing core (PR1) ────────────────────────────────────────────────
+  - id: R01
+    title: --wait=ordered turns sequencing on; default applies everything at once
+    section: Specification
+    owner: pr1
+    status: implemented
+    hip: >-
+      For Helm CLI, the `--wait=ordered` flag will enable sequencing where resources
+      are applied in groups. [...] By default, resources are all applied at once which
+      is the same behaviour in Chart v2.
+
+  - id: R02
+    title: The release records whether sequencing was used
+    section: Specification
+    owner: pr1
+    status: implemented
+    hip: >-
+      Each release will store information of whether sequencing was used or not. This
+      information is used when performing uninstalls and rollbacks.
+
+  - id: R03
+    title: Subchart order from dependencies[].depends-on, by name or alias
+    section: Additions to Chart.yaml
+    owner: pr1
+    status: implemented
+    hip: >-
+      `depends-on`: A new field added to `Chart.yaml` `dependencies` fields that is meant
+      to declare a list of subcharts, by `name` or `alias`, that need to be ready before
+      the subchart in question get installed.
+
+  - id: R04
+    title: Parent waits for subcharts listed in helm.sh/depends-on/subcharts
+    section: Additions to Chart.yaml
+    owner: pr1
+    status: implemented
+    hip: >-
+      `helm.sh/depends-on/subcharts`: An annotation added to `Chart.yaml` to specify chart
+      dependencies—identified by their `name` or `alias`—that must be fully deployed and
+      in a ready state before the current chart resources can be installed.
+
+  - id: R15
+    title: Subcharts with no dependency between them deploy together
+    section: Chart dependencies example
+    owner: pr1
+    status: implemented
+    note: >-
+      Read from the example text and diagram (nginx and rabbitmq side by side, installed and
+      then waited on together). The HIP says "at the same time" explicitly only for resource
+      groups (R21). Serializing siblings still satisfies dependency order (R05) but makes an
+      install as slow as the sum of its independent subcharts.
+    hip: >-
+      In this example, Helm will first install and wait for all resources of `nginx` and
+      `rabbitmq` dependencies to be "ready" before attempting to install `bar` resources.
+
+  - id: R05
+    title: A subchart is fully deployed and ready before its dependents begin
+    section: Sequencing Execution Flow
+    owner: pr1
+    status: implemented
+    hip: >-
+      Subcharts are installed in dependency order. Each subchart must be fully deployed
+      and ready before its dependents begin.
+
+  - id: R06
+    title: Circular dependencies are detected and reported
+    section: Chart dependencies example
+    owner: pr1
+    status: implemented
+    hip: >-
+      This approach of building a directed acyclic graph (DAG) is prone to circular
+      dependencies. During the templating phase, Helm will have logic to detect, and
+      report any circular dependencies found in the chart templates.
+
+  - id: R07
+    title: A command prints the DAG
+    section: Chart dependencies example
+    owner: pr1
+    status: implemented
+    hip: >-
+      Helm will also provide a command to print the DAG for development and
+      troubleshooting purposes.
+
+  - id: R08
+    title: Upgrades apply in install order
+    section: Specification
+    owner: pr1
+    status: implemented
+    hip: A similar process would apply for upgrades. [...] Upgrades would follow the same order as installation.
+
+  - id: R09
+    title: Uninstall runs in reverse order
+    section: Sequencing order
+    owner: pr1
+    status: implemented
+    hip: >-
+      Uninstalls: Helm would uninstall resources in the reverse order they were
+      installed, as per the sequencing order.
+
+  - id: R10
+    title: Rollback follows the target revision's sequencing; removals go in reverse
+    section: Sequencing order
+    owner: pr1
+    status: implemented
+    hip: >-
+      Rollbacks: Helm will check from the release object whether the revision being
+      rolled back to, was installed in a sequenced manner. If it was, Helm will respect
+      and enforce this order when installing resources from that revision. When deleting
+      unneeded resources of the revision being rolled back from, the reverse order is
+      followed just like uninstalls.
+
+  - id: R11
+    title: A readiness failure or timeout fails the install; --rollback-on-failure rolls back
+    section: Sequencing order
+    owner: pr1
+    status: implemented
+    note: Helm v4 renamed --atomic to --rollback-on-failure.
+    hip: >-
+      Installs: [...] If any of the readiness checks fail or timeout, the entire install
+      would fail and the release marked as failed. If `--atomic`, or its SDK equivalent
+      is used, a rollback to the last successful install would take place.
+
+  - id: R12
+    title: Readiness timeout defaults to 1m, is set by --readiness-timeout, and cannot exceed --timeout
+    section: Readiness
+    owner: pr1
+    status: implemented
+    hip: >-
+      Helm will wait up to a default of **1 minute** for a resource to either succeed or
+      fail. [...] This timeout can be customized using the `--readiness-timeout` CLI flag
+      [...] However, the specified readiness timeout must not exceed the overall
+      `--timeout` value.
+
+  - id: R13
+    title: Hooks are not sequenced; hook-weight still orders them
+    section: Abstract
+    owner: pr1
+    status: implemented
+    hip: >-
+      Resources deployed as hooks are not sequenced using changes proposed here. Any
+      sequencing of hooks will still rely on using `"helm.sh/hook-weight"` annotations.
+      Annotations added to resources in hooks will be ignored.
+
+  - id: R14
+    title: Charts v2 and below behave exactly as before
+    section: Backwards compatibility
+    owner: all
+    status: implemented
+    hip: >-
+      Helm will continue to install/upgrade/uninstall/rollback all resources and
+      dependencies at one go for all charts using `Charts v2` and below.
+
+  - id: R35
+    title: Readiness is checked only for resources something depends on
+    section: Readiness
+    owner: pr1
+    status: deviation
+    note: >-
+      Decision D1: the executor also waits on leaf batches, so a successful install
+      means every sequenced resource reached ready. Skipping leaf checks would report
+      success for a release whose last batch never became ready.
+    hip: >-
+      A resources readiness is checked if there is a resource that depends on it as per
+      the sequencing DAG, otherwise the checks are ignored.
+
+  # ── Resource groups (PR2) ────────────────────────────────────────────────
+  - id: R20
+    title: A group is applied together and is ready before the next group starts
+    section: Resource-Group Sequencing
+    owner: pr2
+    status: implemented
+    hip: >-
+      Resources in each group are deployed together, and Helm waits for all to be ready
+      before continuing to the next group.
+
+  - id: R21
+    title: Groups without a mutual dependency deploy in parallel; list order is irrelevant
+    section: Template examples
+    owner: pr2
+    status: implemented
+    hip: >-
+      Resources in `database` and `queue` resource-groups would be deployed at the same
+      time. They would need to be ready before attempting to deploy `app` resource-group.
+      [...] The order in which they are listed does not affect deployment sequencing.
+
+  - id: R22
+    title: Unsequenced resources deploy last; misconfigured ones warn
+    section: Unsequenced Resources
+    owner: pr2
+    status: implemented
+    hip: >-
+      Resources that: lack annotations, depend on non-existent groups, or belong to
+      isolated groups will be deployed after all properly sequenced groups have been
+      processed. If a resource includes sequencing annotations but falls into this
+      unsequenced category due to misconfiguration [...], Helm will emit a warning.
+
+  - id: R23
+    title: Group sequencing is sandboxed inside each chart
+    section: Sequencing order
+    owner: pr2
+    status: implemented
+    hip: >-
+      These annotations are only used for sequencing resources within the same chart.
+      They do not influence or interact with resources across charts or subcharts.
+
+  - id: R24
+    title: Resource-group cycles are detected and reported
+    section: Chart dependencies example
+    owner: pr2
+    status: implemented
+    hip: >-
+      During the templating phase, Helm will have logic to detect, and report any
+      circular dependencies found in the chart templates.
+
+  - id: R25
+    title: Group dependency annotation key helm.sh/depends-on/resource-groups
+    section: Additions to templates
+    owner: pr2
+    status: implemented
+    note: >-
+      The key is used exactly as the HIP spells it. It has two '/' characters, so the API server
+      rejects it; Helm removes it from each object before apply and keeps it in the stored
+      release. A single-slash rename is open for maintainer decision.
+    hip: >-
+      `helm.sh/depends-on/resource-groups`: Annotation to declare resource-groups that
+      must exist and in a ready state before this resource can be deployed.
+
+  - id: R26
+    title: helm template prints deploy order with START/END resource-group delimiters
+    section: Sequencing order
+    owner: pr2
+    status: not-implemented
+    note: >-
+      Deferred to a follow-up PR after PR2 (decision 2026-09-26): the maintainers asked for
+      smaller PRs, and `helm dag` already prints the deployment order for troubleshooting.
+    hip: >-
+      `helm template` would print all resources in the order they would be deployed.
+      Groups of resources in a resource-group would be delimited using a
+      `## START resource-group: <chart>/<subchart> <group-name>` comment [...] and
+      `END resource-group: <chart>/<subchart> <group-name>`.
+
+  # ── Readiness (PR3) ──────────────────────────────────────────────────────
+  - id: R30
+    title: Without annotations, readiness is kstatus
+    section: Readiness
+    owner: pr3
+    status: implemented
+    hip: >-
+      By default, Helm uses `kstatus` library to assess readiness based on the
+      resource's type and `.status` field.
+
+  - id: R31
+    title: helm.sh/readiness-success — any true expression marks the resource ready
+    section: Readiness
+    owner: pr3
+    status: implemented
+    hip: >-
+      `helm.sh/readiness-success`: A list of custom success conditions. If any are true,
+      the resource is marked **ready**.
+
+  - id: R32
+    title: helm.sh/readiness-failure — any true expression fails it, over success
+    section: Readiness
+    owner: pr3
+    status: implemented
+    hip: >-
+      `helm.sh/readiness-failure`: A list of custom failure conditions. If any are true,
+      the resource is marked **failed**, which takes precedence over any success check.
+
+  - id: R33
+    title: Both annotations are required; one alone falls back to kstatus, warns, and fails lint
+    section: Readiness
+    owner: pr3
+    status: implemented
+    hip: >-
+      Both `helm.sh/readiness-success` and `helm.sh/readiness-failure` must both be
+      provided to override the default readiness logic. If only one is present, Helm will
+      fall back to `kstatus` and emit a warning. Helm will also fail linting when only
+      one of the two is defined.
+
+  - id: R34
+    title: Expression syntax {jsonpath} op value over .status, ops == != < <= > >=
+    section: JsonPath syntax
+    owner: pr3
+    status: implemented
+    hip: >-
+      `{<jsonpath_query>} <logical_operator> <value>` [...] `<jsonpath_query>` is a
+      Kubernetes JSONPath query scoped to `.status`. `<logical_operator>` supports: `==`,
+      `!=`, `<`, `<=`, `>`, `>=`. `<value>` is the expected literal for comparison.
+
+  - id: R36
+    title: Custom readiness gates sequencing
+    section: Readiness
+    owner: combined
+    status: implemented
+    hip: >-
+      To enforce sequencing, Helm determines whether resources are "ready" before
+      deploying dependent resources. [...] Chart authors can optionally override this
+      behavior using the following annotations.
+
+  - id: R37
+    title: Custom readiness also applies to a plain --wait
+    section: (extension)
+    owner: pr3
+    status: extension
+    note: >-
+      PR3 ships readiness independently of sequencing, so the annotations are honored by
+      the ordinary watcher wait as well.
+    hip: Not in the HIP.
