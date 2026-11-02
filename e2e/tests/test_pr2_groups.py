@@ -19,7 +19,7 @@ def _timeline_rows(tl, deployments, configmaps=()):
     return rows
 
 
-@pytest.mark.req("R20", "R21")
+@pytest.mark.req("R17", "R18")
 @pytest.mark.needs("ordered", "groups")
 def test_groups_follow_the_hip_example(e2e, order):
     """database and queue deploy together; app starts only after both are ready."""
@@ -31,14 +31,14 @@ def test_groups_follow_the_hip_example(e2e, order):
     db_ready, q_ready = tl.ready("Deployment", "db-service"), tl.ready("Deployment", "queue-processor")
     app_apply = tl.applied("Deployment", "my-app")
 
-    # R21: same batch — both siblings were sent before either became ready.
+    # R18: same batch — both siblings were sent before either became ready.
     order.before("last sibling applied", max(db_apply, q_apply), "first sibling ready", min(db_ready, q_ready))
-    # R20: the dependent group waits for every group it depends on to be ready.
+    # R17: the dependent group waits for every group it depends on to be ready.
     order.before("db-service ready", db_ready, "my-app applied", app_apply)
     order.before("queue-processor ready", q_ready, "my-app applied", app_apply)
 
 
-@pytest.mark.req("R22")
+@pytest.mark.req("R19")
 @pytest.mark.needs("ordered", "groups")
 def test_unsequenced_resources_deploy_last_and_warn(e2e, order):
     """No annotations, a missing dependency, an isolated group: all after app, two warnings."""
@@ -58,7 +58,7 @@ def test_unsequenced_resources_deploy_last_and_warn(e2e, order):
     assert not any("loose" in w for w in warnings), "an unannotated resource must not warn"
 
 
-@pytest.mark.req("R23")
+@pytest.mark.req("R20")
 @pytest.mark.needs("ordered", "subcharts", "groups")
 def test_group_sandboxing_parent_and_subchart_use_same_names(e2e, order):
     """Parent and subchart both define groups 'first' and 'second' with opposite edges; each chart's order holds independently."""
@@ -80,7 +80,7 @@ def test_group_sandboxing_parent_and_subchart_use_same_names(e2e, order):
     order.before("sub-second ready", s_second_ready, "sub-first applied", s_first_apply)
 
 
-@pytest.mark.req("R24")
+@pytest.mark.req("R21")
 @pytest.mark.needs("ordered", "groups")
 def test_group_cycle_detected_and_rejected(e2e):
     """Circular group dependency (a -> b -> c -> a) exits non-zero naming the cycle, nothing applied."""
@@ -103,7 +103,7 @@ def test_group_cycle_detected_and_rejected(e2e):
     assert lint_run.code != 0, "helm lint must fail on cycle"
 
 
-@pytest.mark.req("R25")
+@pytest.mark.req("R22")
 @pytest.mark.needs("ordered", "groups")
 def test_hip_dependency_key_is_removed_before_apply(e2e, order):
     """The HIP key helm.sh/depends-on/resource-groups orders groups, is kept in the release, and never reaches the API server."""
@@ -133,39 +133,86 @@ def test_hip_dependency_key_is_removed_before_apply(e2e, order):
                  "my-app applied", tl.applied("Deployment", "my-app"))
 
 
-@pytest.mark.req("R26")
+
+
+@pytest.mark.req("R23")
+@pytest.mark.needs("ordered", "groups")
+def test_duplicate_resource_group_assignment_rejected(e2e):
+    """Same resource assigned to two groups: install fails with 'assigned to multiple resource groups', nothing applied."""
+    run = e2e.helm("install", "r", e2e.chart("hip-groups-duplicate"),
+                   "--namespace", e2e.ns, "--wait=ordered", "--timeout", "1m",
+                   check=False)
+
+    e2e.observe("install exit code", run.code)
+    e2e.observe("error message", run.err[:600])
+
+    assert run.code != 0, "install must fail when same resource is in multiple groups"
+    assert "assigned to multiple resource groups" in run.err, \
+        "error must contain 'assigned to multiple resource groups'"
+
+    # Verify nothing was applied
+    tl = e2e.timeline()
+    assert not tl.applied("Deployment", "conflicting-app"), \
+        "conflicting resource must not have been applied"
+@pytest.mark.req("R24")
 @pytest.mark.needs("groups")
-@pytest.mark.xfail(strict=True, reason="R26 not implemented: helm template does not print START/END resource-group delimiters")
 def test_template_prints_delimiters_for_groups(e2e):
     """helm template prints resources in deploy order with ## START/END resource-group delimiters."""
     run = e2e.helm("template", "test-release", e2e.chart("hip-groups"))
     e2e.observe("helm template output", run.out)
 
-    # HIP requirement: delimiters like "## START resource-group: <chart>/<subchart> <group-name>"
+    # HIP requirement: delimiters like "## START resource-group: <chart> <group>"
     assert "## START resource-group:" in run.out, "template output must contain START resource-group delimiter"
     assert "## END resource-group:" in run.out, "template output must contain END resource-group delimiter"
 
-    # Groups should appear in dependency order
+    # Parse START and END markers
     lines = run.out.splitlines()
-    start_indices = {}
+    start_markers = {}  # group name -> (line index, chart_group label)
+    end_markers = {}    # group name -> (line index, chart_group label)
+
     for i, line in enumerate(lines):
         if "## START resource-group:" in line:
-            # Extract group name from delimiter
+            # Format: "## START resource-group: <chart> <group>"
             parts = line.split()
             if len(parts) >= 4:
+                chart_group = " ".join(parts[3:])  # e.g. "hip-groups database"
+                group = parts[-1]  # last token is the group name
+                start_markers[group] = (i, chart_group)
+        elif "## END resource-group:" in line:
+            parts = line.split()
+            if len(parts) >= 4:
+                chart_group = " ".join(parts[3:])
                 group = parts[-1]
-                start_indices[group] = i
+                end_markers[group] = (i, chart_group)
 
-    e2e.observe("group start indices", start_indices)
-    # database and queue should come before app
-    assert "database" in start_indices, "database group must appear"
-    assert "queue" in start_indices, "queue group must appear"
-    assert "app" in start_indices, "app group must appear"
-    assert start_indices["app"] > start_indices["database"], "app must come after database"
-    assert start_indices["app"] > start_indices["queue"], "app must come after queue"
+    e2e.observe("START markers", {k: v[0] for k, v in start_markers.items()})
+    e2e.observe("END markers", {k: v[0] for k, v in end_markers.items()})
 
+    # Every START must have a matching END with the same chart and group
+    assert start_markers.keys() == end_markers.keys(), \
+        f"START and END groups must match: START={set(start_markers.keys())}, END={set(end_markers.keys())}"
 
-@pytest.mark.req("R08")
+    for group in start_markers:
+        start_idx, start_label = start_markers[group]
+        end_idx, end_label = end_markers[group]
+        assert start_label == end_label, \
+            f"START and END labels must match for {group}: START={start_label}, END={end_label}"
+        assert end_idx > start_idx, \
+            f"END must come after START for {group}: START={start_idx}, END={end_idx}"
+
+    # Groups should appear in dependency order: database and queue before app
+    assert "database" in start_markers, "database group must appear"
+    assert "queue" in start_markers, "queue group must appear"
+    assert "app" in start_markers, "app group must appear"
+
+    db_start = start_markers["database"][0]
+    queue_start = start_markers["queue"][0]
+    app_start = start_markers["app"][0]
+
+    assert app_start > db_start, "app must come after database"
+    assert app_start > queue_start, "app must come after queue"
+
+@pytest.mark.req("R09")
 @pytest.mark.needs("ordered", "groups")
 def test_upgrade_follows_group_order(e2e, order):
     """Upgrade patches every Deployment; patches follow database/queue -> app, and app's patch comes after both are ready again."""
@@ -211,7 +258,7 @@ def test_upgrade_follows_group_order(e2e, order):
     order.before("queue ready after patch", queue_ready, "app patched", app_apply)
 
 
-@pytest.mark.req("R09")
+@pytest.mark.req("R10")
 @pytest.mark.needs("ordered", "groups")
 def test_uninstall_runs_in_reverse_order(e2e, order):
     """Uninstall after ordered install deletes app before database and queue (reverse of install order)."""

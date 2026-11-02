@@ -22,9 +22,11 @@ The patches in this directory connect the `helm` commands to that code, so that 
 | `0001-base-chart-v3-lifecycle.patch` | every tier | A plain chart-v3 lifecycle. It adds release/v2 storage to `action.Configuration`. It adds install, upgrade, rollback and uninstall for chart v3, which apply everything at once and wait like a chart v2. It adds hooks, `--rollback-on-failure`, and `template`, `lint`, `get` and `status` for chart v3. `pkg/action/wire_v3.go` defines the seams that the next two patches use. |
 | `0002-ordered-overlay.patch` | PR1, PR2, combined | `pkg/action/wire_ordered_v3.go` (212 lines). It sends `--wait=ordered` installs and upgrades to the sequencing code of PR1 and stores the plan on the release. It makes rollback follow the plan of the target revision, and uninstall delete in reverse order when the release was installed sequenced. |
 | `0003-readiness-overlay.patch` | PR3, combined | `pkg/action/wire_readiness_v3.go` (46 lines). It gives the `helm.sh/readiness-*` annotations of the resources to each chart-v3 wait, for a plain `--wait` and for each batch of `--wait=ordered`. |
+| `0004-template-order-overlay.patch` | PR2, combined | `pkg/cmd/template_order_v3.go` (56 lines). It makes `helm template` for chart v3 print the manifests in plan order, with resource-group delimiters, when the plan has more than one batch. A plan error stops the command. |
 
-Each patch is the output of `git format-patch` for one commit on top of the upstream commit `d31cd6992`. `make run`
-and `make build` apply them with `git am -3`.
+Each patch is the output of `git format-patch` for one commit. `0001` is on top of the upstream commit `d31cd6992`.
+`0002`, `0003` and `0004` are on top of a tree that contains the pull request named in the table. `make run` and
+`make build` apply the patches with `git am -3`.
 
 ## What the patches do not do
 
@@ -34,10 +36,12 @@ The patches do not decide the order of resources or the readiness of a resource:
   `wire_ordered_v3.go` calls these functions and gives the plan to the executor of PR1 (`sequencedDeployment`).
 - The readiness comes from `kube.CustomReadinessEligibleResources` and `kube.WithCustomReadiness` (PR3).
   `wire_readiness_v3.go` calls these two functions only.
+- The template order and the delimiters come from `sequence.Plan.TemplateManifest` (PR2). `template_order_v3.go`
+  calls `sequence.ParseStoredManifests`, `sequence.Build` and this function only.
 - Without an overlay, a chart-v3 operation applies everything at once and waits like a chart v2.
 
-To examine this, read `wire_ordered_v3.go` in `0002-ordered-overlay.patch` and `wire_readiness_v3.go` in
-`0003-readiness-overlay.patch`. Each file is short.
+To examine this, read `wire_ordered_v3.go` in `0002-ordered-overlay.patch`, `wire_readiness_v3.go` in
+`0003-readiness-overlay.patch`, and `template_order_v3.go` in `0004-template-order-overlay.patch`. Each file is short.
 
 ## The combined tier
 

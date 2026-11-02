@@ -22,6 +22,7 @@ wiring:
   base: wiring/0001-base-chart-v3-lifecycle.patch
   ordered: wiring/0002-ordered-overlay.patch
   readiness: wiring/0003-readiness-overlay.patch
+  template: wiring/0004-template-order-overlay.patch
 
 tiers:
   pr1:
@@ -36,16 +37,16 @@ tiers:
     label: PR2
     title: PR2 · resource-group sequencing (stacked on PR1)
     branch: feat/hip-0025-v3-resource-groups
-    commit: 5960aa3ee7c6c597e451f874c566148fb2b5f21b
+    commit: d655709ee04c04a655ce134665f9a55bffcdc935
     pr: https://github.com/caretak3r/helm/pull/5
     stacked_on: pr1   # the unit stage tests only the changes PR2 adds to PR1
-    wiring: [base, ordered]
+    wiring: [base, ordered, template]
     features: [ordered, subcharts, groups]
   pr3:
     label: PR3
     title: PR3 · custom readiness
     branch: feat/hip-0025-v3-readiness
-    commit: 176b059b0c4b4d0e2a9600be4aafef7ec756a903
+    commit: 82aba7eeeff7c343de24b7f66d3d4ced8a3b06d8
     pr: https://github.com/caretak3r/helm/pull/3
     wiring: [base, readiness]
     features: [readiness]
@@ -54,5 +55,5 @@ tiers:
     title: All three PRs merged
     merge: [pr2, pr3]   # PR2 contains PR1
     resolve: scripts/resolve-combined.sh
-    wiring: [base, ordered, readiness]
+    wiring: [base, ordered, readiness, template]
     features: [ordered, subcharts, groups, readiness]

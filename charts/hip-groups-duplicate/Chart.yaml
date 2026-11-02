@@ -1,0 +1,4 @@
+apiVersion: v3
+name: hip-groups-duplicate
+description: R23 duplicate resource-group assignment (same resource in two groups)
+version: 0.1.0

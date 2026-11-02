@@ -1,0 +1,50 @@
+# Two templates render the same Deployment (same kind and metadata.name) but
+# assign it to different resource groups. ParseResourceGroups should reject this
+# with "assigned to multiple resource groups".
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: conflicting-app
+  annotations:
+    helm.sh/resource-group: group-a
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: conflicting-app}
+  template:
+    metadata:
+      labels: {app: conflicting-app}
+    spec:
+      terminationGracePeriodSeconds: 0
+      containers:
+        - name: web
+          image: {{ .Values.image }}
+          imagePullPolicy: IfNotPresent
+          readinessProbe:
+            httpGet: {path: /, port: 80}
+            initialDelaySeconds: {{ .Values.readyDelay }}
+            periodSeconds: 1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: conflicting-app
+  annotations:
+    helm.sh/resource-group: group-b
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: conflicting-app}
+  template:
+    metadata:
+      labels: {app: conflicting-app}
+    spec:
+      terminationGracePeriodSeconds: 0
+      containers:
+        - name: web
+          image: {{ .Values.image }}
+          imagePullPolicy: IfNotPresent
+          readinessProbe:
+            httpGet: {path: /, port: 80}
+            initialDelaySeconds: {{ .Values.readyDelay }}
+            periodSeconds: 1

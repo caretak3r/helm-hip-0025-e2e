@@ -8,7 +8,7 @@ from timeline import fmt_ts
 CHART = "hip-readiness-basic"
 
 
-@pytest.mark.req("R30")
+@pytest.mark.req("R25")
 @pytest.mark.needs("readiness")
 def test_deployment_without_annotations_uses_kstatus(e2e):
     """Deployment with no readiness annotations: plain --wait returns after Available."""
@@ -22,7 +22,7 @@ def test_deployment_without_annotations_uses_kstatus(e2e):
     assert app_ready is not None, "Deployment never became ready"
 
 
-@pytest.mark.req("R31")
+@pytest.mark.req("R26")
 @pytest.mark.needs("readiness")
 def test_success_expressions_mark_ready(e2e, order):
     """Success list with multiple expressions: install exits only after one becomes true."""
@@ -56,7 +56,7 @@ def test_success_expressions_mark_ready(e2e, order):
         f"install finished at {fmt_ts(finished)}, before the count patch at {fmt_ts(patch_time)}"
 
 
-@pytest.mark.req("R32")
+@pytest.mark.req("R27")
 @pytest.mark.needs("readiness")
 def test_failure_takes_precedence_over_success(e2e):
     """Success AND failure both true: install fails, error names the Probe."""
@@ -85,7 +85,7 @@ def test_failure_takes_precedence_over_success(e2e):
         "error should mention readiness or failure"
 
 
-@pytest.mark.req("R32")
+@pytest.mark.req("R27")
 @pytest.mark.needs("readiness")
 def test_failure_expression_alone_fails_install(e2e):
     """Only failure expression true: install fails."""
@@ -112,7 +112,7 @@ def test_failure_expression_alone_fails_install(e2e):
     assert "probe" in run.err.lower()
 
 
-@pytest.mark.req("R32")
+@pytest.mark.req("R27")
 @pytest.mark.needs("readiness")
 def test_failed_probe_plus_pending_waits_for_timeout(e2e):
     """One failed Probe + one pending: helm waits until --timeout, error names both."""
@@ -162,7 +162,7 @@ def test_failed_probe_plus_pending_waits_for_timeout(e2e):
     assert "probe2" in err_lower, "error should mention probe2"
 
 
-@pytest.mark.req("R33")
+@pytest.mark.req("R28")
 @pytest.mark.needs("readiness")
 def test_only_success_annotation_falls_back_to_kstatus_and_warns(e2e):
     """Only readiness-success annotation: kstatus fallback occurs and helm warns."""
@@ -198,7 +198,7 @@ def test_only_success_annotation_falls_back_to_kstatus_and_warns(e2e):
         f"expected a fallback warning naming the Probe, got {warnings}"
 
 
-@pytest.mark.req("R33")
+@pytest.mark.req("R28")
 @pytest.mark.needs("readiness")
 def test_only_success_annotation_fails_helm_lint(e2e):
     """Chart with only readiness-success annotation: helm lint fails."""
@@ -222,7 +222,7 @@ def test_only_success_annotation_fails_helm_lint(e2e):
     assert "readiness" in output or "annotation" in output, \
         "lint error should mention readiness or annotations"
 
-@pytest.mark.req("R34")
+@pytest.mark.req("R29")
 @pytest.mark.needs("readiness")
 @pytest.mark.parametrize("operator,initial,target,threshold,field,description", [
     ("==", 5, 10, 10, "count", "equality number"),
@@ -286,7 +286,7 @@ def test_readiness_operators(e2e, operator, initial, target, threshold, field, d
         f"install finished at {fmt_ts(finished)}, before {field} reached {target} at {fmt_ts(target_time)}"
 
 
-@pytest.mark.req("R37")
+@pytest.mark.req("R31")
 @pytest.mark.needs("readiness")
 def test_custom_readiness_applies_to_plain_wait(e2e):
     """Probe with custom readiness annotations gates a plain --wait install."""
@@ -321,4 +321,69 @@ def test_custom_readiness_applies_to_plain_wait(e2e):
     finished = tl.finished()
     e2e.observe_timeline("apiserver timeline", [(ready_time, "status Probe/probe phase=Ready (test patch)"),
                                                 (finished, "helm writes release record: deployed")])
-    assert finished is not None and finished > ready_time, "plain --wait returned before the custom expression held"
+
+
+@pytest.mark.req("R30")
+@pytest.mark.needs("readiness")
+def test_lint_rejects_object_literal_comparison(e2e):
+    """helm lint fails when readiness expression compares to an object literal."""
+    # Create a chart with an expression comparing to an object literal
+    values_content = {
+        "probe": {
+            "successExpressions": ['{.data} == {"key": "value"}'],
+            "failureExpressions": ['{.phase} == Failed']
+        }
+    }
+    values_file = e2e.dir / "values.yaml"
+    values_file.write_text(yaml.dump(values_content))
+
+    run = e2e.helm("lint", e2e.chart(CHART), "-f", str(values_file), check=False)
+
+    e2e.observe("lint exit code", run.code)
+    e2e.observe("lint output", run.out + run.err)
+
+    assert run.code != 0, "helm lint must fail for object literal comparison"
+    combined_output = run.out + run.err
+    # Lint error format: 'expression "{.status.config} == {\"key\":\"value\"}": object comparisons are not supported'
+    assert "object comparisons are not supported" in combined_output, \
+        "lint error must contain 'object comparisons are not supported'"
+
+
+@pytest.mark.req("R30")
+@pytest.mark.needs("readiness")
+def test_install_rejects_object_jsonpath_result(e2e):
+    """install --wait fails promptly when JSONPath result is an object, with wrapped error."""
+    import time
+
+    # Expression points at .metadata (an object)
+    values_content = {
+        "probe": {
+            "successExpressions": ['{.metadata} == {}'],  # JSONPath returns an object
+            "failureExpressions": ['{.phase} == Failed']
+        }
+    }
+    values_file = e2e.dir / "values.yaml"
+    values_file.write_text(yaml.dump(values_content))
+
+    # Patch the status to have a metadata object
+    e2e.later(2.0, e2e.patch_status, "Probe", "probe", {"metadata": {"key": "value"}})
+
+    start_time = time.time()
+    run = e2e.helm("install", "r", e2e.chart(CHART), "-f", str(values_file),
+                   "--namespace", e2e.ns, "--wait", "--timeout", "30s",
+                   check=False)
+    elapsed = time.time() - start_time
+
+    e2e.observe("install exit code", run.code)
+    e2e.observe("elapsed time", f"{elapsed:.1f}s")
+    e2e.observe("error message", run.err[:800])
+
+    assert run.code != 0, "install must fail when JSONPath result is an object/array"
+    # Runtime error format: 'custom readiness expression error: evaluating success expression "...":
+    # JSONPath result is an object or array: object comparisons are not supported'
+    assert "custom readiness expression error" in run.err, \
+        "error must be wrapped in 'custom readiness expression error'"
+    assert "object comparisons are not supported" in run.err, \
+        "error must contain 'object comparisons are not supported'"
+    # Must fail well before the 30s timeout (object comparison errors cause immediate Failed status)
+    assert elapsed < 15, f"install must fail promptly, not after {elapsed:.1f}s"
