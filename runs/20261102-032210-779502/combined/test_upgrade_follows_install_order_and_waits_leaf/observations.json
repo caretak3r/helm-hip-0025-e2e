@@ -1,0 +1,14 @@
+[
+  {
+    "label": "upgrade timeline",
+    "value": [
+      "03:23:17.510  patch  Deployment/subchart-a",
+      "03:23:20.427  ready  Deployment/subchart-a (new pod)",
+      "03:23:20.559  patch  Deployment/subchart-b",
+      "03:23:24.445  ready  Deployment/subchart-b (new pod)",
+      "03:23:24.574  patch  Deployment/parent",
+      "03:23:28.460  ready  Deployment/parent (new pod)",
+      "03:23:28.555  helm writes release record: deployed"
+    ]
+  }
+]

@@ -1,0 +1,30 @@
+03:24:20.437 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr3-custom-readiness-applies-to-plain-wait --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+03:24:20.475 $ kubectl --context kind-hip0025-e2e create namespace e2e-pr3-custom-readiness-applies-to-plain-wait
+[exit 0, 0.0s]
+namespace/e2e-pr3-custom-readiness-applies-to-plain-wait created
+
+
+03:24:24.518 $ kubectl --context kind-hip0025-e2e patch Probe probe -n e2e-pr3-custom-readiness-applies-to-plain-wait --subresource=status --type=merge -p {"status": {"phase": "Ready"}}
+[exit 0, 0.1s]
+probe.readiness.hip0025.example/probe patched
+
+
+03:24:20.510 $ .bin/helm-pr3 install r charts/hip-readiness-basic -f runs/20261102-032210-779502/pr3/test_custom_readiness_applies_to_plain_wait/values.yaml --namespace e2e-pr3-custom-readiness-applies-to-plain-wait --wait --timeout 2m --kube-context kind-hip0025-e2e
+[exit 0, 4.1s]
+NAME: r
+LAST DEPLOYED: Sun Nov  1 22:24:20 2026
+NAMESPACE: e2e-pr3-custom-readiness-applies-to-plain-wait
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+
+
+03:24:25.606 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr3-custom-readiness-applies-to-plain-wait --wait=false
+[exit 0, 0.1s]
+namespace "e2e-pr3-custom-readiness-applies-to-plain-wait" deleted
+
+

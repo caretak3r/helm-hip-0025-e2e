@@ -1,0 +1,37 @@
+03:23:07.441 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-upgrade-follows-install-order-and-waits-leaf --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+03:23:07.483 $ kubectl --context kind-hip0025-e2e create namespace e2e-combined-upgrade-follows-install-order-and-waits-leaf
+[exit 0, 0.0s]
+namespace/e2e-combined-upgrade-follows-install-order-and-waits-leaf created
+
+
+03:23:07.522 $ .bin/helm-combined install r charts/hip-lifecycle --namespace e2e-combined-upgrade-follows-install-order-and-waits-leaf --set global.rev=1 --wait=ordered --timeout 3m --kube-context kind-hip0025-e2e
+[exit 0, 9.9s]
+NAME: r
+LAST DEPLOYED: Sun Nov  1 22:23:07 2026
+NAMESPACE: e2e-combined-upgrade-follows-install-order-and-waits-leaf
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+
+
+03:23:17.425 $ .bin/helm-combined upgrade r charts/hip-lifecycle --namespace e2e-combined-upgrade-follows-install-order-and-waits-leaf --set global.rev=2 --wait=ordered --timeout 3m --kube-context kind-hip0025-e2e
+[exit 0, 11.1s]
+Release "r" has been upgraded. Happy Helming!
+NAME: r
+LAST DEPLOYED: Sun Nov  1 22:23:17 2026
+NAMESPACE: e2e-combined-upgrade-follows-install-order-and-waits-leaf
+STATUS: deployed
+REVISION: 2
+DESCRIPTION: Upgrade complete
+TEST SUITE: None
+
+
+03:23:29.571 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-upgrade-follows-install-order-and-waits-leaf --wait=false
+[exit 0, 0.0s]
+namespace "e2e-combined-upgrade-follows-install-order-and-waits-leaf" deleted
+
+

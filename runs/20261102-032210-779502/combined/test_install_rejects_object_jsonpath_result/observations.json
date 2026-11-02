@@ -1,0 +1,14 @@
+[
+  {
+    "label": "install exit code",
+    "value": 1
+  },
+  {
+    "label": "elapsed time",
+    "value": "2.1s"
+  },
+  {
+    "label": "error message",
+    "value": "Error: INSTALLATION FAILED: resource Probe/e2e-combined-install-rejects-object-jsonpath-result/probe not ready. status: Failed, message: custom readiness expression error: evaluating success expression \"{.metadata} == {}\": JSONPath result is an object or array: object comparisons are not supported\n"
+  }
+]

@@ -1,0 +1,77 @@
+03:24:18.167 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr1-failure-stops-install-dependent-never-applied --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+03:24:18.208 $ kubectl --context kind-hip0025-e2e create namespace e2e-pr1-failure-stops-install-dependent-never-applied
+[exit 0, 0.0s]
+namespace/e2e-pr1-failure-stops-install-dependent-never-applied created
+
+
+03:24:18.245 $ .bin/helm-pr1 install r charts/hip-lifecycle-failure --namespace e2e-pr1-failure-stops-install-dependent-never-applied --wait=ordered --timeout 45s --kube-context kind-hip0025-e2e
+[exit 1, 45.1s]
+Error: INSTALLATION FAILED: resource Deployment/e2e-pr1-failure-stops-install-dependent-never-applied/broken not ready. status: InProgress, message: Available: 0/1
+context deadline exceeded
+
+
+03:25:04.341 $ .bin/helm-pr1 status r --namespace e2e-pr1-failure-stops-install-dependent-never-applied --kube-context kind-hip0025-e2e
+[exit 0, 0.1s]
+NAME: r
+LAST DEPLOYED: Sun Nov  1 22:24:18 2026
+NAMESPACE: e2e-pr1-failure-stops-install-dependent-never-applied
+STATUS: failed
+REVISION: 1
+DESCRIPTION: Release "r" failed: resource Deployment/e2e-pr1-failure-stops-install-dependent-never-applied/broken not ready. status: InProgress, message: Available: 0/1
+context deadline exceeded
+RESOURCES:
+==> v1/Deployment
+NAME     READY   UP-TO-DATE   AVAILABLE   AGE
+broken   0/1     1            0           46s
+
+==> v1/Pod(related)
+NAME                      READY   STATUS    RESTARTS   AGE
+broken-58545dd874-gz78l   0/1     Running   0          46s
+
+
+TEST SUITE: None
+
+
+03:25:04.407 $ kubectl --context kind-hip0025-e2e get secret -n e2e-pr1-failure-stops-install-dependent-never-applied -l owner=helm,name=r -o json
+[exit 0, 0.0s]
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "v1",
+            "data": {
+                "release": "SDRzSUFBQUFBQUFDLzlSV1VXL2JOaEQrSzRmYksyVkxUcHMwZk50V29DZ3dETVk2N0dGUlVKekZzMDJFSWptU2RtTVkvdThESlV1eGtUUkkwcjFNOElNbDhqN2U5K20rTyszUlVzc29NYUJBYlpjTzVSNlhPc1QwVmJFM2JzY0tKYzdLMldWUlZVVlovVG1ieWRrN1dYMllYSlJWZVhWZGxPOWxXYUpBUTY4T1VSeWJvSDNTenFMRVA5Z3dSWVlhUTQyd0pHMVlTUWdjM1NZMERCODc2Slp0bXZLTUN4K3FJdS9aQkM1aWNqNFcyc1pFeGhTS1BWdkZOaFdXdHh3Szh0NW9WdE5GY0hkc3dib0VnVW50SmhBVHBVMlU4Tm5PZzFzRmpsRkF5ekhTaWlYOHZDVnRhR0ZZUWptdGF0czRtL2crZ1dKU1Jsc0d2bStZRlNzVTJBT2h4RDVyUEFoczFoUlMxckxsUklvUzVmOUhxZGZhRjBZdnVkazFoZ2NXS0hETElmWmFsSk5xOGxpaFh6TW1mTk5wRFFROXVZNEp4TTJpT3crU2c4UXh3UkVUMW1SenNpc1VTRjcvTmVKdkx6cndYcWhHYzBSNU02YlhDL1ZrUG9HOWl6cTVzTXRrdFdFNW5YWW54K2tZeFRhcnBsQ21zT0dER0dISDkvSmE1TlBBTS9DQlFpd3kxTTJRK08zaDlpRFF1T1lPcGQwWUl6Qng2dzBsanNPRExabE52dHNQTVhLUEsrTVdaRkR1RHdKMVM2dWNzMTFwZXkrcnlleXFJT08xWlR3TWgrWjhYaFAxN0dKczF0elNrRjEvMXpxVmRLZGNXWmJaUjlsS1pTbTczOThvT3BWR1JnKzdPK09WMThYc1hUYmUrMnQ1Y1QyNXZMeTZ2Q2l2eW91aWZKZTlkeERZa3RWTGpna2xGa1ZSMjUvZ1MyYzBDVStXNS9scm5vNktUbnZMVDNiVW10bytGSmtFOGo1T3QxVnQ3N1JWOHNTL3RSMDhJV3NMa010RFFvOWIyK2k1NlI0SDlrWTNGQ1ZVK1RheTRTYTUwSzBCdEpTYTlXKzBZQk1sN01uN0FlR1ExNGZzaHMybngrWExmQzhRWUR3L1g0bERxeTFsKzMwSzFQQ2NnM2JxQ3pmT3FpaWhIUGJsM2tEYWNvaGpLRUJ4WlBhTkZ3OFBBYm82a1BDb0RCN3RtVytNbVR1am01MkV6OHZmWFpvSGpwMThEeHV6L2JYbEdPZkJMVmllTGdHc1UvS2ZPRW5ZZTBwckNWTUIzb1VrNFVOMU9OK3ByVTZhekVjMnRCdlp6YzczK0hQdVZXMXIrNXJDR1YzejM5Zk9DUDBqNVRPQ3ZLR0N6bVAvSDBWVTUxN3REWFc5Yit6SGxVRERXemI5UU1oMTg4eThVdXp6ZWlsd0dFQy9aRjI3YWZMUWpjWE5TY2U4dlJYSWFuVWNPTXZnMnRPQms5elpuTWg5L1Bra0hnMmZZMHJWU3dOUFo4c1lleXR3TVJMWjk2TjgvcFlzQk9iNlJZa2JHL21mRGR1bSsxeFlVQWlhd3pERWhrN2NuNmF0NHZ0TzFKY1RmOXBTUi8xZW5QNVRXdndBZzBxODdnMThuMFFlNTZjVm1pMFJQVFdNRXQvMExkaDlEbm16KzlweVdydE1MMGJDdzc4REFNcVcwRjhNQ3dBQQ=="
+            },
+            "kind": "Secret",
+            "metadata": {
+                "creationTimestamp": "2026-11-02T03:24:18Z",
+                "labels": {
+                    "modifiedAt": "1793589903",
+                    "name": "r",
+                    "owner": "helm",
+                    "status": "failed",
+                    "version": "1"
+                },
+                "name": "sh.helm.release.v1.r.v1",
+                "namespace": "e2e-pr1-failure-stops-install-dependent-never-applied",
+                "resourceVersion": "3986",
+                "uid": "a1811fbb-3a9d-4cfd-a8b8-e7242b2e2ba6"
+            },
+            "type": "helm.sh/release.v2"
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}
+
+
+03:25:04.451 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr1-failure-stops-install-dependent-never-applied --wait=false
+[exit 0, 0.0s]
+namespace "e2e-pr1-failure-stops-install-dependent-never-applied" deleted
+
+

@@ -1,0 +1,60 @@
+03:24:27.998 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr3-v2-chart-with-plain-wait-applies-in-one-burst --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+03:24:28.038 $ kubectl --context kind-hip0025-e2e create namespace e2e-pr3-v2-chart-with-plain-wait-applies-in-one-burst
+[exit 0, 0.0s]
+namespace/e2e-pr3-v2-chart-with-plain-wait-applies-in-one-burst created
+
+
+03:24:28.073 $ .bin/helm-pr3 install r charts/v2-annotated --namespace e2e-pr3-v2-chart-with-plain-wait-applies-in-one-burst --wait --timeout 3m --kube-context kind-hip0025-e2e
+[exit 0, 0.5s]
+NAME: r
+LAST DEPLOYED: Sun Nov  1 22:24:28 2026
+NAMESPACE: e2e-pr3-v2-chart-with-plain-wait-applies-in-one-burst
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+
+
+03:24:29.616 $ kubectl --context kind-hip0025-e2e get secret -n e2e-pr3-v2-chart-with-plain-wait-applies-in-one-burst -l owner=helm,name=r -o json
+[exit 0, 0.1s]
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "v1",
+            "data": {
+                "release": "SDRzSUFBQUFBQUFDLzZSV2YzUGJLaGI5S2d6dlh5dVJjSlRHbW5sL1dINjFyRFEvbXJTUmJLM2Z2QUZFSkdJRWpFQjJuSXkvK3c2S25hVHRibmZhMWRnekF1NDluSE1SQjU2aHhBMkRFV3poQUhKNXIyRDBETzk1YSt3L0pkTkNiVmtKSTRoOGRPb0ZnZWNIWHhHSzBFbUV6bzZDNE9Ua3c1bm5oNUh2d3dFVStKZFRTbVpveTdYbFNzSUlwdEpZTEFTZ3F0R0NXUVlIMEZoc093TWorSXE3RzBCYTQ5WTZsZzJ6dU1RV3UvZTlpRFh5c0pUS1lzdEtPSUJyMXBvWGNQOG9PUHB4eXR2Z0ZLd1I2QkhCaHRzYVZLM3FOTmhqY0NVTjhFRFRHUXMycWwyOWhHaUJ1UVNldDhIY0RrRExIaGkxKythZnFpMVoyMCtOTmM5ZVoxK2pmbXJOWk1razVjekE2Rit2bkUxSC9pUFZsbWxsdUZYdEZrYnduZ3NXSFIvM1RNM3hTd3FUbUFoWGE5dDJiUGYzYmdDRm9pc1l5VTZJQWJTczBRTGJiK2Q2N1R6R1doOXRjU01jc2I2R01OM0crU1dQSDNBeTNaYVRlSWpudHlwTnlpMFpacHMwbVhha0dmbUwrYTBtS0h4S0ozNUZVYjB1ODhkVk9pdlh0REZWaVlTUEovR0dKRk5OK05oZXpNc2F6MjgrTGVheHpwcHNTNUZZa3dkVkxlYnhobTVINlBKR3R6Z1BWOWM4L2xqTVkwT0d3aFo1NkUrYVFKVEpkTFdZMzliWGxhclNKS3hKZm5lYXp1S2FObGxYVG9LYXpzYWYwa2xja3laY2w4blV4L21vbzAvcVV6b1pWMmxTQzVMNEhVWFZtamJaRXhsbTJ3VzZzOFh3ZkYzT3g2ZHBNdDNRc1g2aVNmYlE0OC9PQlUwZTlRSk5uNjc1K0hIQ3h4VkZtU255SzU4TTAxUFhUaWV4WGN4dkgvREh4M3JSWklZK3FZcWg2WWIrcFNxYVRMZU85MFUrM2RDWjczajVSUjY0T3ZqRjF3T243elJOZWt5enlNOEZtVjJlcGpQck5IMm5NUjd0NTM3aitwTG5GL056aS9Pd0xoT3hKcXR5dThpdnhGMlNiWEUrV3QyaDdJR2djT1U0WG81ZmMxeWZ2OGhGVjh6UG45NnczTit2U0RPMXhWZFZsU2pqRTM3bzcvTTB5YWZTamJHaHFTNUVVWk5aSnVnMmZPbi9Fby91Yjk1ampTdWNCM1dCc3BzeWZ6UjN5Y2pnL0NxODV2RjVzUXJYNVRUZUZ2TXJRZVROcDRzdnZwMDAwdzNPQ2tIbGxTYm81RFNkTFI0bmpkV2t1VGxOUDE2dFNWUG93ZzlxT3RhMm1OL1dSVEwxRjMxTjQyNlJCK0theDV2Ri9OemgyU0pKLzQ5djRyWXVreWxmeksvRXBISHZIOTJhUEJBVWJBZ0tIZjQzTWZjMzZrODRnSTBxTFcvWXdlMzhrWWMrZkVYRENBMGovK3dvK09DZm5JUm9lT2I1Sjg3d2RuOFA0QnFMem0zSlo4Z2JYTGxNV1hINUdBVkg2SU9IaGVheTk3Mk91SkJLS0lJRmpKNTNnNStFNzNZRGFHak5HbnpZK2krdE4zSys3enNmZGxicysxSC9LK0NnOXhSenlQbE95dDY0Z3lnTW8vRHNhRFFLd3BQUk1OeGI5MjRBR3l6NVBUTVdSdER6dktYOEEzeFJYVXRaQk41NzhEdkRPbjd6SHRPUjNudVc4czBsSTdBT2xuTEZaUm1CaVpMM3ZMckVlaWtQSGg4dEpRRE94Q0xRZXFZanJ2bk9wZnRoQUdvbW1pTlRIN2ZNOUdTODNzNGpZRHJTdnkzbEs1WTdaWlJrMHZhalBjMmxYTXFmYWZuUlBIOVBnTVl0azlZcmYxR0VReUhZc0wwSThQeE93bUZzOXpzYS9nRFovendEVGEwNlVmNlhVL0RiTW1DdHpmRmJMZjdxais2R1NmdXpZbUN0ZjYwYWZZTFJqUFp4TGRPQ1Uyd2lFTGltWVlKUnE5bzlSb010clM4d1ljSkU0QmxyL1g3YW5ZczVsT1dROEo2bmU4VFBrZ0Y0NWVFZXk5cUd5MTVFMG1MS1ByT1dxL0lMbzBxV0pnTCtJWTRxYVRHWHJEV3ZxUUI0KzdKc0dIbnJCS0RmL1JINFlmUC9FUE81RStLekVweHVJNURlWHluN3VXV21yLzFTdnI5bEJJUCtTbUEwcG03UE04UTgzUTY5TmZMNkQ4RnphK3oxYTl5dnNOTXFPRE1lbDU2U3pDTmRhMngveTlGaSswL0RiSzNjbmM4WURIZi9IZ0RqeDdJcVVnb0FBQT09"
+            },
+            "kind": "Secret",
+            "metadata": {
+                "creationTimestamp": "2026-11-02T03:24:28Z",
+                "labels": {
+                    "modifiedAt": "1793589868",
+                    "name": "r",
+                    "owner": "helm",
+                    "status": "deployed",
+                    "version": "1"
+                },
+                "name": "sh.helm.release.v1.r.v1",
+                "namespace": "e2e-pr3-v2-chart-with-plain-wait-applies-in-one-burst",
+                "resourceVersion": "3610",
+                "uid": "e685ae1c-d407-4ba2-8a6a-8f6269cbe51c"
+            },
+            "type": "helm.sh/release.v1"
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}
+
+
+03:24:29.673 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr3-v2-chart-with-plain-wait-applies-in-one-burst --wait=false
+[exit 0, 0.0s]
+namespace "e2e-pr3-v2-chart-with-plain-wait-applies-in-one-burst" deleted
+
+

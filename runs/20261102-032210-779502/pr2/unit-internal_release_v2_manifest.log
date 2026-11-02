@@ -1,0 +1,7 @@
+$ go test -list . ./internal/release/v2/manifest/
+?   	helm.sh/helm/v4/internal/release/v2/manifest	[no test files]
+
+$ go test -json -count=1 ./internal/release/v2/manifest/
+{"Time":"2026-11-01T22:22:48.43321-05:00","Action":"start","Package":"helm.sh/helm/v4/internal/release/v2/manifest"}
+{"Time":"2026-11-01T22:22:48.433356-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2/manifest","Output":"?   \thelm.sh/helm/v4/internal/release/v2/manifest\t[no test files]\n"}
+{"Time":"2026-11-01T22:22:48.433368-05:00","Action":"skip","Package":"helm.sh/helm/v4/internal/release/v2/manifest","Elapsed":0}

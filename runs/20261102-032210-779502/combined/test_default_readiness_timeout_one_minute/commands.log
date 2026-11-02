@@ -1,0 +1,20 @@
+03:26:14.386 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-default-readiness-timeout-one-minute --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+03:26:14.427 $ kubectl --context kind-hip0025-e2e create namespace e2e-combined-default-readiness-timeout-one-minute
+[exit 0, 0.0s]
+namespace/e2e-combined-default-readiness-timeout-one-minute created
+
+
+03:26:14.465 $ .bin/helm-combined install r charts/hip-lifecycle-failure --namespace e2e-combined-default-readiness-timeout-one-minute --wait=ordered --timeout 3m --kube-context kind-hip0025-e2e
+[exit 1, 60.1s]
+Error: INSTALLATION FAILED: resource Deployment/e2e-combined-default-readiness-timeout-one-minute/broken not ready. status: InProgress, message: Available: 0/1
+context deadline exceeded
+
+
+03:27:14.565 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-default-readiness-timeout-one-minute --wait=false
+[exit 0, 0.1s]
+namespace "e2e-combined-default-readiness-timeout-one-minute" deleted
+
+

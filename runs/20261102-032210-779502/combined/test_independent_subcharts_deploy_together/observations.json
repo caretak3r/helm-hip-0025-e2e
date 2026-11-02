@@ -1,0 +1,15 @@
+[
+  {
+    "label": "apiserver timeline",
+    "value": [
+      "03:27:32.526  apply  Deployment/nginx",
+      "03:27:32.541  apply  Deployment/rabbitmq",
+      "03:27:35.218  ready  Deployment/nginx",
+      "03:27:35.223  ready  Deployment/rabbitmq",
+      "03:27:35.264  apply  Deployment/bar",
+      "03:27:38.233  ready  Deployment/bar",
+      "03:27:38.256  apply  Deployment/foo",
+      "03:27:41.249  ready  Deployment/foo"
+    ]
+  }
+]

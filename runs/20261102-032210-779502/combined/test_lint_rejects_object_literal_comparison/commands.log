@@ -1,0 +1,23 @@
+03:31:06.134 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-lint-rejects-object-literal-comparison --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+03:31:06.176 $ kubectl --context kind-hip0025-e2e create namespace e2e-combined-lint-rejects-object-literal-comparison
+[exit 0, 0.0s]
+namespace/e2e-combined-lint-rejects-object-literal-comparison created
+
+
+03:31:06.226 $ .bin/helm-combined lint charts/hip-readiness-basic -f runs/20261102-032210-779502/combined/test_lint_rejects_object_literal_comparison/values.yaml --kube-context kind-hip0025-e2e
+[exit 1, 0.0s]
+==> Linting charts/hip-readiness-basic
+[INFO] Chart.yaml: icon is recommended
+[ERROR] hip-readiness-basic/templates/probe.yaml: resource "Probe/probe" has malformed "helm.sh/readiness-success" annotation: expression "{.data} == {\"key\": \"value\"}": object comparisons are not supported
+
+Error: 1 chart(s) linted, 1 chart(s) failed
+
+
+03:31:06.258 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-lint-rejects-object-literal-comparison --wait=false
+[exit 0, 0.0s]
+namespace "e2e-combined-lint-rejects-object-literal-comparison" deleted
+
+

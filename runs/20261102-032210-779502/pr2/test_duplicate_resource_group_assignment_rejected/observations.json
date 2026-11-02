@@ -1,0 +1,10 @@
+[
+  {
+    "label": "install exit code",
+    "value": 1
+  },
+  {
+    "label": "error message",
+    "value": "Error: INSTALLATION FAILED: parsing resource-group annotations for hip-groups-duplicate: resource \"apps/v1/Deployment//conflicting-app\" assigned to multiple resource groups \"group-a\" and \"group-b\"\n"
+  }
+]

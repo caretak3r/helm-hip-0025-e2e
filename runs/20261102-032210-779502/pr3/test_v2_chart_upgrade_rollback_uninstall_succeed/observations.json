@@ -1,0 +1,16 @@
+[
+  {
+    "label": "upgrade revision",
+    "value": 2
+  },
+  {
+    "label": "rollback revision",
+    "value": 3
+  },
+  {
+    "label": "deployments deleted",
+    "value": [
+      "parent-app"
+    ]
+  }
+]

@@ -1,0 +1,29 @@
+{
+  "tier": "pr3",
+  "commits": {
+    "feat/hip-0025-v3-readiness": "82aba7eeeff7c343de24b7f66d3d4ced8a3b06d8"
+  },
+  "wiring": [
+    {
+      "name": "base",
+      "file": "wiring/0001-base-chart-v3-lifecycle.patch",
+      "sha256": "5ff507228070d529cac835fe892cac77dc40ec48696fadfcd809abb51b9794de"
+    },
+    {
+      "name": "readiness",
+      "file": "wiring/0003-readiness-overlay.patch",
+      "sha256": "6b5a4d97847cbea4fe313e940c97494b35e176de7e499c3bc5a0d201e6d76e5c"
+    }
+  ],
+  "base": "bc232c5312e784e808ea95ae76f9e82d4fe142fc",
+  "tree_head": "c7b03d10b2e655eeb10543324462d7c51688e49a",
+  "tree": "5f87bd6574207cc7658cb028fb33de6ebb5f7711",
+  "version": "v4.3+gc7b03d1",
+  "binary": ".bin/helm-pr3",
+  "binary_sha256": "88b4cb7733f3d13d35aefe0549a652fa64c9da86002668d27f5f978e4914a40f",
+  "go": "go1.27.3",
+  "goos": "darwin",
+  "goarch": "arm64",
+  "build_seconds": 13.9,
+  "rebuilt": true
+}

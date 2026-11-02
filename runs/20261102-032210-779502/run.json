@@ -1,0 +1,769 @@
+{
+  "evidence_version": 2,
+  "stamp": "20261102-032210-779502",
+  "started_utc": "2026-11-02T03:22:10Z",
+  "tiers": [
+    "pr1",
+    "pr2",
+    "pr3",
+    "combined"
+  ],
+  "pytest_args": [],
+  "pytest_addopts": "",
+  "skip_unit": false,
+  "status": "completed",
+  "exit_code": 0,
+  "stages": {
+    "collection": {
+      "status": "passed",
+      "updated_utc": "2026-11-02T03:22:10Z"
+    },
+    "sources": {
+      "status": "passed",
+      "updated_utc": "2026-11-02T03:22:10Z"
+    },
+    "cluster": {
+      "status": "passed",
+      "updated_utc": "2026-11-02T03:22:42Z"
+    },
+    "metadata": {
+      "status": "passed",
+      "updated_utc": "2026-11-02T03:22:42Z"
+    },
+    "charts": {
+      "status": "passed",
+      "updated_utc": "2026-11-02T03:22:42Z"
+    },
+    "unit:pr1": {
+      "status": "passed",
+      "updated_utc": "2026-11-02T03:31:13Z"
+    },
+    "build:pr1": {
+      "status": "passed",
+      "updated_utc": "2026-11-02T03:22:57Z"
+    },
+    "unit:pr2": {
+      "status": "passed",
+      "updated_utc": "2026-11-02T03:31:13Z"
+    },
+    "build:pr2": {
+      "status": "passed",
+      "updated_utc": "2026-11-02T03:22:57Z"
+    },
+    "unit:pr3": {
+      "status": "passed",
+      "updated_utc": "2026-11-02T03:31:13Z"
+    },
+    "build:pr3": {
+      "status": "passed",
+      "updated_utc": "2026-11-02T03:22:57Z"
+    },
+    "build:combined": {
+      "status": "passed",
+      "updated_utc": "2026-11-02T03:22:57Z"
+    },
+    "e2e:pr3": {
+      "status": "passed",
+      "updated_utc": "2026-11-02T03:24:32Z",
+      "exit_code": 0
+    },
+    "e2e:combined": {
+      "status": "passed",
+      "updated_utc": "2026-11-02T03:31:13Z",
+      "exit_code": 0
+    },
+    "e2e:pr1": {
+      "status": "passed",
+      "updated_utc": "2026-11-02T03:28:23Z",
+      "exit_code": 0
+    },
+    "e2e:pr2": {
+      "status": "passed",
+      "updated_utc": "2026-11-02T03:29:32Z",
+      "exit_code": 0
+    },
+    "grading": {
+      "status": "passed",
+      "updated_utc": "2026-11-02T03:31:13Z"
+    },
+    "report": {
+      "status": "passed",
+      "updated_utc": "2026-11-02T03:31:13Z",
+      "sha256": "65f2fe5d523af3f56eb894120cc758ed1451bd208d4d1417adf794e81255a9e1"
+    }
+  },
+  "suite": [
+    {
+      "nodeid": "e2e/tests/test_combined.py::test_custom_readiness_gates_sequencing",
+      "reqs": [
+        "R32"
+      ],
+      "needs": [
+        "ordered",
+        "groups",
+        "readiness"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_upgrade_follows_install_order_and_waits_leaf",
+      "reqs": [
+        "R09",
+        "R15"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_uninstall_reverse_order_for_ordered_install",
+      "reqs": [
+        "R10"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_uninstall_after_plain_install_is_not_sequenced",
+      "reqs": [
+        "R10",
+        "R02"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_rollback_follows_target_revision_order",
+      "reqs": [
+        "R11"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_failure_stops_install_dependent_never_applied",
+      "reqs": [
+        "R12"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_rollback_on_failure_cleans_up",
+      "reqs": [
+        "R12"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_readiness_timeout_per_batch_cap",
+      "reqs": [
+        "R13"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_readiness_timeout_exceeds_timeout_rejected",
+      "reqs": [
+        "R13"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_default_readiness_timeout_one_minute",
+      "reqs": [
+        "R13"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_hooks_not_sequenced_run_by_weight",
+      "reqs": [
+        "R14"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_subcharts.py::test_plain_wait_applies_everything_at_once",
+      "reqs": [
+        "R01"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_subcharts.py::test_independent_subcharts_deploy_together",
+      "reqs": [
+        "R05"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_subcharts.py::test_subcharts_dag_order_and_gating",
+      "reqs": [
+        "R06",
+        "R04",
+        "R03"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_subcharts.py::test_release_record_has_plan_when_sequenced",
+      "reqs": [
+        "R02"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_subcharts.py::test_subchart_alias_dependency",
+      "reqs": [
+        "R03"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_subcharts.py::test_nested_subcharts_three_levels",
+      "reqs": [
+        "R06"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_subcharts.py::test_subchart_cycle_detected",
+      "reqs": [
+        "R07"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_subcharts.py::test_helm_dag_prints_subchart_order",
+      "reqs": [
+        "R08"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr2_groups.py::test_groups_follow_the_hip_example",
+      "reqs": [
+        "R17",
+        "R18"
+      ],
+      "needs": [
+        "ordered",
+        "groups"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr2_groups.py::test_unsequenced_resources_deploy_last_and_warn",
+      "reqs": [
+        "R19"
+      ],
+      "needs": [
+        "ordered",
+        "groups"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr2_groups.py::test_group_sandboxing_parent_and_subchart_use_same_names",
+      "reqs": [
+        "R20"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts",
+        "groups"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr2_groups.py::test_group_cycle_detected_and_rejected",
+      "reqs": [
+        "R21"
+      ],
+      "needs": [
+        "ordered",
+        "groups"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr2_groups.py::test_hip_dependency_key_is_removed_before_apply",
+      "reqs": [
+        "R22"
+      ],
+      "needs": [
+        "ordered",
+        "groups"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr2_groups.py::test_duplicate_resource_group_assignment_rejected",
+      "reqs": [
+        "R23"
+      ],
+      "needs": [
+        "ordered",
+        "groups"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr2_groups.py::test_template_prints_delimiters_for_groups",
+      "reqs": [
+        "R24"
+      ],
+      "needs": [
+        "groups"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr2_groups.py::test_upgrade_follows_group_order",
+      "reqs": [
+        "R09"
+      ],
+      "needs": [
+        "ordered",
+        "groups"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr2_groups.py::test_uninstall_runs_in_reverse_order",
+      "reqs": [
+        "R10"
+      ],
+      "needs": [
+        "ordered",
+        "groups"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_deployment_without_annotations_uses_kstatus",
+      "reqs": [
+        "R25"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_success_expressions_mark_ready",
+      "reqs": [
+        "R26"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_failure_takes_precedence_over_success",
+      "reqs": [
+        "R27"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_failure_expression_alone_fails_install",
+      "reqs": [
+        "R27"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_failed_probe_plus_pending_waits_for_timeout",
+      "reqs": [
+        "R27"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_only_success_annotation_falls_back_to_kstatus_and_warns",
+      "reqs": [
+        "R28"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_only_success_annotation_fails_helm_lint",
+      "reqs": [
+        "R28"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[==-5-10-10-count-equality number]",
+      "reqs": [
+        "R29"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[!=-5-10-5-count-inequality number]",
+      "reqs": [
+        "R29"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[<-10-4-5-count-less than]",
+      "reqs": [
+        "R29"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[<=-10-5-5-count-less or equal]",
+      "reqs": [
+        "R29"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[>-5-11-10-count-greater than]",
+      "reqs": [
+        "R29"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[>=-5-10-10-count-greater or equal]",
+      "reqs": [
+        "R29"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[==-Pending-Ready-Ready-phase-equality string]",
+      "reqs": [
+        "R29"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[==-false-true-true-ready-equality boolean]",
+      "reqs": [
+        "R29"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_custom_readiness_applies_to_plain_wait",
+      "reqs": [
+        "R31"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_lint_rejects_object_literal_comparison",
+      "reqs": [
+        "R30"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_install_rejects_object_jsonpath_result",
+      "reqs": [
+        "R30"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_v2_compat.py::test_v2_chart_with_plain_wait_applies_in_one_burst",
+      "reqs": [
+        "R16"
+      ],
+      "needs": [],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_v2_compat.py::test_v2_chart_with_ordered_wait_fails",
+      "reqs": [
+        "R16"
+      ],
+      "needs": [],
+      "xfail_strict": false
+    },
+    {
+      "nodeid": "e2e/tests/test_v2_compat.py::test_v2_chart_upgrade_rollback_uninstall_succeed",
+      "reqs": [
+        "R16"
+      ],
+      "needs": [],
+      "xfail_strict": false
+    }
+  ],
+  "harness": {
+    "url": "https://github.com/caretak3r/helm-hip-0025-e2e",
+    "commit": "365b51cbcbfe4da6474f119134d431958809ef5c",
+    "dirty": false
+  },
+  "host": {
+    "os": "darwin",
+    "arch": "arm64"
+  },
+  "tools": {
+    "go": "go1.27.3",
+    "kind": "kind v0.33.0 go1.27.0 darwin/arm64",
+    "kubectl": "v1.37.2",
+    "docker": "29.9.2",
+    "python": "3.13.13"
+  },
+  "cluster": {
+    "name": "hip0025-e2e",
+    "context": "kind-hip0025-e2e",
+    "node_image": "kindest/node:v1.37.0@sha256:a1ed56cfb0e7b93589bdf97c8cd566405a265939e3620fc4f5de89adff580ae5",
+    "server_version": "v1.37.0"
+  },
+  "sources": {
+    "upstream": {
+      "url": "https://github.com/helm/helm.git",
+      "base": "bc232c5312e784e808ea95ae76f9e82d4fe142fc"
+    },
+    "fork": {
+      "url": "https://github.com/caretak3r/helm.git"
+    }
+  },
+  "charts": [
+    {
+      "source": "charts/hip-groups",
+      "name": "hip-groups",
+      "version": "0.1.0",
+      "apiVersion": "v3",
+      "archive": "hip-groups-0.1.0.tgz",
+      "sha256": "bf37c35e80bb2a8c9fe01a5aaf8c0b1d489c900bcbe2953a077c367e0dfcf7a4"
+    },
+    {
+      "source": "charts/hip-groups-cycle",
+      "name": "hip-groups-cycle",
+      "version": "0.1.0",
+      "apiVersion": "v3",
+      "archive": "hip-groups-cycle-0.1.0.tgz",
+      "sha256": "df80e6310334f49a7557cf873160c46e7ffb97dc38feaa57629d2ac00fa6213b"
+    },
+    {
+      "source": "charts/hip-groups-duplicate",
+      "name": "hip-groups-duplicate",
+      "version": "0.1.0",
+      "apiVersion": "v3",
+      "archive": "hip-groups-duplicate-0.1.0.tgz",
+      "sha256": "e1b3e207300a5d5b1fb3dda7589979a46e2282431e792fd322472c2b2ccb0f07"
+    },
+    {
+      "source": "charts/hip-groups-sandbox",
+      "name": "hip-groups-sandbox",
+      "version": "0.1.0",
+      "apiVersion": "v3",
+      "archive": "hip-groups-sandbox-0.1.0.tgz",
+      "sha256": "55e0f55f660533e4bfc45317cba7bb10660cb82dfc94321143839d025cce83f9"
+    },
+    {
+      "source": "charts/hip-groups-upgrade",
+      "name": "hip-groups-upgrade",
+      "version": "0.1.0",
+      "apiVersion": "v3",
+      "archive": "hip-groups-upgrade-0.1.0.tgz",
+      "sha256": "c85ed21623f9786b3e38fd7619f67569ad43cac24050e00898721f461200c02b"
+    },
+    {
+      "source": "charts/hip-lifecycle",
+      "name": "hip-lifecycle",
+      "version": "0.1.0",
+      "apiVersion": "v3",
+      "archive": "hip-lifecycle-0.1.0.tgz",
+      "sha256": "a06bfada6ae70d40af6663b9623c1f428a400fe5a96a90387450c86e6e31ac5c"
+    },
+    {
+      "source": "charts/hip-lifecycle-failure",
+      "name": "hip-lifecycle-failure",
+      "version": "0.1.0",
+      "apiVersion": "v3",
+      "archive": "hip-lifecycle-failure-0.1.0.tgz",
+      "sha256": "81e8152aaa1933a7b0b80d787bb8622d75d773712e5416c99b0916521777b912"
+    },
+    {
+      "source": "charts/hip-lifecycle-hooks",
+      "name": "hip-lifecycle-hooks",
+      "version": "0.1.0",
+      "apiVersion": "v3",
+      "archive": "hip-lifecycle-hooks-0.1.0.tgz",
+      "sha256": "ff795f70d0fc5a7dfd934c6c329dfd5d61128389c6b3dc3354fcb2509a404533"
+    },
+    {
+      "source": "charts/hip-readiness-basic",
+      "name": "hip-readiness-basic",
+      "version": "0.1.0",
+      "apiVersion": "v3",
+      "archive": "hip-readiness-basic-0.1.0.tgz",
+      "sha256": "2534a8588e3d9ccf9834f1757ed48ede56dcd930bd7478e784352ce53d2172f7"
+    },
+    {
+      "source": "charts/hip-readiness-gate",
+      "name": "hip-readiness-gate",
+      "version": "0.1.0",
+      "apiVersion": "v3",
+      "archive": "hip-readiness-gate-0.1.0.tgz",
+      "sha256": "2f36f921cbcbf4eaf1ca905c7b55f4846263a8d24e8083a380378af8481a7353"
+    },
+    {
+      "source": "charts/hip-subcharts",
+      "name": "foo",
+      "version": "0.1.0",
+      "apiVersion": "v3",
+      "archive": "foo-0.1.0.tgz",
+      "sha256": "e5cb6705dbea067f70cddcf9d0549cd38647ea73ba45e6fa9a04b7cd397e6fb7"
+    },
+    {
+      "source": "charts/hip-subcharts-alias",
+      "name": "hip-subcharts-alias",
+      "version": "0.1.0",
+      "apiVersion": "v3",
+      "archive": "hip-subcharts-alias-0.1.0.tgz",
+      "sha256": "2ad3522e71c23a882040ade1fd685658e19fdca1213a7535ec433435c360af55"
+    },
+    {
+      "source": "charts/hip-subcharts-cycle",
+      "name": "hip-subcharts-cycle",
+      "version": "0.1.0",
+      "apiVersion": "v3",
+      "archive": "hip-subcharts-cycle-0.1.0.tgz",
+      "sha256": "3bb3813a3d5898e193a14daee0d4d02fd2967cca92a6ad7c1ce913c3a05cdc13"
+    },
+    {
+      "source": "charts/hip-subcharts-nested",
+      "name": "parent-z",
+      "version": "0.1.0",
+      "apiVersion": "v3",
+      "archive": "parent-z-0.1.0.tgz",
+      "sha256": "81410cb307cfa7030ea46af0e2e9a8c61f436791eee3b9a44506b5d37344acb2"
+    },
+    {
+      "source": "charts/v2-annotated",
+      "name": "v2-annotated",
+      "version": "0.1.0",
+      "apiVersion": "v2",
+      "archive": "v2-annotated-0.1.0.tgz",
+      "sha256": "4c6203de1dff4f32b3674f23a8e85f679fdc9c7258feea3f0f322dff16e3909b"
+    }
+  ],
+  "finished_utc": "2026-11-02T03:31:13Z"
+}

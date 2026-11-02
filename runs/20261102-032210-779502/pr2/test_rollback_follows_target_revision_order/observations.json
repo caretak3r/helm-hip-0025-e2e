@@ -1,0 +1,29 @@
+[
+  {
+    "label": "rollback timeline",
+    "value": [
+      "03:24:04.770  patch  Deployment/subchart-a",
+      "03:24:08.588  ready  Deployment/subchart-a",
+      "03:24:08.611  patch  Deployment/subchart-b",
+      "03:24:12.597  ready  Deployment/subchart-b",
+      "03:24:12.659  patch  Deployment/parent",
+      "03:24:16.765  delete Deployment/subchart-d (rev2 only)",
+      "03:24:16.872  delete Deployment/subchart-c (rev2 only)"
+    ]
+  },
+  {
+    "label": "plan batches rev1 / rev3",
+    "value": {
+      "rev1": [
+        "hip-lifecycle/charts/a",
+        "hip-lifecycle/charts/b",
+        "hip-lifecycle"
+      ],
+      "rev3 (rollback)": [
+        "hip-lifecycle/charts/a",
+        "hip-lifecycle/charts/b",
+        "hip-lifecycle"
+      ]
+    }
+  }
+]

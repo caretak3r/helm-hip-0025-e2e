@@ -1,0 +1,25 @@
+03:27:42.321 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-subcharts-dag-order-and-gating --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+03:27:42.359 $ kubectl --context kind-hip0025-e2e create namespace e2e-combined-subcharts-dag-order-and-gating
+[exit 0, 0.0s]
+namespace/e2e-combined-subcharts-dag-order-and-gating created
+
+
+03:27:42.394 $ .bin/helm-combined install r charts/hip-subcharts --namespace e2e-combined-subcharts-dag-order-and-gating --wait=ordered --timeout 3m --kube-context kind-hip0025-e2e
+[exit 0, 8.9s]
+NAME: r
+LAST DEPLOYED: Sun Nov  1 22:27:42 2026
+NAMESPACE: e2e-combined-subcharts-dag-order-and-gating
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+
+
+03:27:52.337 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-subcharts-dag-order-and-gating --wait=false
+[exit 0, 0.0s]
+namespace "e2e-combined-subcharts-dag-order-and-gating" deleted
+
+

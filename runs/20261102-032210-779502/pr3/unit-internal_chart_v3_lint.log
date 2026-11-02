@@ -1,0 +1,79 @@
+$ go test -list . ./internal/chart/v3/lint/
+TestBadChartV3
+TestInvalidYaml
+TestInvalidChartYamlV3
+TestBadValuesV3
+TestBadCrdFileV3
+TestGoodChart
+TestHelmCreateChart
+TestHelmCreateChart_CheckDeprecatedWarnings
+TestSubChartValuesChart
+TestMalformedTemplate
+ok  	helm.sh/helm/v4/internal/chart/v3/lint	0.383s
+# helm.sh/helm/v4/internal/chart/v3/lint.test
+ld: warning: object file (/private/var/folders/10/9lylcxg10rd17gqmylhpw3740000gn/T/go-link-1136185982/000000.o) was built for newer 'macOS' version (27.2) than being linked (26.5)
+ld: warning: object file (/private/var/folders/10/9lylcxg10rd17gqmylhpw3740000gn/T/go-link-1136185982/000001.o) was built for newer 'macOS' version (27.2) than being linked (26.5)
+ld: warning: object file (/private/var/folders/10/9lylcxg10rd17gqmylhpw3740000gn/T/go-link-1136185982/000002.o) was built for newer 'macOS' version (27.2) than being linked (26.5)
+ld: warning: object file (/private/var/folders/10/9lylcxg10rd17gqmylhpw3740000gn/T/go-link-1136185982/000003.o) was built for newer 'macOS' version (27.2) than being linked (26.5)
+ld: warning: object file (/private/var/folders/10/9lylcxg10rd17gqmylhpw3740000gn/T/go-link-1136185982/000004.o) was built for newer 'macOS' version (27.2) than being linked (26.5)
+ld: warning: object file (/private/var/folders/10/9lylcxg10rd17gqmylhpw3740000gn/T/go-link-1136185982/000005.o) was built for newer 'macOS' version (27.2) than being linked (26.5)
+ld: warning: object file (/private/var/folders/10/9lylcxg10rd17gqmylhpw3740000gn/T/go-link-1136185982/000006.o) was built for newer 'macOS' version (27.2) than being linked (26.5)
+ld: warning: object file (/private/var/folders/10/9lylcxg10rd17gqmylhpw3740000gn/T/go-link-1136185982/000007.o) was built for newer 'macOS' version (27.2) than being linked (26.5)
+ld: warning: object file (/private/var/folders/10/9lylcxg10rd17gqmylhpw3740000gn/T/go-link-1136185982/000008.o) was built for newer 'macOS' version (27.2) than being linked (26.5)
+ld: warning: object file (/private/var/folders/10/9lylcxg10rd17gqmylhpw3740000gn/T/go-link-1136185982/000009.o) was built for newer 'macOS' version (27.2) than being linked (26.5)
+ld: warning: object file (/private/var/folders/10/9lylcxg10rd17gqmylhpw3740000gn/T/go-link-1136185982/000010.o) was built for newer 'macOS' version (27.2) than being linked (26.5)
+ld: warning: object file (/private/var/folders/10/9lylcxg10rd17gqmylhpw3740000gn/T/go-link-1136185982/000011.o) was built for newer 'macOS' version (27.2) than being linked (26.5)
+ld: warning: object file (/private/var/folders/10/9lylcxg10rd17gqmylhpw3740000gn/T/go-link-1136185982/000012.o) was built for newer 'macOS' version (27.2) than being linked (26.5)
+ld: warning: object file (/private/var/folders/10/9lylcxg10rd17gqmylhpw3740000gn/T/go-link-1136185982/000013.o) was built for newer 'macOS' version (27.2) than being linked (26.5)
+ld: warning: object file (/private/var/folders/10/9lylcxg10rd17gqmylhpw3740000gn/T/go-link-1136185982/000014.o) was built for newer 'macOS' version (27.2) than being linked (26.5)
+ld: warning: object file (/private/var/folders/10/9lylcxg10rd17gqmylhpw3740000gn/T/go-link-1136185982/000015.o) was built for newer 'macOS' version (27.2) than being linked (26.5)
+
+$ go test -json -count=1 ./internal/chart/v3/lint/
+{"ImportPath":"helm.sh/helm/v4/internal/chart/v3/lint.test","Action":"build-output","Output":"# helm.sh/helm/v4/internal/chart/v3/lint.test\nld: warning: object file (/private/var/folders/10/9lylcxg10rd17gqmylhpw3740000gn/T/go-link-2261174867/000000.o) was built for newer 'macOS' version (27.2) than being linked (26.5)\nld: warning: object file (/private/var/folders/10/9lylcxg10rd17gqmylhpw3740000gn/T/go-link-2261174867/000001.o) was built for newer 'macOS' version (27.2) than being linked (26.5)\nld: warning: object file (/private/var/folders/10/9lylcxg10rd17gqmylhpw3740000gn/T/go-link-2261174867/000002.o) was built for newer 'macOS' version (27.2) than being linked (26.5)\nld: warning: object file (/private/var/folders/10/9lylcxg10rd17gqmylhpw3740000gn/T/go-link-2261174867/000003.o) was built for newer 'macOS' version (27.2) than being linked (26.5)\nld: warning: object file (/private/var/folders/10/9lylcxg10rd17gqmylhpw3740000gn/T/go-link-2261174867/000004.o) was built for newer 'macOS' version (27.2) than being linked (26.5)\nld: warning: object file (/private/var/folders/10/9lylcxg10rd17gqmylhpw3740000gn/T/go-link-2261174867/000005.o) was built for newer 'macOS' version (27.2) than being linked (26.5)\nld: warning: object file (/private/var/folders/10/9lylcxg10rd17gqmylhpw3740000gn/T/go-link-2261174867/000006.o) was built for newer 'macOS' version (27.2) than being linked (26.5)\nld: warning: object file (/private/var/folders/10/9lylcxg10rd17gqmylhpw3740000gn/T/go-link-2261174867/000007.o) was built for newer 'macOS' version (27.2) than being linked (26.5)\nld: warning: object file (/private/var/folders/10/9lylcxg10rd17gqmylhpw3740000gn/T/go-link-2261174867/000008.o) was built for newer 'macOS' version (27.2) than being linked (26.5)\nld: warning: object file (/private/var/folders/10/9lylcxg10rd17gqmylhpw3740000gn/T/go-link-2261174867/000009.o) was built for newer 'macOS' version (27.2) than being linked (26.5)\nld: warning: object file (/private/var/folders/10/9lylcxg10rd17gqmylhpw3740000gn/T/go-link-2261174867/000010.o) was built for newer 'macOS' version (27.2) than being linked (26.5)\nld: warning: object file (/private/var/folders/10/9lylcxg10rd17gqmylhpw3740000gn/T/go-link-2261174867/000011.o) was built for newer 'macOS' version (27.2) than being linked (26.5)\nld: warning: object file (/private/var/folders/10/9lylcxg10rd17gqmylhpw3740000gn/T/go-link-2261174867/000012.o) was built for newer 'macOS' version (27.2) than being linked (26.5)\nld: warning: object file (/private/var/folders/10/9lylcxg10rd17gqmylhpw3740000gn/T/go-link-2261174867/000013.o) was built for newer 'macOS' version (27.2) than being linked (26.5)\nld: warning: object file (/private/var/folders/10/9lylcxg10rd17gqmylhpw3740000gn/T/go-link-2261174867/000014.o) was built for newer 'macOS' version (27.2) than being linked (26.5)\nld: warning: object file (/private/var/folders/10/9lylcxg10rd17gqmylhpw3740000gn/T/go-link-2261174867/000015.o) was built for newer 'macOS' version (27.2) than being linked (26.5)\n"}
+{"Time":"2026-11-01T22:22:49.870407-05:00","Action":"start","Package":"helm.sh/helm/v4/internal/chart/v3/lint"}
+{"Time":"2026-11-01T22:22:50.235449-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestBadChartV3"}
+{"Time":"2026-11-01T22:22:50.235572-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestBadChartV3","Output":"=== RUN   TestBadChartV3\n","OutputType":"frame"}
+{"Time":"2026-11-01T22:22:50.241264-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestBadChartV3","Output":"--- PASS: TestBadChartV3 (0.01s)\n","OutputType":"frame"}
+{"Time":"2026-11-01T22:22:50.241282-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestBadChartV3","Elapsed":0.01}
+{"Time":"2026-11-01T22:22:50.241307-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestInvalidYaml"}
+{"Time":"2026-11-01T22:22:50.241309-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestInvalidYaml","Output":"=== RUN   TestInvalidYaml\n","OutputType":"frame"}
+{"Time":"2026-11-01T22:22:50.24419-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestInvalidYaml","Output":"--- PASS: TestInvalidYaml (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-01T22:22:50.244206-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestInvalidYaml","Elapsed":0}
+{"Time":"2026-11-01T22:22:50.244222-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestInvalidChartYamlV3"}
+{"Time":"2026-11-01T22:22:50.244224-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestInvalidChartYamlV3","Output":"=== RUN   TestInvalidChartYamlV3\n","OutputType":"frame"}
+{"Time":"2026-11-01T22:22:50.244935-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestInvalidChartYamlV3","Output":"    lint_test.go:104: [[WARNING] Chart.yaml: failed to strictly parse chart metadata file\n"}
+{"Time":"2026-11-01T22:22:50.244948-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestInvalidChartYamlV3","Output":"        \terror converting YAML to JSON: yaml: unmarshal errors:\n"}
+{"Time":"2026-11-01T22:22:50.244951-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestInvalidChartYamlV3","Output":"          line 3: key \"apiVersion\" already set in map [ERROR] Chart.yaml: apiVersion 'v1' is not valid. The value must be \"v3\" [WARNING] templates/: directory does not exist]\n"}
+{"Time":"2026-11-01T22:22:50.244964-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestInvalidChartYamlV3","Output":"--- PASS: TestInvalidChartYamlV3 (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-01T22:22:50.244974-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestInvalidChartYamlV3","Elapsed":0}
+{"Time":"2026-11-01T22:22:50.24498-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestBadValuesV3"}
+{"Time":"2026-11-01T22:22:50.244982-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestBadValuesV3","Output":"=== RUN   TestBadValuesV3\n","OutputType":"frame"}
+{"Time":"2026-11-01T22:22:50.245675-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestBadValuesV3","Output":"--- PASS: TestBadValuesV3 (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-01T22:22:50.245682-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestBadValuesV3","Elapsed":0}
+{"Time":"2026-11-01T22:22:50.245685-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestBadCrdFileV3"}
+{"Time":"2026-11-01T22:22:50.245686-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestBadCrdFileV3","Output":"=== RUN   TestBadCrdFileV3\n","OutputType":"frame"}
+{"Time":"2026-11-01T22:22:50.246725-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestBadCrdFileV3","Output":"--- PASS: TestBadCrdFileV3 (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-01T22:22:50.246729-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestBadCrdFileV3","Elapsed":0}
+{"Time":"2026-11-01T22:22:50.246738-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestGoodChart"}
+{"Time":"2026-11-01T22:22:50.24674-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestGoodChart","Output":"=== RUN   TestGoodChart\n","OutputType":"frame"}
+{"Time":"2026-11-01T22:22:50.247945-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestGoodChart","Output":"--- PASS: TestGoodChart (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-01T22:22:50.247948-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestGoodChart","Elapsed":0}
+{"Time":"2026-11-01T22:22:50.24795-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestHelmCreateChart"}
+{"Time":"2026-11-01T22:22:50.247951-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestHelmCreateChart","Output":"=== RUN   TestHelmCreateChart\n","OutputType":"frame"}
+{"Time":"2026-11-01T22:22:50.271174-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestHelmCreateChart","Output":"--- PASS: TestHelmCreateChart (0.02s)\n","OutputType":"frame"}
+{"Time":"2026-11-01T22:22:50.271188-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestHelmCreateChart","Elapsed":0.02}
+{"Time":"2026-11-01T22:22:50.271193-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestHelmCreateChart_CheckDeprecatedWarnings"}
+{"Time":"2026-11-01T22:22:50.271199-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestHelmCreateChart_CheckDeprecatedWarnings","Output":"=== RUN   TestHelmCreateChart_CheckDeprecatedWarnings\n","OutputType":"frame"}
+{"Time":"2026-11-01T22:22:50.282393-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestHelmCreateChart_CheckDeprecatedWarnings","Output":"--- PASS: TestHelmCreateChart_CheckDeprecatedWarnings (0.01s)\n","OutputType":"frame"}
+{"Time":"2026-11-01T22:22:50.282419-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestHelmCreateChart_CheckDeprecatedWarnings","Elapsed":0.01}
+{"Time":"2026-11-01T22:22:50.282425-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestSubChartValuesChart"}
+{"Time":"2026-11-01T22:22:50.282427-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestSubChartValuesChart","Output":"=== RUN   TestSubChartValuesChart\n","OutputType":"frame"}
+{"Time":"2026-11-01T22:22:50.283835-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestSubChartValuesChart","Output":"--- PASS: TestSubChartValuesChart (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-01T22:22:50.283849-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestSubChartValuesChart","Elapsed":0}
+{"Time":"2026-11-01T22:22:50.283859-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestMalformedTemplate"}
+{"Time":"2026-11-01T22:22:50.283861-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestMalformedTemplate","Output":"=== RUN   TestMalformedTemplate\n","OutputType":"frame"}
+{"Time":"2026-11-01T22:22:50.28506-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestMalformedTemplate","Output":"--- PASS: TestMalformedTemplate (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-01T22:22:50.285066-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Test":"TestMalformedTemplate","Elapsed":0}
+{"Time":"2026-11-01T22:22:50.285068-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Output":"PASS\n","OutputType":"frame"}
+{"Time":"2026-11-01T22:22:50.28617-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Output":"ok  \thelm.sh/helm/v4/internal/chart/v3/lint\t0.416s\n"}
+{"Time":"2026-11-01T22:22:50.28618-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/chart/v3/lint","Elapsed":0.416}

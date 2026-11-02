@@ -1,0 +1,19 @@
+03:29:08.776 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-duplicate-resource-group-assignment-rejected --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+03:29:08.813 $ kubectl --context kind-hip0025-e2e create namespace e2e-combined-duplicate-resource-group-assignment-rejected
+[exit 0, 0.0s]
+namespace/e2e-combined-duplicate-resource-group-assignment-rejected created
+
+
+03:29:08.846 $ .bin/helm-combined install r charts/hip-groups-duplicate --namespace e2e-combined-duplicate-resource-group-assignment-rejected --wait=ordered --timeout 1m --kube-context kind-hip0025-e2e
+[exit 1, 0.1s]
+Error: INSTALLATION FAILED: parsing resource-group annotations for hip-groups-duplicate: resource "apps/v1/Deployment//conflicting-app" assigned to multiple resource groups "group-a" and "group-b"
+
+
+03:29:09.918 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-duplicate-resource-group-assignment-rejected --wait=false
+[exit 0, 0.1s]
+namespace "e2e-combined-duplicate-resource-group-assignment-rejected" deleted
+
+

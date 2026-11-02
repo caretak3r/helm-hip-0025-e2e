@@ -1,0 +1,25 @@
+03:29:37.058 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-deployment-without-annotations-uses-kstatus --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+03:29:37.097 $ kubectl --context kind-hip0025-e2e create namespace e2e-combined-deployment-without-annotations-uses-kstatus
+[exit 0, 0.0s]
+namespace/e2e-combined-deployment-without-annotations-uses-kstatus created
+
+
+03:29:37.135 $ .bin/helm-combined install r charts/hip-readiness-basic --namespace e2e-combined-deployment-without-annotations-uses-kstatus --set deployment.enabled=true --wait --timeout 2m --kube-context kind-hip0025-e2e
+[exit 0, 3.6s]
+NAME: r
+LAST DEPLOYED: Sun Nov  1 22:29:37 2026
+NAMESPACE: e2e-combined-deployment-without-annotations-uses-kstatus
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+
+
+03:29:41.723 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-deployment-without-annotations-uses-kstatus --wait=false
+[exit 0, 0.1s]
+namespace "e2e-combined-deployment-without-annotations-uses-kstatus" deleted
+
+

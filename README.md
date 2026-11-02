@@ -61,6 +61,22 @@ The [dashboard](https://caretak3r.github.io/helm-hip-0025-e2e/) shows each run i
 
 `runs/<stamp>/REPORT.md` contains the same verdicts as Markdown.
 
+### Run 20261102-032210-779502
+
+This run uses the new requirement IDs R01-R32. It tests the `helm template` delimiters of PR2 (R24), the rejection
+of object comparisons in PR3 (R30) and the new requirement R23. It used the harness commit `365b51cbcbfe`, a new
+kind cluster (Kubernetes v1.37.0) and new builds. The run status is PASS. No requirement is "not implemented".
+[Dashboard page](https://caretak3r.github.io/helm-hip-0025-e2e/20261102-032210-779502/index.html),
+[REPORT.md](runs/20261102-032210-779502/REPORT.md),
+[charts](https://caretak3r.github.io/helm-hip-0025-e2e/20261102-032210-779502/charts/index.html).
+
+| Tier | Commit | HIP requirements | Tests | Go unit tests |
+|---|---|---|---|---|
+| PR1 | `588ef3bf8` | 16 graded: 15 met, 1 deviation (R15) | 21 pass, 28 n/a | 10/10 packages pass, 1 compile only |
+| PR2 | `d655709ee` | 9 graded: 9 met | 30 pass, 19 n/a | 4/4 packages pass, 1 compile only |
+| PR3 | `82aba7eee` | 8 graded: 7 met, 1 extension (R31) | 21 pass, 28 n/a | 3/3 packages pass |
+| Combined | PR2 + PR3 | 32 graded: 30 met, 1 extension, 1 deviation | 49 pass | — |
+
 ### Run 20261102-014745-815201
 
 This run fetched the rebased pull request commits from GitHub after the push. It used the harness commit
