@@ -1,7 +1,7 @@
 # Wiring patches (test only)
 
 Upstream Helm cannot install a chart-v3 release yet. At the commit that the three pull requests start from
-(`d31cd6992`), and on `main` today:
+(`bc232c531`), and on `main` today:
 
 - `helm install` and `helm upgrade` stop with `invalid chart apiVersion` for a chart that is not v2
   (`pkg/action/install.go`, `pkg/action/upgrade.go`).
