@@ -13,7 +13,7 @@ upstream:
   url: https://github.com/helm/helm.git
   branch: main
   # The upstream commit that all three PRs are based on.
-  base: bc232c5312e784e808ea95ae76f9e82d4fe142fc
+  base: 3c2635de452c8df481f59a1e1246bef1355b7e8d
 
 fork:
   url: https://github.com/caretak3r/helm.git
@@ -29,7 +29,7 @@ tiers:
     label: PR1
     title: PR1 · subchart sequencing
     branch: feat/hip-0025-v3-subcharts
-    commit: 588ef3bf86822f6b24aedbb84e3687ca86acd8a3
+    commit: 04319f19438209b4b82d60438e2b955ecededc9f
     pr: https://github.com/caretak3r/helm/pull/4
     wiring: [base, ordered]
     features: [ordered, subcharts]
@@ -37,7 +37,7 @@ tiers:
     label: PR2
     title: PR2 · resource-group sequencing (stacked on PR1)
     branch: feat/hip-0025-v3-resource-groups
-    commit: d655709ee04c04a655ce134665f9a55bffcdc935
+    commit: b697bdd956094c37c2387304cfa397b25143bad4
     pr: https://github.com/caretak3r/helm/pull/5
     stacked_on: pr1   # the unit stage tests only the changes PR2 adds to PR1
     wiring: [base, ordered, template]
@@ -46,7 +46,7 @@ tiers:
     label: PR3
     title: PR3 · custom readiness
     branch: feat/hip-0025-v3-readiness
-    commit: 82aba7eeeff7c343de24b7f66d3d4ced8a3b06d8
+    commit: 8ae5bce2b48044e40146a58b4c714f3ec49b4da9
     pr: https://github.com/caretak3r/helm/pull/3
     wiring: [base, readiness]
     features: [readiness]
