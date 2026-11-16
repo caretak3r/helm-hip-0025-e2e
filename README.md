@@ -61,6 +61,23 @@ The [dashboard](https://caretak3r.github.io/helm-hip-0025-e2e/) shows each run i
 
 `runs/<stamp>/REPORT.md` contains the same verdicts as Markdown.
 
+### Run 20261116-145035-876615
+
+This run tests the pull request commits after the rebase onto the upstream `main` commit `3c2635de4`
+(2026-11-15). The rebase did not change the content of a pull request commit. It used the harness commit
+`1477cd6a66a1`, a new kind cluster (Kubernetes v1.37.0) and new builds. The run status is PASS. The results are
+the same as in run 20261102-032210-779502.
+[Dashboard page](https://caretak3r.github.io/helm-hip-0025-e2e/20261116-145035-876615/index.html),
+[REPORT.md](runs/20261116-145035-876615/REPORT.md),
+[charts](https://caretak3r.github.io/helm-hip-0025-e2e/20261116-145035-876615/charts/index.html).
+
+| Tier | Commit | HIP requirements | Tests | Go unit tests |
+|---|---|---|---|---|
+| PR1 | `04319f194` | 16 graded: 15 met, 1 deviation (R15) | 21 pass, 28 n/a | 10/10 packages pass, 1 compile only |
+| PR2 | `b697bdd95` | 9 graded: 9 met | 30 pass, 19 n/a | 4/4 packages pass, 1 compile only |
+| PR3 | `8ae5bce2b` | 8 graded: 7 met, 1 extension (R31) | 21 pass, 28 n/a | 3/3 packages pass |
+| Combined | PR2 + PR3 | 32 graded: 30 met, 1 extension, 1 deviation | 49 pass | — |
+
 ### Run 20261102-032210-779502
 
 This run uses the new requirement IDs R01-R32. It tests the `helm template` delimiters of PR2 (R24), the rejection

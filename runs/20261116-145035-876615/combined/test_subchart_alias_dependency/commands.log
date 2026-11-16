@@ -1,0 +1,25 @@
+14:56:43.208 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-subchart-alias-dependency --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+14:56:43.245 $ kubectl --context kind-hip0025-e2e create namespace e2e-combined-subchart-alias-dependency
+[exit 0, 0.0s]
+namespace/e2e-combined-subchart-alias-dependency created
+
+
+14:56:43.279 $ .bin/helm-combined install r charts/hip-subcharts-alias --namespace e2e-combined-subchart-alias-dependency --wait=ordered --timeout 3m --kube-context kind-hip0025-e2e
+[exit 0, 8.9s]
+NAME: r
+LAST DEPLOYED: Mon Nov 16 09:56:43 2026
+NAMESPACE: e2e-combined-subchart-alias-dependency
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+
+
+14:56:53.162 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-subchart-alias-dependency --wait=false
+[exit 0, 0.0s]
+namespace "e2e-combined-subchart-alias-dependency" deleted
+
+

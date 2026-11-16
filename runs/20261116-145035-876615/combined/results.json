@@ -1,0 +1,2580 @@
+{
+  "tier": "combined",
+  "features": [
+    "groups",
+    "ordered",
+    "readiness",
+    "subcharts"
+  ],
+  "helm": ".bin/helm-combined",
+  "finished": "2026-11-16T14:59:39.909779+00:00",
+  "exit_code": 0,
+  "errors": [],
+  "coverage": {
+    "expected": [
+      {
+        "nodeid": "e2e/tests/test_combined.py::test_custom_readiness_gates_sequencing",
+        "reqs": [
+          "R32"
+        ],
+        "needs": [
+          "ordered",
+          "groups",
+          "readiness"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_upgrade_follows_install_order_and_waits_leaf",
+        "reqs": [
+          "R09",
+          "R15"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_uninstall_reverse_order_for_ordered_install",
+        "reqs": [
+          "R10"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_uninstall_after_plain_install_is_not_sequenced",
+        "reqs": [
+          "R10",
+          "R02"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_rollback_follows_target_revision_order",
+        "reqs": [
+          "R11"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_failure_stops_install_dependent_never_applied",
+        "reqs": [
+          "R12"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_rollback_on_failure_cleans_up",
+        "reqs": [
+          "R12"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_readiness_timeout_per_batch_cap",
+        "reqs": [
+          "R13"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_readiness_timeout_exceeds_timeout_rejected",
+        "reqs": [
+          "R13"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_default_readiness_timeout_one_minute",
+        "reqs": [
+          "R13"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_hooks_not_sequenced_run_by_weight",
+        "reqs": [
+          "R14"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr1_subcharts.py::test_plain_wait_applies_everything_at_once",
+        "reqs": [
+          "R01"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr1_subcharts.py::test_independent_subcharts_deploy_together",
+        "reqs": [
+          "R05"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr1_subcharts.py::test_subcharts_dag_order_and_gating",
+        "reqs": [
+          "R06",
+          "R04",
+          "R03"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr1_subcharts.py::test_release_record_has_plan_when_sequenced",
+        "reqs": [
+          "R02"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr1_subcharts.py::test_subchart_alias_dependency",
+        "reqs": [
+          "R03"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr1_subcharts.py::test_nested_subcharts_three_levels",
+        "reqs": [
+          "R06"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr1_subcharts.py::test_subchart_cycle_detected",
+        "reqs": [
+          "R07"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr1_subcharts.py::test_helm_dag_prints_subchart_order",
+        "reqs": [
+          "R08"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr2_groups.py::test_groups_follow_the_hip_example",
+        "reqs": [
+          "R17",
+          "R18"
+        ],
+        "needs": [
+          "ordered",
+          "groups"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr2_groups.py::test_unsequenced_resources_deploy_last_and_warn",
+        "reqs": [
+          "R19"
+        ],
+        "needs": [
+          "ordered",
+          "groups"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr2_groups.py::test_group_sandboxing_parent_and_subchart_use_same_names",
+        "reqs": [
+          "R20"
+        ],
+        "needs": [
+          "ordered",
+          "subcharts",
+          "groups"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr2_groups.py::test_group_cycle_detected_and_rejected",
+        "reqs": [
+          "R21"
+        ],
+        "needs": [
+          "ordered",
+          "groups"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr2_groups.py::test_hip_dependency_key_is_removed_before_apply",
+        "reqs": [
+          "R22"
+        ],
+        "needs": [
+          "ordered",
+          "groups"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr2_groups.py::test_duplicate_resource_group_assignment_rejected",
+        "reqs": [
+          "R23"
+        ],
+        "needs": [
+          "ordered",
+          "groups"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr2_groups.py::test_template_prints_delimiters_for_groups",
+        "reqs": [
+          "R24"
+        ],
+        "needs": [
+          "groups"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr2_groups.py::test_upgrade_follows_group_order",
+        "reqs": [
+          "R09"
+        ],
+        "needs": [
+          "ordered",
+          "groups"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr2_groups.py::test_uninstall_runs_in_reverse_order",
+        "reqs": [
+          "R10"
+        ],
+        "needs": [
+          "ordered",
+          "groups"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr3_readiness.py::test_deployment_without_annotations_uses_kstatus",
+        "reqs": [
+          "R25"
+        ],
+        "needs": [
+          "readiness"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr3_readiness.py::test_success_expressions_mark_ready",
+        "reqs": [
+          "R26"
+        ],
+        "needs": [
+          "readiness"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr3_readiness.py::test_failure_takes_precedence_over_success",
+        "reqs": [
+          "R27"
+        ],
+        "needs": [
+          "readiness"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr3_readiness.py::test_failure_expression_alone_fails_install",
+        "reqs": [
+          "R27"
+        ],
+        "needs": [
+          "readiness"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr3_readiness.py::test_failed_probe_plus_pending_waits_for_timeout",
+        "reqs": [
+          "R27"
+        ],
+        "needs": [
+          "readiness"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr3_readiness.py::test_only_success_annotation_falls_back_to_kstatus_and_warns",
+        "reqs": [
+          "R28"
+        ],
+        "needs": [
+          "readiness"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr3_readiness.py::test_only_success_annotation_fails_helm_lint",
+        "reqs": [
+          "R28"
+        ],
+        "needs": [
+          "readiness"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[==-5-10-10-count-equality number]",
+        "reqs": [
+          "R29"
+        ],
+        "needs": [
+          "readiness"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[!=-5-10-5-count-inequality number]",
+        "reqs": [
+          "R29"
+        ],
+        "needs": [
+          "readiness"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[<-10-4-5-count-less than]",
+        "reqs": [
+          "R29"
+        ],
+        "needs": [
+          "readiness"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[<=-10-5-5-count-less or equal]",
+        "reqs": [
+          "R29"
+        ],
+        "needs": [
+          "readiness"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[>-5-11-10-count-greater than]",
+        "reqs": [
+          "R29"
+        ],
+        "needs": [
+          "readiness"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[>=-5-10-10-count-greater or equal]",
+        "reqs": [
+          "R29"
+        ],
+        "needs": [
+          "readiness"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[==-Pending-Ready-Ready-phase-equality string]",
+        "reqs": [
+          "R29"
+        ],
+        "needs": [
+          "readiness"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[==-false-true-true-ready-equality boolean]",
+        "reqs": [
+          "R29"
+        ],
+        "needs": [
+          "readiness"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr3_readiness.py::test_custom_readiness_applies_to_plain_wait",
+        "reqs": [
+          "R31"
+        ],
+        "needs": [
+          "readiness"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr3_readiness.py::test_lint_rejects_object_literal_comparison",
+        "reqs": [
+          "R30"
+        ],
+        "needs": [
+          "readiness"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_pr3_readiness.py::test_install_rejects_object_jsonpath_result",
+        "reqs": [
+          "R30"
+        ],
+        "needs": [
+          "readiness"
+        ],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_v2_compat.py::test_v2_chart_with_plain_wait_applies_in_one_burst",
+        "reqs": [
+          "R16"
+        ],
+        "needs": [],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_v2_compat.py::test_v2_chart_with_ordered_wait_fails",
+        "reqs": [
+          "R16"
+        ],
+        "needs": [],
+        "xfail_strict": false
+      },
+      {
+        "nodeid": "e2e/tests/test_v2_compat.py::test_v2_chart_upgrade_rollback_uninstall_succeed",
+        "reqs": [
+          "R16"
+        ],
+        "needs": [],
+        "xfail_strict": false
+      }
+    ],
+    "selected": [
+      "e2e/tests/test_combined.py::test_custom_readiness_gates_sequencing",
+      "e2e/tests/test_pr1_lifecycle.py::test_upgrade_follows_install_order_and_waits_leaf",
+      "e2e/tests/test_pr1_lifecycle.py::test_uninstall_reverse_order_for_ordered_install",
+      "e2e/tests/test_pr1_lifecycle.py::test_uninstall_after_plain_install_is_not_sequenced",
+      "e2e/tests/test_pr1_lifecycle.py::test_rollback_follows_target_revision_order",
+      "e2e/tests/test_pr1_lifecycle.py::test_failure_stops_install_dependent_never_applied",
+      "e2e/tests/test_pr1_lifecycle.py::test_rollback_on_failure_cleans_up",
+      "e2e/tests/test_pr1_lifecycle.py::test_readiness_timeout_per_batch_cap",
+      "e2e/tests/test_pr1_lifecycle.py::test_readiness_timeout_exceeds_timeout_rejected",
+      "e2e/tests/test_pr1_lifecycle.py::test_default_readiness_timeout_one_minute",
+      "e2e/tests/test_pr1_lifecycle.py::test_hooks_not_sequenced_run_by_weight",
+      "e2e/tests/test_pr1_subcharts.py::test_plain_wait_applies_everything_at_once",
+      "e2e/tests/test_pr1_subcharts.py::test_independent_subcharts_deploy_together",
+      "e2e/tests/test_pr1_subcharts.py::test_subcharts_dag_order_and_gating",
+      "e2e/tests/test_pr1_subcharts.py::test_release_record_has_plan_when_sequenced",
+      "e2e/tests/test_pr1_subcharts.py::test_subchart_alias_dependency",
+      "e2e/tests/test_pr1_subcharts.py::test_nested_subcharts_three_levels",
+      "e2e/tests/test_pr1_subcharts.py::test_subchart_cycle_detected",
+      "e2e/tests/test_pr1_subcharts.py::test_helm_dag_prints_subchart_order",
+      "e2e/tests/test_pr2_groups.py::test_groups_follow_the_hip_example",
+      "e2e/tests/test_pr2_groups.py::test_unsequenced_resources_deploy_last_and_warn",
+      "e2e/tests/test_pr2_groups.py::test_group_sandboxing_parent_and_subchart_use_same_names",
+      "e2e/tests/test_pr2_groups.py::test_group_cycle_detected_and_rejected",
+      "e2e/tests/test_pr2_groups.py::test_hip_dependency_key_is_removed_before_apply",
+      "e2e/tests/test_pr2_groups.py::test_duplicate_resource_group_assignment_rejected",
+      "e2e/tests/test_pr2_groups.py::test_template_prints_delimiters_for_groups",
+      "e2e/tests/test_pr2_groups.py::test_upgrade_follows_group_order",
+      "e2e/tests/test_pr2_groups.py::test_uninstall_runs_in_reverse_order",
+      "e2e/tests/test_pr3_readiness.py::test_deployment_without_annotations_uses_kstatus",
+      "e2e/tests/test_pr3_readiness.py::test_success_expressions_mark_ready",
+      "e2e/tests/test_pr3_readiness.py::test_failure_takes_precedence_over_success",
+      "e2e/tests/test_pr3_readiness.py::test_failure_expression_alone_fails_install",
+      "e2e/tests/test_pr3_readiness.py::test_failed_probe_plus_pending_waits_for_timeout",
+      "e2e/tests/test_pr3_readiness.py::test_only_success_annotation_falls_back_to_kstatus_and_warns",
+      "e2e/tests/test_pr3_readiness.py::test_only_success_annotation_fails_helm_lint",
+      "e2e/tests/test_pr3_readiness.py::test_readiness_operators[==-5-10-10-count-equality number]",
+      "e2e/tests/test_pr3_readiness.py::test_readiness_operators[!=-5-10-5-count-inequality number]",
+      "e2e/tests/test_pr3_readiness.py::test_readiness_operators[<-10-4-5-count-less than]",
+      "e2e/tests/test_pr3_readiness.py::test_readiness_operators[<=-10-5-5-count-less or equal]",
+      "e2e/tests/test_pr3_readiness.py::test_readiness_operators[>-5-11-10-count-greater than]",
+      "e2e/tests/test_pr3_readiness.py::test_readiness_operators[>=-5-10-10-count-greater or equal]",
+      "e2e/tests/test_pr3_readiness.py::test_readiness_operators[==-Pending-Ready-Ready-phase-equality string]",
+      "e2e/tests/test_pr3_readiness.py::test_readiness_operators[==-false-true-true-ready-equality boolean]",
+      "e2e/tests/test_pr3_readiness.py::test_custom_readiness_applies_to_plain_wait",
+      "e2e/tests/test_pr3_readiness.py::test_lint_rejects_object_literal_comparison",
+      "e2e/tests/test_pr3_readiness.py::test_install_rejects_object_jsonpath_result",
+      "e2e/tests/test_v2_compat.py::test_v2_chart_with_plain_wait_applies_in_one_burst",
+      "e2e/tests/test_v2_compat.py::test_v2_chart_with_ordered_wait_fails",
+      "e2e/tests/test_v2_compat.py::test_v2_chart_upgrade_rollback_uninstall_succeed"
+    ],
+    "executed": [
+      "e2e/tests/test_combined.py::test_custom_readiness_gates_sequencing",
+      "e2e/tests/test_pr1_lifecycle.py::test_upgrade_follows_install_order_and_waits_leaf",
+      "e2e/tests/test_pr1_lifecycle.py::test_uninstall_reverse_order_for_ordered_install",
+      "e2e/tests/test_pr1_lifecycle.py::test_uninstall_after_plain_install_is_not_sequenced",
+      "e2e/tests/test_pr1_lifecycle.py::test_rollback_follows_target_revision_order",
+      "e2e/tests/test_pr1_lifecycle.py::test_failure_stops_install_dependent_never_applied",
+      "e2e/tests/test_pr1_lifecycle.py::test_rollback_on_failure_cleans_up",
+      "e2e/tests/test_pr1_lifecycle.py::test_readiness_timeout_per_batch_cap",
+      "e2e/tests/test_pr1_lifecycle.py::test_readiness_timeout_exceeds_timeout_rejected",
+      "e2e/tests/test_pr1_lifecycle.py::test_default_readiness_timeout_one_minute",
+      "e2e/tests/test_pr1_lifecycle.py::test_hooks_not_sequenced_run_by_weight",
+      "e2e/tests/test_pr1_subcharts.py::test_plain_wait_applies_everything_at_once",
+      "e2e/tests/test_pr1_subcharts.py::test_independent_subcharts_deploy_together",
+      "e2e/tests/test_pr1_subcharts.py::test_subcharts_dag_order_and_gating",
+      "e2e/tests/test_pr1_subcharts.py::test_release_record_has_plan_when_sequenced",
+      "e2e/tests/test_pr1_subcharts.py::test_subchart_alias_dependency",
+      "e2e/tests/test_pr1_subcharts.py::test_nested_subcharts_three_levels",
+      "e2e/tests/test_pr1_subcharts.py::test_subchart_cycle_detected",
+      "e2e/tests/test_pr1_subcharts.py::test_helm_dag_prints_subchart_order",
+      "e2e/tests/test_pr2_groups.py::test_groups_follow_the_hip_example",
+      "e2e/tests/test_pr2_groups.py::test_unsequenced_resources_deploy_last_and_warn",
+      "e2e/tests/test_pr2_groups.py::test_group_sandboxing_parent_and_subchart_use_same_names",
+      "e2e/tests/test_pr2_groups.py::test_group_cycle_detected_and_rejected",
+      "e2e/tests/test_pr2_groups.py::test_hip_dependency_key_is_removed_before_apply",
+      "e2e/tests/test_pr2_groups.py::test_duplicate_resource_group_assignment_rejected",
+      "e2e/tests/test_pr2_groups.py::test_template_prints_delimiters_for_groups",
+      "e2e/tests/test_pr2_groups.py::test_upgrade_follows_group_order",
+      "e2e/tests/test_pr2_groups.py::test_uninstall_runs_in_reverse_order",
+      "e2e/tests/test_pr3_readiness.py::test_deployment_without_annotations_uses_kstatus",
+      "e2e/tests/test_pr3_readiness.py::test_success_expressions_mark_ready",
+      "e2e/tests/test_pr3_readiness.py::test_failure_takes_precedence_over_success",
+      "e2e/tests/test_pr3_readiness.py::test_failure_expression_alone_fails_install",
+      "e2e/tests/test_pr3_readiness.py::test_failed_probe_plus_pending_waits_for_timeout",
+      "e2e/tests/test_pr3_readiness.py::test_only_success_annotation_falls_back_to_kstatus_and_warns",
+      "e2e/tests/test_pr3_readiness.py::test_only_success_annotation_fails_helm_lint",
+      "e2e/tests/test_pr3_readiness.py::test_readiness_operators[==-5-10-10-count-equality number]",
+      "e2e/tests/test_pr3_readiness.py::test_readiness_operators[!=-5-10-5-count-inequality number]",
+      "e2e/tests/test_pr3_readiness.py::test_readiness_operators[<-10-4-5-count-less than]",
+      "e2e/tests/test_pr3_readiness.py::test_readiness_operators[<=-10-5-5-count-less or equal]",
+      "e2e/tests/test_pr3_readiness.py::test_readiness_operators[>-5-11-10-count-greater than]",
+      "e2e/tests/test_pr3_readiness.py::test_readiness_operators[>=-5-10-10-count-greater or equal]",
+      "e2e/tests/test_pr3_readiness.py::test_readiness_operators[==-Pending-Ready-Ready-phase-equality string]",
+      "e2e/tests/test_pr3_readiness.py::test_readiness_operators[==-false-true-true-ready-equality boolean]",
+      "e2e/tests/test_pr3_readiness.py::test_custom_readiness_applies_to_plain_wait",
+      "e2e/tests/test_pr3_readiness.py::test_lint_rejects_object_literal_comparison",
+      "e2e/tests/test_pr3_readiness.py::test_install_rejects_object_jsonpath_result",
+      "e2e/tests/test_v2_compat.py::test_v2_chart_with_plain_wait_applies_in_one_burst",
+      "e2e/tests/test_v2_compat.py::test_v2_chart_with_ordered_wait_fails",
+      "e2e/tests/test_v2_compat.py::test_v2_chart_upgrade_rollback_uninstall_succeed"
+    ]
+  },
+  "tests": [
+    {
+      "nodeid": "e2e/tests/test_combined.py::test_custom_readiness_gates_sequencing",
+      "reqs": [
+        "R32"
+      ],
+      "needs": [
+        "ordered",
+        "groups",
+        "readiness"
+      ],
+      "xfail_strict": false,
+      "name": "test_custom_readiness_gates_sequencing",
+      "doc": "A Probe gated only by custom readiness holds back the group that depends on it.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 9.55,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "apiserver timeline",
+          "value": [
+            "14:51:37.287  apply  Probe/gate (group first)",
+            "14:51:42.231  status Probe/gate phase=Ready (test patch)",
+            "14:51:42.246  apply  Deployment/app (group second, depends on first)"
+          ]
+        }
+      ],
+      "evidence": "combined/test_custom_readiness_gates_sequencing"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_upgrade_follows_install_order_and_waits_leaf",
+      "reqs": [
+        "R09",
+        "R15"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "xfail_strict": false,
+      "name": "test_upgrade_follows_install_order_and_waits_leaf",
+      "doc": "Upgrade patches a -> b -> parent, each after the previous is ready again; helm finishes after the leaf is ready.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 20.13,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "upgrade timeline",
+          "value": [
+            "14:51:56.540  patch  Deployment/subchart-a",
+            "14:51:59.441  ready  Deployment/subchart-a (new pod)",
+            "14:51:59.554  patch  Deployment/subchart-b",
+            "14:52:02.454  ready  Deployment/subchart-b (new pod)",
+            "14:52:02.568  patch  Deployment/parent",
+            "14:52:05.457  ready  Deployment/parent (new pod)",
+            "14:52:05.562  helm writes release record: deployed"
+          ]
+        }
+      ],
+      "evidence": "combined/test_upgrade_follows_install_order_and_waits_leaf"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_uninstall_reverse_order_for_ordered_install",
+      "reqs": [
+        "R10"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "xfail_strict": false,
+      "name": "test_uninstall_reverse_order_for_ordered_install",
+      "doc": "Uninstall of a sequenced release deletes in exact reverse: parent -> b -> a, each after the previous is gone.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 11.3,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "uninstall timeline",
+          "value": [
+            "14:52:16.549  delete Deployment/parent",
+            "14:52:16.658  delete Deployment/subchart-b",
+            "14:52:16.765  delete Deployment/subchart-a"
+          ]
+        }
+      ],
+      "evidence": "combined/test_uninstall_reverse_order_for_ordered_install"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_uninstall_after_plain_install_is_not_sequenced",
+      "reqs": [
+        "R10",
+        "R02"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "xfail_strict": false,
+      "name": "test_uninstall_after_plain_install_is_not_sequenced",
+      "doc": "A release installed all at once (plain --wait, no stored plan) is uninstalled all at once.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 4.93,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "uninstall timeline",
+          "value": [
+            "14:52:21.704  delete Deployment/subchart-a",
+            "14:52:21.704  delete Deployment/parent",
+            "14:52:21.704  delete Deployment/subchart-b"
+          ]
+        },
+        {
+          "label": "delete spread",
+          "value": "0.000s"
+        }
+      ],
+      "evidence": "combined/test_uninstall_after_plain_install_is_not_sequenced"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_rollback_follows_target_revision_order",
+      "reqs": [
+        "R11"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "xfail_strict": false,
+      "name": "test_rollback_follows_target_revision_order",
+      "doc": "Rollback to a sequenced revision re-applies it in its order, then removes the extras in reverse (d before c).",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 42.23,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "rollback timeline",
+          "value": [
+            "14:52:51.755  patch  Deployment/subchart-a",
+            "14:52:55.605  ready  Deployment/subchart-a",
+            "14:52:55.703  patch  Deployment/subchart-b",
+            "14:52:59.604  ready  Deployment/subchart-b",
+            "14:52:59.714  patch  Deployment/parent",
+            "14:53:03.720  delete Deployment/subchart-d (rev2 only)",
+            "14:53:03.827  delete Deployment/subchart-c (rev2 only)"
+          ]
+        },
+        {
+          "label": "plan batches rev1 / rev3",
+          "value": {
+            "rev1": [
+              "hip-lifecycle/charts/a",
+              "hip-lifecycle/charts/b",
+              "hip-lifecycle"
+            ],
+            "rev3 (rollback)": [
+              "hip-lifecycle/charts/a",
+              "hip-lifecycle/charts/b",
+              "hip-lifecycle"
+            ]
+          }
+        }
+      ],
+      "evidence": "combined/test_rollback_follows_target_revision_order"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_failure_stops_install_dependent_never_applied",
+      "reqs": [
+        "R12"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "xfail_strict": false,
+      "name": "test_failure_stops_install_dependent_never_applied",
+      "doc": "A dependency that never becomes ready fails the install; its dependent is never applied; the release is failed.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 46.31,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "install",
+          "value": "exit 1 after 45s: context deadline exceeded"
+        },
+        {
+          "label": "apiserver timeline",
+          "value": [
+            "14:53:05.264  apply  Deployment/broken"
+          ]
+        },
+        {
+          "label": "release status",
+          "value": "failed"
+        }
+      ],
+      "evidence": "combined/test_failure_stops_install_dependent_never_applied"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_rollback_on_failure_cleans_up",
+      "reqs": [
+        "R12"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "xfail_strict": false,
+      "name": "test_rollback_on_failure_cleans_up",
+      "doc": "--rollback-on-failure: the install fails, then Helm deletes what it applied and leaves no release.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 46.47,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "install",
+          "value": "exit 1: context deadline exceeded"
+        },
+        {
+          "label": "apiserver timeline",
+          "value": [
+            "14:53:51.538  apply  Deployment/broken",
+            "14:54:36.546  delete Deployment/broken"
+          ]
+        },
+        {
+          "label": "releases left in namespace",
+          "value": []
+        }
+      ],
+      "evidence": "combined/test_rollback_on_failure_cleans_up"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_readiness_timeout_per_batch_cap",
+      "reqs": [
+        "R13"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "xfail_strict": false,
+      "name": "test_readiness_timeout_per_batch_cap",
+      "doc": "--readiness-timeout 10s under --timeout 2m fails the never-ready batch after ~10s, not 1m or 2m.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 10.22,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "install",
+          "value": "exit 1 after 10.1s"
+        },
+        {
+          "label": "error",
+          "value": "context deadline exceeded"
+        }
+      ],
+      "evidence": "combined/test_readiness_timeout_per_batch_cap"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_readiness_timeout_exceeds_timeout_rejected",
+      "reqs": [
+        "R13"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "xfail_strict": false,
+      "name": "test_readiness_timeout_exceeds_timeout_rejected",
+      "doc": "--readiness-timeout 3m --timeout 2m: rejected immediately, nothing applied.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 1.17,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "error message",
+          "value": "Error: INSTALLATION FAILED: --readiness-timeout (3m0s) must not exceed --timeout (2m0s)\n"
+        },
+        {
+          "label": "applies count",
+          "value": 0
+        }
+      ],
+      "evidence": "combined/test_readiness_timeout_exceeds_timeout_rejected"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_default_readiness_timeout_one_minute",
+      "reqs": [
+        "R13"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "xfail_strict": false,
+      "name": "test_default_readiness_timeout_one_minute",
+      "doc": "No --readiness-timeout, --timeout 3m: fails after ~60s (default 1m readiness timeout).",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 60.23,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "elapsed seconds",
+          "value": 60.104608
+        }
+      ],
+      "evidence": "combined/test_default_readiness_timeout_one_minute"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_lifecycle.py::test_hooks_not_sequenced_run_by_weight",
+      "reqs": [
+        "R14"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "xfail_strict": false,
+      "name": "test_hooks_not_sequenced_run_by_weight",
+      "doc": "Hooks run before chart resources in hook-weight order, outside the plan, despite sequencing annotations.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 14.69,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "apiserver timeline",
+          "value": [
+            "14:55:49.736  create Job/hook-weight-minus-5 (pre-install, weight -5)",
+            "14:55:52.904  create Job/hook-weight-5 (pre-install, weight 5)",
+            "14:55:55.952  apply  Deployment/first",
+            "14:55:59.444  apply  Deployment/second"
+          ]
+        },
+        {
+          "label": "hook templates",
+          "value": [
+            "hip-lifecycle-hooks/templates/hooks.yaml"
+          ]
+        },
+        {
+          "label": "plan manifests",
+          "value": [
+            "hip-lifecycle-hooks/charts/first/templates/deploy.yaml",
+            "hip-lifecycle-hooks/charts/second/templates/deploy.yaml"
+          ]
+        },
+        {
+          "label": "hook last_run phases",
+          "value": {
+            "hook-weight-minus-5": "Succeeded",
+            "hook-weight-5": "Succeeded"
+          }
+        }
+      ],
+      "evidence": "combined/test_hooks_not_sequenced_run_by_weight"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_subcharts.py::test_plain_wait_applies_everything_at_once",
+      "reqs": [
+        "R01"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "xfail_strict": false,
+      "name": "test_plain_wait_applies_everything_at_once",
+      "doc": "--wait applies all four Deployments together; at least one dependent before dependency ready.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 5.0,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "apiserver timeline",
+          "value": [
+            "14:56:04.308  apply  Deployment/foo",
+            "14:56:04.308  apply  Deployment/nginx",
+            "14:56:04.308  apply  Deployment/rabbitmq",
+            "14:56:04.308  apply  Deployment/bar",
+            "14:56:07.990  ready  Deployment/nginx",
+            "14:56:07.994  ready  Deployment/foo",
+            "14:56:08.004  ready  Deployment/bar",
+            "14:56:08.009  ready  Deployment/rabbitmq"
+          ]
+        },
+        {
+          "label": "apply burst duration (seconds)",
+          "value": 4.1e-05
+        }
+      ],
+      "evidence": "combined/test_plain_wait_applies_everything_at_once"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_subcharts.py::test_independent_subcharts_deploy_together",
+      "reqs": [
+        "R05"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "xfail_strict": false,
+      "name": "test_independent_subcharts_deploy_together",
+      "doc": "nginx and rabbitmq (no mutual dependency) applied together before either is ready.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 11.92,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "apiserver timeline",
+          "value": [
+            "14:56:09.329  apply  Deployment/nginx",
+            "14:56:09.348  apply  Deployment/rabbitmq",
+            "14:56:13.004  ready  Deployment/nginx",
+            "14:56:13.010  ready  Deployment/rabbitmq",
+            "14:56:13.133  apply  Deployment/bar",
+            "14:56:17.012  ready  Deployment/bar",
+            "14:56:17.051  apply  Deployment/foo",
+            "14:56:20.016  ready  Deployment/foo"
+          ]
+        }
+      ],
+      "evidence": "combined/test_independent_subcharts_deploy_together"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_subcharts.py::test_subcharts_dag_order_and_gating",
+      "reqs": [
+        "R06",
+        "R04",
+        "R03"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "xfail_strict": false,
+      "name": "test_subcharts_dag_order_and_gating",
+      "doc": "bar waits for nginx+rabbitmq ready; foo waits for bar ready.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 10.02,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "apiserver timeline",
+          "value": [
+            "14:56:21.253  apply  Deployment/nginx",
+            "14:56:21.269  apply  Deployment/rabbitmq",
+            "14:56:24.045  ready  Deployment/rabbitmq",
+            "14:56:24.051  ready  Deployment/nginx",
+            "14:56:24.167  apply  Deployment/bar",
+            "14:56:27.047  ready  Deployment/bar",
+            "14:56:27.084  apply  Deployment/foo",
+            "14:56:30.053  ready  Deployment/foo"
+          ]
+        }
+      ],
+      "evidence": "combined/test_subcharts_dag_order_and_gating"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_subcharts.py::test_release_record_has_plan_when_sequenced",
+      "reqs": [
+        "R02"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "xfail_strict": false,
+      "name": "test_release_record_has_plan_when_sequenced",
+      "doc": "Ordered install has plan with batches; plain --wait has no plan.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 12.07,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "plain --wait release plan",
+          "value": null
+        },
+        {
+          "label": "stored plan batches (chartPath, kind, manifests)",
+          "value": [
+            "('foo/charts/nginx', 'unsequenced', ['foo/charts/nginx/templates/nginx.yaml'])",
+            "('foo/charts/rabbitmq', 'unsequenced', ['foo/charts/rabbitmq/templates/rabbitmq.yaml'])",
+            "('foo/charts/bar', 'unsequenced', ['foo/charts/bar/templates/bar.yaml'])",
+            "('foo', 'unsequenced', ['foo/templates/foo.yaml'])"
+          ]
+        }
+      ],
+      "evidence": "combined/test_release_record_has_plan_when_sequenced"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_subcharts.py::test_subchart_alias_dependency",
+      "reqs": [
+        "R03"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "xfail_strict": false,
+      "name": "test_subchart_alias_dependency",
+      "doc": "zeta with alias z-service; alpha depends on both alias and original name; order respected.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 9.99,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "apiserver timeline",
+          "value": [
+            "14:56:43.352  apply  Deployment/zeta",
+            "14:56:46.140  ready  Deployment/zeta",
+            "14:56:46.177  apply  Deployment/alpha",
+            "14:56:49.154  apply  Deployment/parent"
+          ]
+        }
+      ],
+      "evidence": "combined/test_subchart_alias_dependency"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_subcharts.py::test_nested_subcharts_three_levels",
+      "reqs": [
+        "R06"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "xfail_strict": false,
+      "name": "test_nested_subcharts_three_levels",
+      "doc": "grandchild-a \u2192 child-b \u2192 parent-z; each level applied after the level below is ready.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 10.04,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "apiserver timeline",
+          "value": [
+            "14:56:53.349  apply  Deployment/grandchild-a",
+            "14:56:56.170  ready  Deployment/grandchild-a",
+            "14:56:56.195  apply  Deployment/child-b",
+            "14:56:59.157  ready  Deployment/child-b",
+            "14:56:59.185  apply  Deployment/parent-z"
+          ]
+        }
+      ],
+      "evidence": "combined/test_nested_subcharts_three_levels"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_subcharts.py::test_subchart_cycle_detected",
+      "reqs": [
+        "R07"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "xfail_strict": false,
+      "name": "test_subchart_cycle_detected",
+      "doc": "Cycle (a\u2192b, b\u2192a) fails helm install and helm lint; no objects applied.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 1.24,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "install exit code",
+          "value": 1
+        },
+        {
+          "label": "install stderr",
+          "value": "Error: INSTALLATION FAILED: subchart circular dependency detected in hip-subcharts-cycle: cycle detected among nodes: a, b\n"
+        },
+        {
+          "label": "helm apply count",
+          "value": 0
+        },
+        {
+          "label": "lint exit code",
+          "value": 1
+        },
+        {
+          "label": "lint output",
+          "value": "==> Linting charts/hip-subcharts-cycle\n[INFO] Chart.yaml: icon is recommended\n[INFO] values.yaml: file does not exist\n[ERROR] /Users/rohit/Documents/helm-hip-0025-e2e/charts/hip-subcharts-cycle: subchart circular dependency detected in hip-subcharts-cycle: cycle detected among nodes: a, b\n\nError: 1 chart(s) linted, 1 chart(s) failed\n"
+        }
+      ],
+      "evidence": "combined/test_subchart_cycle_detected"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr1_subcharts.py::test_helm_dag_prints_subchart_order",
+      "reqs": [
+        "R08"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts"
+      ],
+      "xfail_strict": false,
+      "name": "test_helm_dag_prints_subchart_order",
+      "doc": "helm dag prints nginx and rabbitmq before bar.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 0.14,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "helm dag output",
+          "value": "Chart: foo\n  Subchart batches:\n    Batch 1: nginx, rabbitmq\n    Batch 2: bar\n  Unsequenced (deployed last): Deployment/foo\n  Chart: foo/charts/nginx\n    Subchart batches: (none)\n    Unsequenced (deployed last): Deployment/nginx\n  Chart: foo/charts/rabbitmq\n    Subchart batches: (none)\n    Unsequenced (deployed last): Deployment/rabbitmq\n  Chart: foo/charts/bar\n    Subchart batches: (none)\n    Unsequenced (deployed last): Deployment/bar\n"
+        },
+        {
+          "label": "subchart batches printed for foo",
+          "value": [
+            "nginx, rabbitmq",
+            "bar"
+          ]
+        }
+      ],
+      "evidence": "combined/test_helm_dag_prints_subchart_order"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr2_groups.py::test_groups_follow_the_hip_example",
+      "reqs": [
+        "R17",
+        "R18"
+      ],
+      "needs": [
+        "ordered",
+        "groups"
+      ],
+      "xfail_strict": false,
+      "name": "test_groups_follow_the_hip_example",
+      "doc": "database and queue deploy together; app starts only after both are ready.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 7.68,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "apiserver timeline",
+          "value": [
+            "14:57:04.796  apply  Deployment/db-service",
+            "14:57:04.796  apply  Deployment/queue-processor",
+            "14:57:08.186  ready  Deployment/db-service",
+            "14:57:08.189  ready  Deployment/queue-processor",
+            "14:57:08.213  apply  Deployment/my-app",
+            "14:57:11.197  ready  Deployment/my-app"
+          ]
+        }
+      ],
+      "evidence": "combined/test_groups_follow_the_hip_example"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr2_groups.py::test_unsequenced_resources_deploy_last_and_warn",
+      "reqs": [
+        "R19"
+      ],
+      "needs": [
+        "ordered",
+        "groups"
+      ],
+      "xfail_strict": false,
+      "name": "test_unsequenced_resources_deploy_last_and_warn",
+      "doc": "No annotations, a missing dependency, an isolated group: all after app, two warnings.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 7.01,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "apiserver timeline",
+          "value": [
+            "14:57:15.235  apply  Deployment/my-app",
+            "14:57:18.213  ready  Deployment/my-app",
+            "14:57:18.254  apply  ConfigMap/loose",
+            "14:57:18.254  apply  ConfigMap/orphan",
+            "14:57:18.254  apply  ConfigMap/lonely"
+          ]
+        },
+        {
+          "label": "helm warnings",
+          "value": [
+            "level=WARN msg=\"sequencing: group \"orphan\" depends-on non-existent group \"no-such-group\"; moving group to unsequenced batch\" chart=hip-groups",
+            "level=WARN msg=\"sequencing: resource-group \"lonely\" is isolated (no depends-on edges and no dependents); deploying it in the unsequenced batch after sequenced groups\" chart=hip-groups"
+          ]
+        }
+      ],
+      "evidence": "combined/test_unsequenced_resources_deploy_last_and_warn"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr2_groups.py::test_group_sandboxing_parent_and_subchart_use_same_names",
+      "reqs": [
+        "R20"
+      ],
+      "needs": [
+        "ordered",
+        "subcharts",
+        "groups"
+      ],
+      "xfail_strict": false,
+      "name": "test_group_sandboxing_parent_and_subchart_use_same_names",
+      "doc": "Parent and subchart both define groups 'first' and 'second' with opposite edges; each chart's order holds independently.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 13.11,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "apiserver timeline",
+          "value": [
+            "14:57:19.466  apply  Deployment/sub-second",
+            "14:57:22.225  ready  Deployment/sub-second",
+            "14:57:22.248  apply  Deployment/sub-first",
+            "14:57:25.231  ready  Deployment/sub-first",
+            "14:57:25.255  apply  Deployment/parent-first",
+            "14:57:28.234  ready  Deployment/parent-first",
+            "14:57:28.261  apply  Deployment/parent-second",
+            "14:57:31.247  ready  Deployment/parent-second"
+          ]
+        }
+      ],
+      "evidence": "combined/test_group_sandboxing_parent_and_subchart_use_same_names"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr2_groups.py::test_group_cycle_detected_and_rejected",
+      "reqs": [
+        "R21"
+      ],
+      "needs": [
+        "ordered",
+        "groups"
+      ],
+      "xfail_strict": false,
+      "name": "test_group_cycle_detected_and_rejected",
+      "doc": "Circular group dependency (a -> b -> c -> a) exits non-zero naming the cycle, nothing applied.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 1.23,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "exit code",
+          "value": 1
+        },
+        {
+          "label": "stderr",
+          "value": "Error: INSTALLATION FAILED: resource-group circular dependency detected in hip-groups-cycle: cycle detected among nodes: group-a, group-b, group-c\n"
+        },
+        {
+          "label": "apiserver applies",
+          "value": []
+        },
+        {
+          "label": "helm lint exit code",
+          "value": 1
+        }
+      ],
+      "evidence": "combined/test_group_cycle_detected_and_rejected"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr2_groups.py::test_hip_dependency_key_is_removed_before_apply",
+      "reqs": [
+        "R22"
+      ],
+      "needs": [
+        "ordered",
+        "groups"
+      ],
+      "xfail_strict": false,
+      "name": "test_hip_dependency_key_is_removed_before_apply",
+      "doc": "The HIP key helm.sh/depends-on/resource-groups orders groups, is kept in the release, and never reaches the API server.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 7.8,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "API server on the HIP key",
+          "value": "The ConfigMap \"key-probe\" is invalid: metadata.annotations: Invalid value: \"helm.sh/depends-on/resource-groups\": a valid label key must consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character (e.g. 'MyName',  or 'my.name',  or '123-abc', regex used for validation is '([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]') with an optional DNS subdomain prefix and '/' (e.g. 'example.com/MyName')"
+        },
+        {
+          "label": "my-app annotations on the cluster",
+          "value": {
+            "deployment.kubernetes.io/revision": "1",
+            "helm.sh/resource-group": "app",
+            "meta.helm.sh/release-name": "r",
+            "meta.helm.sh/release-namespace": "e2e-combined-hip-dependency-key-is-removed-before-apply"
+          }
+        },
+        {
+          "label": "key in the stored release manifest",
+          "value": true
+        },
+        {
+          "label": "apiserver timeline",
+          "value": [
+            "14:57:33.900  apply  Deployment/queue-processor",
+            "14:57:33.900  apply  Deployment/db-service",
+            "14:57:37.256  ready  Deployment/queue-processor",
+            "14:57:37.260  ready  Deployment/db-service",
+            "14:57:37.391  apply  Deployment/my-app",
+            "14:57:40.264  ready  Deployment/my-app"
+          ]
+        }
+      ],
+      "evidence": "combined/test_hip_dependency_key_is_removed_before_apply"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr2_groups.py::test_duplicate_resource_group_assignment_rejected",
+      "reqs": [
+        "R23"
+      ],
+      "needs": [
+        "ordered",
+        "groups"
+      ],
+      "xfail_strict": false,
+      "name": "test_duplicate_resource_group_assignment_rejected",
+      "doc": "Same resource assigned to two groups: install fails with 'assigned to multiple resource groups', nothing applied.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 1.19,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "install exit code",
+          "value": 1
+        },
+        {
+          "label": "error message",
+          "value": "Error: INSTALLATION FAILED: parsing resource-group annotations for hip-groups-duplicate: resource \"apps/v1/Deployment//conflicting-app\" assigned to multiple resource groups \"group-a\" and \"group-b\"\n"
+        }
+      ],
+      "evidence": "combined/test_duplicate_resource_group_assignment_rejected"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr2_groups.py::test_template_prints_delimiters_for_groups",
+      "reqs": [
+        "R24"
+      ],
+      "needs": [
+        "groups"
+      ],
+      "xfail_strict": false,
+      "name": "test_template_prints_delimiters_for_groups",
+      "doc": "helm template prints resources in deploy order with ## START/END resource-group delimiters.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 0.14,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "helm template output",
+          "value": "---\n## START resource-group: hip-groups database\n# Source: hip-groups/templates/groups.yaml\n# Source: hip-groups/templates/groups.yaml\n# HIP-0025 \"Template examples\": database and queue have no mutual dependency and\n# deploy together; app waits for both. The dependency list is deliberately in the\n# opposite order to the HIP text (\"The order in which they are listed does not\n# affect deployment sequencing\").\napiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: db-service\n  annotations:\n    helm.sh/resource-group: database\nspec:\n  replicas: 1\n  selector:\n    matchLabels: {app: db-service}\n  template:\n    metadata:\n      labels: {app: db-service}\n    spec:\n      terminationGracePeriodSeconds: 0\n      containers:\n        - name: web\n          image: nginx:1.27-alpine\n          imagePullPolicy: IfNotPresent\n          readinessProbe:\n            httpGet: {path: /, port: 80}\n            initialDelaySeconds: 3\n            periodSeconds: 1\n\n\n## END resource-group: hip-groups database\n---\n## START resource-group: hip-groups queue\n# Source: hip-groups/templates/groups.yaml\n# Source: hip-groups/templates/groups.yaml\napiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: queue-processor\n  annotations:\n    helm.sh/resource-group: queue\nspec:\n  replicas: 1\n  selector:\n    matchLabels: {app: queue-processor}\n  template:\n    metadata:\n      labels: {app: queue-processor}\n    spec:\n      terminationGracePeriodSeconds: 0\n      containers:\n        - name: web\n          image: nginx:1.27-alpine\n          imagePullPolicy: IfNotPresent\n          readinessProbe:\n            httpGet: {path: /, port: 80}\n            initialDelaySeconds: 3\n            periodSeconds: 1\n\n\n## END resource-group: hip-groups queue\n---\n## START resource-group: hip-groups app\n# Source: hip-groups/templates/groups.yaml\n# Source: hip-groups/templates/groups.yaml\napiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: my-app\n  annotations:\n    helm.sh/resource-group: app\n    helm.sh/depends-on/resource-groups: \"[\\\"queue\\\",\\\"database\\\"]\"\nspec:\n  replicas: 1\n  selector:\n    matchLabels: {app: my-app}\n  template:\n    metadata:\n      labels: {app: my-app}\n    spec:\n      terminationGracePeriodSeconds: 0\n      containers:\n        - name: web\n          image: nginx:1.27-alpine\n          imagePullPolicy: IfNotPresent\n          readinessProbe:\n            httpGet: {path: /, port: 80}\n            initialDelaySeconds: 3\n            periodSeconds: 1\n\n\n## END resource-group: hip-groups app\n---\n# Source: hip-groups/templates/unsequenced.yaml\n# Source: hip-groups/templates/unsequenced.yaml\n# The three \"Unsequenced Resources\" cases: deployed after every sequenced group.\napiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: loose            # lacks annotations\ndata: {case: no-annotations}\n\n\n---\n# Source: hip-groups/templates/unsequenced.yaml\n# Source: hip-groups/templates/unsequenced.yaml\napiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: orphan           # depends on a group that does not exist -> warning\n  annotations:\n    helm.sh/resource-group: orphan\n    helm.sh/depends-on/resource-groups: '[\"no-such-group\"]'\ndata: {case: missing-dependency}\n\n\n---\n# Source: hip-groups/templates/unsequenced.yaml\n# Source: hip-groups/templates/unsequenced.yaml\napiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: lonely           # isolated group: no edges in or out -> warning\n  annotations:\n    helm.sh/resource-group: lonely\ndata: {case: isolated-group}\n"
+        },
+        {
+          "label": "START markers",
+          "value": {
+            "database": 1,
+            "queue": 35,
+            "app": 65
+          }
+        },
+        {
+          "label": "END markers",
+          "value": {
+            "database": 33,
+            "queue": 63,
+            "app": 94
+          }
+        }
+      ],
+      "evidence": "combined/test_template_prints_delimiters_for_groups"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr2_groups.py::test_upgrade_follows_group_order",
+      "reqs": [
+        "R09"
+      ],
+      "needs": [
+        "ordered",
+        "groups"
+      ],
+      "xfail_strict": false,
+      "name": "test_upgrade_follows_group_order",
+      "doc": "Upgrade patches every Deployment; patches follow database/queue -> app, and app's patch comes after both are ready again.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 14.75,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "upgrade timeline",
+          "value": [
+            "14:57:49.404  apply  Deployment/db",
+            "14:57:49.409  apply  Deployment/queue",
+            "14:57:52.308  ready  Deployment/db",
+            "14:57:52.314  ready  Deployment/queue",
+            "14:57:52.435  apply  Deployment/app",
+            "14:57:55.320  ready  Deployment/app"
+          ]
+        },
+        {
+          "label": "db patch-marker",
+          "value": "v2"
+        },
+        {
+          "label": "queue patch-marker",
+          "value": "v2"
+        },
+        {
+          "label": "app patch-marker",
+          "value": "v2"
+        },
+        {
+          "label": "db patched",
+          "value": "14:57:49.404"
+        },
+        {
+          "label": "queue patched",
+          "value": "14:57:49.409"
+        },
+        {
+          "label": "app patched",
+          "value": "14:57:52.435"
+        },
+        {
+          "label": "db ready after patch",
+          "value": "14:57:52.308"
+        },
+        {
+          "label": "queue ready after patch",
+          "value": "14:57:52.314"
+        }
+      ],
+      "evidence": "combined/test_upgrade_follows_group_order"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr2_groups.py::test_uninstall_runs_in_reverse_order",
+      "reqs": [
+        "R10"
+      ],
+      "needs": [
+        "ordered",
+        "groups"
+      ],
+      "xfail_strict": false,
+      "name": "test_uninstall_runs_in_reverse_order",
+      "doc": "Uninstall after ordered install deletes app before database and queue (reverse of install order).",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 8.12,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "uninstall timeline",
+          "value": [
+            "14:58:04.397  delete Deployment/app",
+            "14:58:04.509  delete Deployment/queue",
+            "14:58:04.509  delete Deployment/db"
+          ]
+        },
+        {
+          "label": "deletion timestamps",
+          "value": {
+            "app": "14:58:04.397",
+            "queue": "14:58:04.509",
+            "db": "14:58:04.509"
+          }
+        }
+      ],
+      "evidence": "combined/test_uninstall_runs_in_reverse_order"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_deployment_without_annotations_uses_kstatus",
+      "reqs": [
+        "R25"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "xfail_strict": false,
+      "name": "test_deployment_without_annotations_uses_kstatus",
+      "doc": "Deployment with no readiness annotations: plain --wait returns after Available.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 4.78,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "Deployment ready time",
+          "value": "14:58:09.383"
+        },
+        {
+          "label": "install succeeded with kstatus",
+          "value": true
+        }
+      ],
+      "evidence": "combined/test_deployment_without_annotations_uses_kstatus"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_success_expressions_mark_ready",
+      "reqs": [
+        "R26"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "xfail_strict": false,
+      "name": "test_success_expressions_mark_ready",
+      "doc": "Success list with multiple expressions: install exits only after one becomes true.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 5.17,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "Probe count changes",
+          "value": [
+            [
+              "14:58:14.571",
+              3
+            ]
+          ]
+        },
+        {
+          "label": "apiserver timeline",
+          "value": [
+            "14:58:14.571  status Probe/probe count=3 (test patch)",
+            "14:58:14.575  helm writes release record: deployed"
+          ]
+        }
+      ],
+      "evidence": "combined/test_success_expressions_mark_ready"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_failure_takes_precedence_over_success",
+      "reqs": [
+        "R27"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "xfail_strict": false,
+      "name": "test_failure_takes_precedence_over_success",
+      "doc": "Success AND failure both true: install fails, error names the Probe.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 2.17,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "install exit code",
+          "value": 1
+        },
+        {
+          "label": "error message",
+          "value": "Error: INSTALLATION FAILED: resource Probe/e2e-combined-failure-takes-precedence-over-success/probe not ready. status: Failed, message: custom readiness failure condition met\n"
+        }
+      ],
+      "evidence": "combined/test_failure_takes_precedence_over_success"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_failure_expression_alone_fails_install",
+      "reqs": [
+        "R27"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "xfail_strict": false,
+      "name": "test_failure_expression_alone_fails_install",
+      "doc": "Only failure expression true: install fails.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 2.17,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "install exit code",
+          "value": 1
+        },
+        {
+          "label": "error message snippet",
+          "value": "Error: INSTALLATION FAILED: resource Probe/e2e-combined-failure-expression-alone-fails-install/probe not ready. status: Failed, message: custom readiness failure condition met\n"
+        }
+      ],
+      "evidence": "combined/test_failure_expression_alone_fails_install"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_failed_probe_plus_pending_waits_for_timeout",
+      "reqs": [
+        "R27"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "xfail_strict": false,
+      "name": "test_failed_probe_plus_pending_waits_for_timeout",
+      "doc": "One failed Probe + one pending: helm waits until --timeout, error names both.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 30.21,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "install exit code",
+          "value": 1
+        },
+        {
+          "label": "elapsed seconds",
+          "value": 30.1
+        },
+        {
+          "label": "error message",
+          "value": "Error: INSTALLATION FAILED: resource Probe/e2e-combined-failed-probe-plus-pending-waits-for-timeout/probe1 not ready. status: Failed, message: custom readiness failure condition met\nresource Probe/e2e-combined-failed-probe-plus-pending-waits-for-timeout/probe2 not ready. status: InProgress, message: waiting for custom readiness conditions\ncontext deadline exceeded\n"
+        }
+      ],
+      "evidence": "combined/test_failed_probe_plus_pending_waits_for_timeout"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_only_success_annotation_falls_back_to_kstatus_and_warns",
+      "reqs": [
+        "R28"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "xfail_strict": false,
+      "name": "test_only_success_annotation_falls_back_to_kstatus_and_warns",
+      "doc": "Only readiness-success annotation: kstatus fallback occurs and helm warns.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 4.37,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "install",
+          "value": "exit 0 after 3.2s"
+        },
+        {
+          "label": "Probe .status.phase changes during install",
+          "value": [
+            "none: never Ready"
+          ]
+        },
+        {
+          "label": "helm warnings",
+          "value": [
+            "level=WARN msg=\"custom readiness annotations must be used together; falling back to default readiness\" kind=Probe namespace=e2e-combined-only-success-annotation-falls-back-to-kstatus-and name=probe successAnnotation=helm.sh/readiness-success failureAnnotation=helm.sh/readiness-failure"
+          ]
+        }
+      ],
+      "evidence": "combined/test_only_success_annotation_falls_back_to_kstatus_and_warns"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_only_success_annotation_fails_helm_lint",
+      "reqs": [
+        "R28"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "xfail_strict": false,
+      "name": "test_only_success_annotation_fails_helm_lint",
+      "doc": "Chart with only readiness-success annotation: helm lint fails.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 0.14,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "lint exit code",
+          "value": 1
+        },
+        {
+          "label": "lint output",
+          "value": "==> Linting charts/hip-readiness-basic\n[INFO] Chart.yaml: icon is recommended\n[ERROR] hip-readiness-basic/templates/probe.yaml: resource \"Probe/probe\" has only one of \"helm.sh/readiness-success\" / \"helm.sh/readiness-failure\" annotations; both must be present or absent together\n\nError: 1 chart(s) linted, 1 chart(s) failed\n"
+        }
+      ],
+      "evidence": "combined/test_only_success_annotation_fails_helm_lint"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[==-5-10-10-count-equality number]",
+      "reqs": [
+        "R29"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "xfail_strict": false,
+      "name": "test_readiness_operators[==-5-10-10-count-equality number]",
+      "doc": "Each operator (==, !=, <, <=, >, >= on numbers; == on strings and booleans) holds the wait until the patch makes it true.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 4.18,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "equality number operator",
+          "value": "=="
+        },
+        {
+          "label": "count changes",
+          "value": [
+            [
+              "14:58:57.804",
+              10
+            ]
+          ]
+        },
+        {
+          "label": "install completed",
+          "value": true
+        },
+        {
+          "label": "apiserver timeline",
+          "value": [
+            "14:58:57.804  status Probe/probe count=10 (test patch)",
+            "14:58:57.809  helm writes release record: deployed"
+          ]
+        }
+      ],
+      "evidence": "combined/test_readiness_operators_-5-10-10-count-equality_number_"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[!=-5-10-5-count-inequality number]",
+      "reqs": [
+        "R29"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "xfail_strict": false,
+      "name": "test_readiness_operators[!=-5-10-5-count-inequality number]",
+      "doc": "Each operator (==, !=, <, <=, >, >= on numbers; == on strings and booleans) holds the wait until the patch makes it true.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 4.21,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "inequality number operator",
+          "value": "!="
+        },
+        {
+          "label": "count changes",
+          "value": [
+            [
+              "14:59:02.003",
+              10
+            ]
+          ]
+        },
+        {
+          "label": "install completed",
+          "value": true
+        },
+        {
+          "label": "apiserver timeline",
+          "value": [
+            "14:59:02.003  status Probe/probe count=10 (test patch)",
+            "14:59:02.008  helm writes release record: deployed"
+          ]
+        }
+      ],
+      "evidence": "combined/test_readiness_operators_-5-10-5-count-inequality_number_"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[<-10-4-5-count-less than]",
+      "reqs": [
+        "R29"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "xfail_strict": false,
+      "name": "test_readiness_operators[<-10-4-5-count-less than]",
+      "doc": "Each operator (==, !=, <, <=, >, >= on numbers; == on strings and booleans) holds the wait until the patch makes it true.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 4.19,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "less than operator",
+          "value": "<"
+        },
+        {
+          "label": "count changes",
+          "value": [
+            [
+              "14:59:06.196",
+              4
+            ]
+          ]
+        },
+        {
+          "label": "install completed",
+          "value": true
+        },
+        {
+          "label": "apiserver timeline",
+          "value": [
+            "14:59:06.196  status Probe/probe count=4 (test patch)",
+            "14:59:06.201  helm writes release record: deployed"
+          ]
+        }
+      ],
+      "evidence": "combined/test_readiness_operators_-10-4-5-count-less_than_"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[<=-10-5-5-count-less or equal]",
+      "reqs": [
+        "R29"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "xfail_strict": false,
+      "name": "test_readiness_operators[<=-10-5-5-count-less or equal]",
+      "doc": "Each operator (==, !=, <, <=, >, >= on numbers; == on strings and booleans) holds the wait until the patch makes it true.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 4.22,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "less or equal operator",
+          "value": "<="
+        },
+        {
+          "label": "count changes",
+          "value": [
+            [
+              "14:59:10.413",
+              5
+            ]
+          ]
+        },
+        {
+          "label": "install completed",
+          "value": true
+        },
+        {
+          "label": "apiserver timeline",
+          "value": [
+            "14:59:10.413  status Probe/probe count=5 (test patch)",
+            "14:59:10.417  helm writes release record: deployed"
+          ]
+        }
+      ],
+      "evidence": "combined/test_readiness_operators_-10-5-5-count-less_or_equal_"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[>-5-11-10-count-greater than]",
+      "reqs": [
+        "R29"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "xfail_strict": false,
+      "name": "test_readiness_operators[>-5-11-10-count-greater than]",
+      "doc": "Each operator (==, !=, <, <=, >, >= on numbers; == on strings and booleans) holds the wait until the patch makes it true.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 4.16,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "greater than operator",
+          "value": ">"
+        },
+        {
+          "label": "count changes",
+          "value": [
+            [
+              "14:59:14.586",
+              11
+            ]
+          ]
+        },
+        {
+          "label": "install completed",
+          "value": true
+        },
+        {
+          "label": "apiserver timeline",
+          "value": [
+            "14:59:14.586  status Probe/probe count=11 (test patch)",
+            "14:59:14.590  helm writes release record: deployed"
+          ]
+        }
+      ],
+      "evidence": "combined/test_readiness_operators_-5-11-10-count-greater_than_"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[>=-5-10-10-count-greater or equal]",
+      "reqs": [
+        "R29"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "xfail_strict": false,
+      "name": "test_readiness_operators[>=-5-10-10-count-greater or equal]",
+      "doc": "Each operator (==, !=, <, <=, >, >= on numbers; == on strings and booleans) holds the wait until the patch makes it true.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 4.18,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "greater or equal operator",
+          "value": ">="
+        },
+        {
+          "label": "count changes",
+          "value": [
+            [
+              "14:59:18.757",
+              10
+            ]
+          ]
+        },
+        {
+          "label": "install completed",
+          "value": true
+        },
+        {
+          "label": "apiserver timeline",
+          "value": [
+            "14:59:18.757  status Probe/probe count=10 (test patch)",
+            "14:59:18.762  helm writes release record: deployed"
+          ]
+        }
+      ],
+      "evidence": "combined/test_readiness_operators_-5-10-10-count-greater_or_equal_"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[==-Pending-Ready-Ready-phase-equality string]",
+      "reqs": [
+        "R29"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "xfail_strict": false,
+      "name": "test_readiness_operators[==-Pending-Ready-Ready-phase-equality string]",
+      "doc": "Each operator (==, !=, <, <=, >, >= on numbers; == on strings and booleans) holds the wait until the patch makes it true.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 4.2,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "equality string operator",
+          "value": "=="
+        },
+        {
+          "label": "phase changes",
+          "value": [
+            [
+              "14:59:22.957",
+              "Ready"
+            ]
+          ]
+        },
+        {
+          "label": "install completed",
+          "value": true
+        },
+        {
+          "label": "apiserver timeline",
+          "value": [
+            "14:59:22.957  status Probe/probe phase=Ready (test patch)",
+            "14:59:22.962  helm writes release record: deployed"
+          ]
+        }
+      ],
+      "evidence": "combined/test_readiness_operators_-Pending-Ready-Ready-phase-equality_string_"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_readiness_operators[==-false-true-true-ready-equality boolean]",
+      "reqs": [
+        "R29"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "xfail_strict": false,
+      "name": "test_readiness_operators[==-false-true-true-ready-equality boolean]",
+      "doc": "Each operator (==, !=, <, <=, >, >= on numbers; == on strings and booleans) holds the wait until the patch makes it true.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 4.2,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "equality boolean operator",
+          "value": "=="
+        },
+        {
+          "label": "ready changes",
+          "value": [
+            [
+              "14:59:27.165",
+              true
+            ]
+          ]
+        },
+        {
+          "label": "install completed",
+          "value": true
+        },
+        {
+          "label": "apiserver timeline",
+          "value": [
+            "14:59:27.165  status Probe/probe ready=True (test patch)",
+            "14:59:27.170  helm writes release record: deployed"
+          ]
+        }
+      ],
+      "evidence": "combined/test_readiness_operators_-false-true-true-ready-equality_boolean_"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_custom_readiness_applies_to_plain_wait",
+      "reqs": [
+        "R31"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "xfail_strict": false,
+      "name": "test_custom_readiness_applies_to_plain_wait",
+      "doc": "Probe with custom readiness annotations gates a plain --wait install.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 5.2,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "phase changes",
+          "value": [
+            [
+              "14:59:32.371",
+              "Ready"
+            ]
+          ]
+        },
+        {
+          "label": "apiserver timeline",
+          "value": [
+            "14:59:32.371  status Probe/probe phase=Ready (test patch)",
+            "14:59:32.374  helm writes release record: deployed"
+          ]
+        }
+      ],
+      "evidence": "combined/test_custom_readiness_applies_to_plain_wait"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_lint_rejects_object_literal_comparison",
+      "reqs": [
+        "R30"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "xfail_strict": false,
+      "name": "test_lint_rejects_object_literal_comparison",
+      "doc": "helm lint fails when readiness expression compares to an object literal.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 0.15,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "lint exit code",
+          "value": 1
+        },
+        {
+          "label": "lint output",
+          "value": "==> Linting charts/hip-readiness-basic\n[INFO] Chart.yaml: icon is recommended\n[ERROR] hip-readiness-basic/templates/probe.yaml: resource \"Probe/probe\" has malformed \"helm.sh/readiness-success\" annotation: expression \"{.data} == {\\\"key\\\": \\\"value\\\"}\": object comparisons are not supported\n\nError: 1 chart(s) linted, 1 chart(s) failed\n"
+        }
+      ],
+      "evidence": "combined/test_lint_rejects_object_literal_comparison"
+    },
+    {
+      "nodeid": "e2e/tests/test_pr3_readiness.py::test_install_rejects_object_jsonpath_result",
+      "reqs": [
+        "R30"
+      ],
+      "needs": [
+        "readiness"
+      ],
+      "xfail_strict": false,
+      "name": "test_install_rejects_object_jsonpath_result",
+      "doc": "install --wait fails promptly when JSONPath result is an object, with wrapped error.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 2.16,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "install exit code",
+          "value": 1
+        },
+        {
+          "label": "elapsed time",
+          "value": "2.1s"
+        },
+        {
+          "label": "error message",
+          "value": "Error: INSTALLATION FAILED: resource Probe/e2e-combined-install-rejects-object-jsonpath-result/probe not ready. status: Failed, message: custom readiness expression error: evaluating success expression \"{.metadata} == {}\": JSONPath result is an object or array: object comparisons are not supported\n"
+        }
+      ],
+      "evidence": "combined/test_install_rejects_object_jsonpath_result"
+    },
+    {
+      "nodeid": "e2e/tests/test_v2_compat.py::test_v2_chart_with_plain_wait_applies_in_one_burst",
+      "reqs": [
+        "R16"
+      ],
+      "needs": [],
+      "xfail_strict": false,
+      "name": "test_v2_chart_with_plain_wait_applies_in_one_burst",
+      "doc": "V2 chart with group annotations: plain --wait applies all at once (max-min < 1s), no sequencing, no plan in release.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 1.73,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "install exit code",
+          "value": 0
+        },
+        {
+          "label": "resource applies",
+          "value": [
+            [
+              "14:59:35.898",
+              "ConfigMap/parent-db"
+            ],
+            [
+              "14:59:35.898",
+              "ConfigMap/r-sub"
+            ],
+            [
+              "14:59:35.901",
+              "Deployment/parent-app"
+            ]
+          ]
+        },
+        {
+          "label": "burst duration (seconds)",
+          "value": 0.002692
+        },
+        {
+          "label": "release record has plan",
+          "value": false
+        }
+      ],
+      "evidence": "combined/test_v2_chart_with_plain_wait_applies_in_one_burst"
+    },
+    {
+      "nodeid": "e2e/tests/test_v2_compat.py::test_v2_chart_with_ordered_wait_fails",
+      "reqs": [
+        "R16"
+      ],
+      "needs": [],
+      "xfail_strict": false,
+      "name": "test_v2_chart_with_ordered_wait_fails",
+      "doc": "V2 chart: --wait=ordered exits non-zero and creates no release.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 0.17,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "install exit code",
+          "value": 1
+        },
+        {
+          "label": "stderr",
+          "value": "Error: INSTALLATION FAILED: --wait=ordered requires chart apiVersion v3 (chart \"v2-annotated\" has apiVersion v2)\n"
+        },
+        {
+          "label": "error type",
+          "value": "v2-rejected"
+        },
+        {
+          "label": "releases in namespace",
+          "value": []
+        }
+      ],
+      "evidence": "combined/test_v2_chart_with_ordered_wait_fails"
+    },
+    {
+      "nodeid": "e2e/tests/test_v2_compat.py::test_v2_chart_upgrade_rollback_uninstall_succeed",
+      "reqs": [
+        "R16"
+      ],
+      "needs": [],
+      "xfail_strict": false,
+      "name": "test_v2_chart_upgrade_rollback_uninstall_succeed",
+      "doc": "V2 chart: upgrade, rollback, and uninstall all succeed with plain --wait.",
+      "outcome": "passed",
+      "reason": "",
+      "duration": 2.25,
+      "phases": {
+        "setup": "passed",
+        "call": "passed",
+        "teardown": "passed"
+      },
+      "observations": [
+        {
+          "label": "upgrade revision",
+          "value": 2
+        },
+        {
+          "label": "rollback revision",
+          "value": 3
+        },
+        {
+          "label": "deployments deleted",
+          "value": [
+            "parent-app"
+          ]
+        }
+      ],
+      "evidence": "combined/test_v2_chart_upgrade_rollback_uninstall_succeed"
+    }
+  ]
+}

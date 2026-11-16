@@ -1,0 +1,10 @@
+[
+  {
+    "label": "install exit code",
+    "value": 1
+  },
+  {
+    "label": "error message snippet",
+    "value": "Error: INSTALLATION FAILED: resource Probe/e2e-combined-failure-expression-alone-fails-install/probe not ready. status: Failed, message: custom readiness failure condition met\n"
+  }
+]

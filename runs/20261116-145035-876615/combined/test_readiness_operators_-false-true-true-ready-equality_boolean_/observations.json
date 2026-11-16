@@ -1,0 +1,26 @@
+[
+  {
+    "label": "equality boolean operator",
+    "value": "=="
+  },
+  {
+    "label": "ready changes",
+    "value": [
+      [
+        "14:59:27.165",
+        true
+      ]
+    ]
+  },
+  {
+    "label": "install completed",
+    "value": true
+  },
+  {
+    "label": "apiserver timeline",
+    "value": [
+      "14:59:27.165  status Probe/probe ready=True (test patch)",
+      "14:59:27.170  helm writes release record: deployed"
+    ]
+  }
+]

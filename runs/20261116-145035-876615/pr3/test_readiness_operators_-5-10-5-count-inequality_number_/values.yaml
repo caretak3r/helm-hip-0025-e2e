@@ -1,0 +1,5 @@
+probe:
+  failureExpressions:
+  - '{.phase} == Failed'
+  successExpressions:
+  - '{.count} != 5'

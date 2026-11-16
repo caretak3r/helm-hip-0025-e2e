@@ -1,0 +1,24 @@
+14:59:33.585 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-install-rejects-object-jsonpath-result --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+14:59:33.623 $ kubectl --context kind-hip0025-e2e create namespace e2e-combined-install-rejects-object-jsonpath-result
+[exit 0, 0.0s]
+namespace/e2e-combined-install-rejects-object-jsonpath-result created
+
+
+14:59:35.658 $ kubectl --context kind-hip0025-e2e patch Probe probe -n e2e-combined-install-rejects-object-jsonpath-result --subresource=status --type=merge -p {"status": {"metadata": {"key": "value"}}}
+[exit 0, 0.0s]
+probe.readiness.hip0025.example/probe patched
+
+
+14:59:33.658 $ .bin/helm-combined install r charts/hip-readiness-basic -f runs/20261116-145035-876615/combined/test_install_rejects_object_jsonpath_result/values.yaml --namespace e2e-combined-install-rejects-object-jsonpath-result --wait --timeout 30s --kube-context kind-hip0025-e2e
+[exit 1, 2.1s]
+Error: INSTALLATION FAILED: resource Probe/e2e-combined-install-rejects-object-jsonpath-result/probe not ready. status: Failed, message: custom readiness expression error: evaluating success expression "{.metadata} == {}": JSONPath result is an object or array: object comparisons are not supported
+
+
+14:59:35.710 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-install-rejects-object-jsonpath-result --wait=false
+[exit 0, 0.0s]
+namespace "e2e-combined-install-rejects-object-jsonpath-result" deleted
+
+

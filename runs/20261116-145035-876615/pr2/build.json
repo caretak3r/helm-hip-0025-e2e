@@ -1,0 +1,34 @@
+{
+  "tier": "pr2",
+  "commits": {
+    "feat/hip-0025-v3-resource-groups": "b697bdd956094c37c2387304cfa397b25143bad4"
+  },
+  "wiring": [
+    {
+      "name": "base",
+      "file": "wiring/0001-base-chart-v3-lifecycle.patch",
+      "sha256": "5ff507228070d529cac835fe892cac77dc40ec48696fadfcd809abb51b9794de"
+    },
+    {
+      "name": "ordered",
+      "file": "wiring/0002-ordered-overlay.patch",
+      "sha256": "d040d30b9482618d74114338cce11571048cc3dd6d0ce2972f8795c3f79c257f"
+    },
+    {
+      "name": "template",
+      "file": "wiring/0004-template-order-overlay.patch",
+      "sha256": "63b474acc381fc0c43e21e1526d25d0ed1485dd5a28528bdb72c096dc475b933"
+    }
+  ],
+  "base": "3c2635de452c8df481f59a1e1246bef1355b7e8d",
+  "tree_head": "8e019e39ff18139995a270bf37b820397b956f6a",
+  "tree": "ff766bb92911de4ad0d901a06c9a7d64012c77b9",
+  "version": "v4.3+g8e019e3",
+  "binary": ".bin/helm-pr2",
+  "binary_sha256": "88872c72da5f76e6e60ba9a689b0d03ec4f7d85033eaa4ac09e9ee02cce7ccb1",
+  "go": "go1.27.3",
+  "goos": "darwin",
+  "goarch": "arm64",
+  "build_seconds": 53.0,
+  "rebuilt": true
+}

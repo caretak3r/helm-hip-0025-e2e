@@ -1,0 +1,17 @@
+[
+  {
+    "label": "install",
+    "value": "exit 1: context deadline exceeded"
+  },
+  {
+    "label": "apiserver timeline",
+    "value": [
+      "14:53:43.572  apply  Deployment/broken",
+      "14:54:28.581  delete Deployment/broken"
+    ]
+  },
+  {
+    "label": "releases left in namespace",
+    "value": []
+  }
+]

@@ -1,0 +1,5 @@
+deployment:
+  enabled: true
+probe:
+  successExpressions:
+  - '{.phase} == Ready'

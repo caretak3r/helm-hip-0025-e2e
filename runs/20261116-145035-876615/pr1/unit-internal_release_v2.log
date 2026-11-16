@@ -1,0 +1,215 @@
+$ go test -list . ./internal/release/v2/
+TestHookExecutionMarshalJSON
+TestHookExecutionUnmarshalJSON
+TestHookExecutionRoundTrip
+TestHookExecutionEmptyStringRoundTrip
+TestInfoMarshalJSON
+TestInfoUnmarshalJSON
+TestInfoRoundTrip
+TestInfoRollbackRevisionRoundTrip
+TestInfoEmptyStringRoundTrip
+TestReleasePlanJSONRoundTrip
+TestReleasePlanOmittedWhenNil
+ok  	helm.sh/helm/v4/internal/release/v2	0.201s
+
+$ go test -json -count=1 ./internal/release/v2/
+{"Time":"2026-11-16T09:51:29.64272-05:00","Action":"start","Package":"helm.sh/helm/v4/internal/release/v2"}
+{"Time":"2026-11-16T09:51:29.84028-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionMarshalJSON"}
+{"Time":"2026-11-16T09:51:29.840369-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionMarshalJSON","Output":"=== RUN   TestHookExecutionMarshalJSON\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840413-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionMarshalJSON/all_fields_populated"}
+{"Time":"2026-11-16T09:51:29.84042-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionMarshalJSON/all_fields_populated","Output":"=== RUN   TestHookExecutionMarshalJSON/all_fields_populated\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.84044-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionMarshalJSON/all_fields_populated","Output":"--- PASS: TestHookExecutionMarshalJSON/all_fields_populated (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840443-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionMarshalJSON/all_fields_populated","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.840453-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionMarshalJSON/only_phase"}
+{"Time":"2026-11-16T09:51:29.840457-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionMarshalJSON/only_phase","Output":"=== RUN   TestHookExecutionMarshalJSON/only_phase\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840459-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionMarshalJSON/only_phase","Output":"--- PASS: TestHookExecutionMarshalJSON/only_phase (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840461-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionMarshalJSON/only_phase","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.840462-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionMarshalJSON/with_started_time_only"}
+{"Time":"2026-11-16T09:51:29.840463-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionMarshalJSON/with_started_time_only","Output":"=== RUN   TestHookExecutionMarshalJSON/with_started_time_only\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840479-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionMarshalJSON/with_started_time_only","Output":"--- PASS: TestHookExecutionMarshalJSON/with_started_time_only (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840482-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionMarshalJSON/with_started_time_only","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.840483-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionMarshalJSON/failed_phase"}
+{"Time":"2026-11-16T09:51:29.840484-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionMarshalJSON/failed_phase","Output":"=== RUN   TestHookExecutionMarshalJSON/failed_phase\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840486-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionMarshalJSON/failed_phase","Output":"--- PASS: TestHookExecutionMarshalJSON/failed_phase (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840487-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionMarshalJSON/failed_phase","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.840488-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionMarshalJSON/unknown_phase"}
+{"Time":"2026-11-16T09:51:29.840489-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionMarshalJSON/unknown_phase","Output":"=== RUN   TestHookExecutionMarshalJSON/unknown_phase\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840494-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionMarshalJSON/unknown_phase","Output":"--- PASS: TestHookExecutionMarshalJSON/unknown_phase (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840495-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionMarshalJSON/unknown_phase","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.840496-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionMarshalJSON","Output":"--- PASS: TestHookExecutionMarshalJSON (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840503-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionMarshalJSON","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.840506-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON"}
+{"Time":"2026-11-16T09:51:29.840507-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON","Output":"=== RUN   TestHookExecutionUnmarshalJSON\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840508-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON/all_fields_populated"}
+{"Time":"2026-11-16T09:51:29.840509-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON/all_fields_populated","Output":"=== RUN   TestHookExecutionUnmarshalJSON/all_fields_populated\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840542-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON/all_fields_populated","Output":"--- PASS: TestHookExecutionUnmarshalJSON/all_fields_populated (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840555-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON/all_fields_populated","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.840556-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON/only_phase"}
+{"Time":"2026-11-16T09:51:29.840557-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON/only_phase","Output":"=== RUN   TestHookExecutionUnmarshalJSON/only_phase\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840613-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON/only_phase","Output":"--- PASS: TestHookExecutionUnmarshalJSON/only_phase (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840629-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON/only_phase","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.840634-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON/empty_string_time_fields"}
+{"Time":"2026-11-16T09:51:29.840636-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON/empty_string_time_fields","Output":"=== RUN   TestHookExecutionUnmarshalJSON/empty_string_time_fields\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840656-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON/empty_string_time_fields","Output":"--- PASS: TestHookExecutionUnmarshalJSON/empty_string_time_fields (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840664-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON/empty_string_time_fields","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.840667-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON/missing_time_fields"}
+{"Time":"2026-11-16T09:51:29.840669-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON/missing_time_fields","Output":"=== RUN   TestHookExecutionUnmarshalJSON/missing_time_fields\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840672-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON/missing_time_fields","Output":"--- PASS: TestHookExecutionUnmarshalJSON/missing_time_fields (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840673-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON/missing_time_fields","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.840677-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON/null_time_fields"}
+{"Time":"2026-11-16T09:51:29.840678-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON/null_time_fields","Output":"=== RUN   TestHookExecutionUnmarshalJSON/null_time_fields\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840703-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON/null_time_fields","Output":"--- PASS: TestHookExecutionUnmarshalJSON/null_time_fields (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840707-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON/null_time_fields","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.840713-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON/mixed_empty_and_valid_time_fields"}
+{"Time":"2026-11-16T09:51:29.840716-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON/mixed_empty_and_valid_time_fields","Output":"=== RUN   TestHookExecutionUnmarshalJSON/mixed_empty_and_valid_time_fields\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840725-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON/mixed_empty_and_valid_time_fields","Output":"--- PASS: TestHookExecutionUnmarshalJSON/mixed_empty_and_valid_time_fields (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840726-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON/mixed_empty_and_valid_time_fields","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.840747-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON/with_started_time_only"}
+{"Time":"2026-11-16T09:51:29.840748-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON/with_started_time_only","Output":"=== RUN   TestHookExecutionUnmarshalJSON/with_started_time_only\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840758-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON/with_started_time_only","Output":"--- PASS: TestHookExecutionUnmarshalJSON/with_started_time_only (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840763-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON/with_started_time_only","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.840765-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON/failed_phase_with_times"}
+{"Time":"2026-11-16T09:51:29.840766-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON/failed_phase_with_times","Output":"=== RUN   TestHookExecutionUnmarshalJSON/failed_phase_with_times\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840768-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON/failed_phase_with_times","Output":"--- PASS: TestHookExecutionUnmarshalJSON/failed_phase_with_times (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840769-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON/failed_phase_with_times","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.84077-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON/invalid_time_format"}
+{"Time":"2026-11-16T09:51:29.840771-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON/invalid_time_format","Output":"=== RUN   TestHookExecutionUnmarshalJSON/invalid_time_format\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840775-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON/invalid_time_format","Output":"--- PASS: TestHookExecutionUnmarshalJSON/invalid_time_format (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840785-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON/invalid_time_format","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.840787-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON","Output":"--- PASS: TestHookExecutionUnmarshalJSON (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840789-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionUnmarshalJSON","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.840796-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionRoundTrip"}
+{"Time":"2026-11-16T09:51:29.8408-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionRoundTrip","Output":"=== RUN   TestHookExecutionRoundTrip\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840818-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionRoundTrip","Output":"--- PASS: TestHookExecutionRoundTrip (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840828-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionRoundTrip","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.84083-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionEmptyStringRoundTrip"}
+{"Time":"2026-11-16T09:51:29.840831-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionEmptyStringRoundTrip","Output":"=== RUN   TestHookExecutionEmptyStringRoundTrip\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840835-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionEmptyStringRoundTrip","Output":"--- PASS: TestHookExecutionEmptyStringRoundTrip (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840837-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestHookExecutionEmptyStringRoundTrip","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.840855-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoMarshalJSON"}
+{"Time":"2026-11-16T09:51:29.840858-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoMarshalJSON","Output":"=== RUN   TestInfoMarshalJSON\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840861-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoMarshalJSON/all_fields_populated"}
+{"Time":"2026-11-16T09:51:29.840863-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoMarshalJSON/all_fields_populated","Output":"=== RUN   TestInfoMarshalJSON/all_fields_populated\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840893-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoMarshalJSON/all_fields_populated","Output":"--- PASS: TestInfoMarshalJSON/all_fields_populated (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840897-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoMarshalJSON/all_fields_populated","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.8409-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoMarshalJSON/only_required_fields"}
+{"Time":"2026-11-16T09:51:29.840901-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoMarshalJSON/only_required_fields","Output":"=== RUN   TestInfoMarshalJSON/only_required_fields\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840958-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoMarshalJSON/only_required_fields","Output":"--- PASS: TestInfoMarshalJSON/only_required_fields (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840963-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoMarshalJSON/only_required_fields","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.840964-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoMarshalJSON/zero_time_values_omitted"}
+{"Time":"2026-11-16T09:51:29.840965-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoMarshalJSON/zero_time_values_omitted","Output":"=== RUN   TestInfoMarshalJSON/zero_time_values_omitted\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840967-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoMarshalJSON/zero_time_values_omitted","Output":"--- PASS: TestInfoMarshalJSON/zero_time_values_omitted (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840969-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoMarshalJSON/zero_time_values_omitted","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.84097-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoMarshalJSON/with_pending_status"}
+{"Time":"2026-11-16T09:51:29.840971-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoMarshalJSON/with_pending_status","Output":"=== RUN   TestInfoMarshalJSON/with_pending_status\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.840993-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoMarshalJSON/with_pending_status","Output":"--- PASS: TestInfoMarshalJSON/with_pending_status (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoMarshalJSON/with_pending_status","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.841002-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoMarshalJSON/uninstalled_with_deleted_time"}
+{"Time":"2026-11-16T09:51:29.841004-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoMarshalJSON/uninstalled_with_deleted_time","Output":"=== RUN   TestInfoMarshalJSON/uninstalled_with_deleted_time\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841015-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoMarshalJSON/uninstalled_with_deleted_time","Output":"--- PASS: TestInfoMarshalJSON/uninstalled_with_deleted_time (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.84102-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoMarshalJSON/uninstalled_with_deleted_time","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.841021-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoMarshalJSON/with_rollback_revision"}
+{"Time":"2026-11-16T09:51:29.841023-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoMarshalJSON/with_rollback_revision","Output":"=== RUN   TestInfoMarshalJSON/with_rollback_revision\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841039-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoMarshalJSON/with_rollback_revision","Output":"--- PASS: TestInfoMarshalJSON/with_rollback_revision (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841043-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoMarshalJSON/with_rollback_revision","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.841044-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoMarshalJSON/zero_rollback_revision_omitted"}
+{"Time":"2026-11-16T09:51:29.841046-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoMarshalJSON/zero_rollback_revision_omitted","Output":"=== RUN   TestInfoMarshalJSON/zero_rollback_revision_omitted\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841064-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoMarshalJSON/zero_rollback_revision_omitted","Output":"--- PASS: TestInfoMarshalJSON/zero_rollback_revision_omitted (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841078-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoMarshalJSON/zero_rollback_revision_omitted","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.841083-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoMarshalJSON","Output":"--- PASS: TestInfoMarshalJSON (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841085-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoMarshalJSON","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.841087-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON"}
+{"Time":"2026-11-16T09:51:29.84109-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON","Output":"=== RUN   TestInfoUnmarshalJSON\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841093-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/all_fields_populated"}
+{"Time":"2026-11-16T09:51:29.841095-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/all_fields_populated","Output":"=== RUN   TestInfoUnmarshalJSON/all_fields_populated\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841097-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/all_fields_populated","Output":"--- PASS: TestInfoUnmarshalJSON/all_fields_populated (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.8411-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/all_fields_populated","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.841132-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/only_required_fields"}
+{"Time":"2026-11-16T09:51:29.84115-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/only_required_fields","Output":"=== RUN   TestInfoUnmarshalJSON/only_required_fields\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841166-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/only_required_fields","Output":"--- PASS: TestInfoUnmarshalJSON/only_required_fields (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841172-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/only_required_fields","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.841176-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/empty_string_time_fields"}
+{"Time":"2026-11-16T09:51:29.841183-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/empty_string_time_fields","Output":"=== RUN   TestInfoUnmarshalJSON/empty_string_time_fields\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.84119-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/empty_string_time_fields","Output":"--- PASS: TestInfoUnmarshalJSON/empty_string_time_fields (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841193-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/empty_string_time_fields","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.841195-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/missing_time_fields"}
+{"Time":"2026-11-16T09:51:29.841198-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/missing_time_fields","Output":"=== RUN   TestInfoUnmarshalJSON/missing_time_fields\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841199-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/missing_time_fields","Output":"--- PASS: TestInfoUnmarshalJSON/missing_time_fields (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841201-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/missing_time_fields","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.841202-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/null_time_fields"}
+{"Time":"2026-11-16T09:51:29.841217-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/null_time_fields","Output":"=== RUN   TestInfoUnmarshalJSON/null_time_fields\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841229-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/null_time_fields","Output":"--- PASS: TestInfoUnmarshalJSON/null_time_fields (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.84123-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/null_time_fields","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.841233-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/mixed_empty_and_valid_time_fields"}
+{"Time":"2026-11-16T09:51:29.841234-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/mixed_empty_and_valid_time_fields","Output":"=== RUN   TestInfoUnmarshalJSON/mixed_empty_and_valid_time_fields\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841238-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/mixed_empty_and_valid_time_fields","Output":"--- PASS: TestInfoUnmarshalJSON/mixed_empty_and_valid_time_fields (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841247-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/mixed_empty_and_valid_time_fields","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.841249-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/pending_install_status"}
+{"Time":"2026-11-16T09:51:29.841251-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/pending_install_status","Output":"=== RUN   TestInfoUnmarshalJSON/pending_install_status\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841255-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/pending_install_status","Output":"--- PASS: TestInfoUnmarshalJSON/pending_install_status (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841257-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/pending_install_status","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.841258-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/uninstalled_with_deleted_time"}
+{"Time":"2026-11-16T09:51:29.841259-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/uninstalled_with_deleted_time","Output":"=== RUN   TestInfoUnmarshalJSON/uninstalled_with_deleted_time\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841265-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/uninstalled_with_deleted_time","Output":"--- PASS: TestInfoUnmarshalJSON/uninstalled_with_deleted_time (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841268-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/uninstalled_with_deleted_time","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.841269-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/failed_status"}
+{"Time":"2026-11-16T09:51:29.84127-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/failed_status","Output":"=== RUN   TestInfoUnmarshalJSON/failed_status\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841273-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/failed_status","Output":"--- PASS: TestInfoUnmarshalJSON/failed_status (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841275-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/failed_status","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.841277-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/invalid_time_format"}
+{"Time":"2026-11-16T09:51:29.841279-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/invalid_time_format","Output":"=== RUN   TestInfoUnmarshalJSON/invalid_time_format\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841283-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/invalid_time_format","Output":"--- PASS: TestInfoUnmarshalJSON/invalid_time_format (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841294-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/invalid_time_format","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.841295-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/empty_object"}
+{"Time":"2026-11-16T09:51:29.841296-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/empty_object","Output":"=== RUN   TestInfoUnmarshalJSON/empty_object\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841299-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/empty_object","Output":"--- PASS: TestInfoUnmarshalJSON/empty_object (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.8413-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/empty_object","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.841302-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/with_rollback_revision"}
+{"Time":"2026-11-16T09:51:29.841303-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/with_rollback_revision","Output":"=== RUN   TestInfoUnmarshalJSON/with_rollback_revision\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841304-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/with_rollback_revision","Output":"--- PASS: TestInfoUnmarshalJSON/with_rollback_revision (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841325-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/with_rollback_revision","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.841331-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/zero_rollback_revision_omitted"}
+{"Time":"2026-11-16T09:51:29.841333-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/zero_rollback_revision_omitted","Output":"=== RUN   TestInfoUnmarshalJSON/zero_rollback_revision_omitted\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841336-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/zero_rollback_revision_omitted","Output":"--- PASS: TestInfoUnmarshalJSON/zero_rollback_revision_omitted (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841338-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON/zero_rollback_revision_omitted","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.84134-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON","Output":"--- PASS: TestInfoUnmarshalJSON (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.84135-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoUnmarshalJSON","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.841356-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoRoundTrip"}
+{"Time":"2026-11-16T09:51:29.841357-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoRoundTrip","Output":"=== RUN   TestInfoRoundTrip\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.84136-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoRoundTrip","Output":"--- PASS: TestInfoRoundTrip (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841362-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoRoundTrip","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.841365-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoRollbackRevisionRoundTrip"}
+{"Time":"2026-11-16T09:51:29.841367-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoRollbackRevisionRoundTrip","Output":"=== RUN   TestInfoRollbackRevisionRoundTrip\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.84137-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoRollbackRevisionRoundTrip/with_rollback_revision"}
+{"Time":"2026-11-16T09:51:29.841371-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoRollbackRevisionRoundTrip/with_rollback_revision","Output":"=== RUN   TestInfoRollbackRevisionRoundTrip/with_rollback_revision\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841372-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoRollbackRevisionRoundTrip/with_rollback_revision","Output":"--- PASS: TestInfoRollbackRevisionRoundTrip/with_rollback_revision (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841374-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoRollbackRevisionRoundTrip/with_rollback_revision","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.841375-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoRollbackRevisionRoundTrip/zero_rollback_revision"}
+{"Time":"2026-11-16T09:51:29.841379-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoRollbackRevisionRoundTrip/zero_rollback_revision","Output":"=== RUN   TestInfoRollbackRevisionRoundTrip/zero_rollback_revision\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841381-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoRollbackRevisionRoundTrip/zero_rollback_revision","Output":"--- PASS: TestInfoRollbackRevisionRoundTrip/zero_rollback_revision (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841382-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoRollbackRevisionRoundTrip/zero_rollback_revision","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.841384-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoRollbackRevisionRoundTrip","Output":"--- PASS: TestInfoRollbackRevisionRoundTrip (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841385-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoRollbackRevisionRoundTrip","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.841386-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoEmptyStringRoundTrip"}
+{"Time":"2026-11-16T09:51:29.841387-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoEmptyStringRoundTrip","Output":"=== RUN   TestInfoEmptyStringRoundTrip\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.84139-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoEmptyStringRoundTrip","Output":"--- PASS: TestInfoEmptyStringRoundTrip (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841391-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestInfoEmptyStringRoundTrip","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.841392-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestReleasePlanJSONRoundTrip"}
+{"Time":"2026-11-16T09:51:29.841393-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestReleasePlanJSONRoundTrip","Output":"=== RUN   TestReleasePlanJSONRoundTrip\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841396-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestReleasePlanJSONRoundTrip","Output":"=== PAUSE TestReleasePlanJSONRoundTrip\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841398-05:00","Action":"pause","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestReleasePlanJSONRoundTrip"}
+{"Time":"2026-11-16T09:51:29.841399-05:00","Action":"run","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestReleasePlanOmittedWhenNil"}
+{"Time":"2026-11-16T09:51:29.841401-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestReleasePlanOmittedWhenNil","Output":"=== RUN   TestReleasePlanOmittedWhenNil\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841416-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestReleasePlanOmittedWhenNil","Output":"=== PAUSE TestReleasePlanOmittedWhenNil\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841419-05:00","Action":"pause","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestReleasePlanOmittedWhenNil"}
+{"Time":"2026-11-16T09:51:29.841428-05:00","Action":"cont","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestReleasePlanJSONRoundTrip"}
+{"Time":"2026-11-16T09:51:29.84143-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestReleasePlanJSONRoundTrip","Output":"=== CONT  TestReleasePlanJSONRoundTrip\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841433-05:00","Action":"cont","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestReleasePlanOmittedWhenNil"}
+{"Time":"2026-11-16T09:51:29.841434-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestReleasePlanOmittedWhenNil","Output":"=== CONT  TestReleasePlanOmittedWhenNil\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841457-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestReleasePlanJSONRoundTrip","Output":"--- PASS: TestReleasePlanJSONRoundTrip (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841461-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestReleasePlanJSONRoundTrip","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.841462-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestReleasePlanOmittedWhenNil","Output":"--- PASS: TestReleasePlanOmittedWhenNil (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.841463-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Test":"TestReleasePlanOmittedWhenNil","Elapsed":0}
+{"Time":"2026-11-16T09:51:29.841465-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Output":"PASS\n","OutputType":"frame"}
+{"Time":"2026-11-16T09:51:29.842295-05:00","Action":"output","Package":"helm.sh/helm/v4/internal/release/v2","Output":"ok  \thelm.sh/helm/v4/internal/release/v2\t0.199s\n"}
+{"Time":"2026-11-16T09:51:29.842303-05:00","Action":"pass","Package":"helm.sh/helm/v4/internal/release/v2","Elapsed":0.2}

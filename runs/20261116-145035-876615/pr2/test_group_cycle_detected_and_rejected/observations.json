@@ -1,0 +1,18 @@
+[
+  {
+    "label": "exit code",
+    "value": 1
+  },
+  {
+    "label": "stderr",
+    "value": "Error: INSTALLATION FAILED: resource-group circular dependency detected in hip-groups-cycle: cycle detected among nodes: group-a, group-b, group-c\n"
+  },
+  {
+    "label": "apiserver applies",
+    "value": []
+  },
+  {
+    "label": "helm lint exit code",
+    "value": 1
+  }
+]

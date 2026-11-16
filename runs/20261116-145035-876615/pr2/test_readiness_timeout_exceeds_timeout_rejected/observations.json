@@ -1,0 +1,10 @@
+[
+  {
+    "label": "error message",
+    "value": "Error: INSTALLATION FAILED: --readiness-timeout (3m0s) must not exceed --timeout (2m0s)\n"
+  },
+  {
+    "label": "applies count",
+    "value": 0
+  }
+]

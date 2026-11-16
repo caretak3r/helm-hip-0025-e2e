@@ -1,0 +1,44 @@
+{
+  "tier": "combined",
+  "commits": {
+    "feat/hip-0025-v3-resource-groups": "b697bdd956094c37c2387304cfa397b25143bad4",
+    "feat/hip-0025-v3-readiness": "8ae5bce2b48044e40146a58b4c714f3ec49b4da9"
+  },
+  "wiring": [
+    {
+      "name": "base",
+      "file": "wiring/0001-base-chart-v3-lifecycle.patch",
+      "sha256": "5ff507228070d529cac835fe892cac77dc40ec48696fadfcd809abb51b9794de"
+    },
+    {
+      "name": "ordered",
+      "file": "wiring/0002-ordered-overlay.patch",
+      "sha256": "d040d30b9482618d74114338cce11571048cc3dd6d0ce2972f8795c3f79c257f"
+    },
+    {
+      "name": "readiness",
+      "file": "wiring/0003-readiness-overlay.patch",
+      "sha256": "6b5a4d97847cbea4fe313e940c97494b35e176de7e499c3bc5a0d201e6d76e5c"
+    },
+    {
+      "name": "template",
+      "file": "wiring/0004-template-order-overlay.patch",
+      "sha256": "63b474acc381fc0c43e21e1526d25d0ed1485dd5a28528bdb72c096dc475b933"
+    }
+  ],
+  "resolve": {
+    "file": "scripts/resolve-combined.sh",
+    "sha256": "97d0aff726a1c0954296c331967e52e1f4395c9ab61c2157e66b16fa384b2607"
+  },
+  "base": "3c2635de452c8df481f59a1e1246bef1355b7e8d",
+  "tree_head": "8bf9ed018160160628c83b9be97d3903d00fab17",
+  "tree": "d35dc3ff56131f2a2be0ea8b96dd9940d7f8cc61",
+  "version": "v4.3+g8bf9ed0",
+  "binary": ".bin/helm-combined",
+  "binary_sha256": "b0075efea49e54b6122675f4352c3af92a5dbe8ab51741835cfd6ed42bcb31b1",
+  "go": "go1.27.3",
+  "goos": "darwin",
+  "goarch": "arm64",
+  "build_seconds": 52.5,
+  "rebuilt": true
+}

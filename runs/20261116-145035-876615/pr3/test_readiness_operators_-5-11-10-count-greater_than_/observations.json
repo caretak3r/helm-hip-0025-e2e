@@ -1,0 +1,26 @@
+[
+  {
+    "label": "greater than operator",
+    "value": ">"
+  },
+  {
+    "label": "count changes",
+    "value": [
+      [
+        "14:52:45.606",
+        11
+      ]
+    ]
+  },
+  {
+    "label": "install completed",
+    "value": true
+  },
+  {
+    "label": "apiserver timeline",
+    "value": [
+      "14:52:45.606  status Probe/probe count=11 (test patch)",
+      "14:52:45.611  helm writes release record: deployed"
+    ]
+  }
+]

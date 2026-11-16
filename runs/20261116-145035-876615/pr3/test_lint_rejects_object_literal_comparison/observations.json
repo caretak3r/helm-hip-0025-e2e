@@ -1,0 +1,10 @@
+[
+  {
+    "label": "lint exit code",
+    "value": 1
+  },
+  {
+    "label": "lint output",
+    "value": "==> Linting charts/hip-readiness-basic\n[INFO] Chart.yaml: icon is recommended\n[ERROR] hip-readiness-basic/templates/probe.yaml: resource \"Probe/probe\" has malformed \"helm.sh/readiness-success\" annotation: expression \"{.data} == {\\\"key\\\": \\\"value\\\"}\": object comparisons are not supported\n\nError: 1 chart(s) linted, 1 chart(s) failed\n"
+  }
+]

@@ -1,0 +1,25 @@
+14:57:19.315 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-group-sandboxing-parent-and-subchart-use-same-name --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+14:57:19.352 $ kubectl --context kind-hip0025-e2e create namespace e2e-combined-group-sandboxing-parent-and-subchart-use-same-name
+[exit 0, 0.0s]
+namespace/e2e-combined-group-sandboxing-parent-and-subchart-use-same-name created
+
+
+14:57:19.387 $ .bin/helm-combined install r charts/hip-groups-sandbox --namespace e2e-combined-group-sandboxing-parent-and-subchart-use-same-name --wait=ordered --timeout 3m --kube-context kind-hip0025-e2e
+[exit 0, 12.0s]
+NAME: r
+LAST DEPLOYED: Mon Nov 16 09:57:19 2026
+NAMESPACE: e2e-combined-group-sandboxing-parent-and-subchart-use-same-name
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+
+
+14:57:32.382 $ kubectl --context kind-hip0025-e2e delete namespace e2e-combined-group-sandboxing-parent-and-subchart-use-same-name --wait=false
+[exit 0, 0.1s]
+namespace "e2e-combined-group-sandboxing-parent-and-subchart-use-same-name" deleted
+
+

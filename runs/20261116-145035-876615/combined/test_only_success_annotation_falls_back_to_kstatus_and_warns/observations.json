@@ -1,0 +1,18 @@
+[
+  {
+    "label": "install",
+    "value": "exit 0 after 3.2s"
+  },
+  {
+    "label": "Probe .status.phase changes during install",
+    "value": [
+      "none: never Ready"
+    ]
+  },
+  {
+    "label": "helm warnings",
+    "value": [
+      "level=WARN msg=\"custom readiness annotations must be used together; falling back to default readiness\" kind=Probe namespace=e2e-combined-only-success-annotation-falls-back-to-kstatus-and name=probe successAnnotation=helm.sh/readiness-success failureAnnotation=helm.sh/readiness-failure"
+    ]
+  }
+]

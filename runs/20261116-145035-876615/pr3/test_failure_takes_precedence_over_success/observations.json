@@ -1,0 +1,10 @@
+[
+  {
+    "label": "install exit code",
+    "value": 1
+  },
+  {
+    "label": "error message",
+    "value": "Error: INSTALLATION FAILED: resource Probe/e2e-pr3-failure-takes-precedence-over-success/probe not ready. status: Failed, message: custom readiness failure condition met\n"
+  }
+]

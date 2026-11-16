@@ -1,0 +1,24 @@
+14:53:04.543 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr3-install-rejects-object-jsonpath-result --ignore-not-found --wait=true --timeout=120s
+[exit 0, 0.0s]
+
+
+14:53:04.584 $ kubectl --context kind-hip0025-e2e create namespace e2e-pr3-install-rejects-object-jsonpath-result
+[exit 0, 0.0s]
+namespace/e2e-pr3-install-rejects-object-jsonpath-result created
+
+
+14:53:06.629 $ kubectl --context kind-hip0025-e2e patch Probe probe -n e2e-pr3-install-rejects-object-jsonpath-result --subresource=status --type=merge -p {"status": {"metadata": {"key": "value"}}}
+[exit 0, 0.0s]
+probe.readiness.hip0025.example/probe patched
+
+
+14:53:04.624 $ .bin/helm-pr3 install r charts/hip-readiness-basic -f runs/20261116-145035-876615/pr3/test_install_rejects_object_jsonpath_result/values.yaml --namespace e2e-pr3-install-rejects-object-jsonpath-result --wait --timeout 30s --kube-context kind-hip0025-e2e
+[exit 1, 2.0s]
+Error: INSTALLATION FAILED: resource Probe/e2e-pr3-install-rejects-object-jsonpath-result/probe not ready. status: Failed, message: custom readiness expression error: evaluating success expression "{.metadata} == {}": JSONPath result is an object or array: object comparisons are not supported
+
+
+14:53:06.672 $ kubectl --context kind-hip0025-e2e delete namespace e2e-pr3-install-rejects-object-jsonpath-result --wait=false
+[exit 0, 0.0s]
+namespace "e2e-pr3-install-rejects-object-jsonpath-result" deleted
+
+

@@ -1,0 +1,5 @@
+probe:
+  failureExpressions:
+  - '{.phase} == Ready'
+  successExpressions:
+  - '{.phase} == Ready'
