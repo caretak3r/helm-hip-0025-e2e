@@ -30,7 +30,7 @@ tiers:
     title: PR1 · subchart sequencing
     branch: feat/hip-0025-v3-subcharts
     commit: 04319f19438209b4b82d60438e2b955ecededc9f
-    pr: https://github.com/caretak3r/helm/pull/4
+    pr: https://github.com/helm/helm/pull/32923
     wiring: [base, ordered]
     features: [ordered, subcharts]
   pr2:
@@ -38,7 +38,7 @@ tiers:
     title: PR2 · resource-group sequencing (stacked on PR1)
     branch: feat/hip-0025-v3-resource-groups
     commit: b697bdd956094c37c2387304cfa397b25143bad4
-    pr: https://github.com/caretak3r/helm/pull/5
+    pr: https://github.com/helm/helm/pull/32925
     stacked_on: pr1   # the unit stage tests only the changes PR2 adds to PR1
     wiring: [base, ordered, template]
     features: [ordered, subcharts, groups]
@@ -47,7 +47,7 @@ tiers:
     title: PR3 · custom readiness
     branch: feat/hip-0025-v3-readiness
     commit: 8ae5bce2b48044e40146a58b4c714f3ec49b4da9
-    pr: https://github.com/caretak3r/helm/pull/3
+    pr: https://github.com/helm/helm/pull/32924
     wiring: [base, readiness]
     features: [readiness]
   combined:

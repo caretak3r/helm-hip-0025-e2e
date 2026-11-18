@@ -8,13 +8,16 @@ The tests install charts with real `helm` binaries on a kind cluster. Every resu
 
 | Tier | Code under test | Pull request |
 |---|---|---|
-| PR1 | Subchart sequencing and `--wait=ordered` | [caretak3r/helm#4](https://github.com/caretak3r/helm/pull/4) |
-| PR2 | Resource-group sequencing (contains PR1) | [caretak3r/helm#5](https://github.com/caretak3r/helm/pull/5) |
-| PR3 | Custom readiness | [caretak3r/helm#3](https://github.com/caretak3r/helm/pull/3) |
+| PR1 | Subchart sequencing and `--wait=ordered` | [helm/helm#32923](https://github.com/helm/helm/pull/32923) |
+| PR2 | Resource-group sequencing (contains PR1) | [helm/helm#32925](https://github.com/helm/helm/pull/32925) |
+| PR3 | Custom readiness | [helm/helm#32924](https://github.com/helm/helm/pull/32924) |
 | Combined | PR2 merged with PR3, so all three pull requests | — |
 
-The three pull requests split the umbrella pull request
-[helm/helm#32314](https://github.com/helm/helm/pull/32314), as the maintainers asked.
+The three pull requests replace the umbrella pull request
+[helm/helm#32314](https://github.com/helm/helm/pull/32314), as the maintainers asked. The dashboard pages of runs
+before 2026-11-18 link to the same commits in the earlier fork pull requests
+([caretak3r/helm#4](https://github.com/caretak3r/helm/pull/4), [#5](https://github.com/caretak3r/helm/pull/5),
+[#3](https://github.com/caretak3r/helm/pull/3)).
 
 ## How a run works
 
